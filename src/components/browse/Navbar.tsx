@@ -2,10 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, User, LogOut, Settings } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -51,11 +59,34 @@ const Navbar = () => {
           <Button variant="ghost" size="icon" className="text-white hover:text-white">
             <Bell className="h-5 w-5" />
           </Button>
-          <Link href="#">
-             <div className="h-8 w-8 rounded-md overflow-hidden">
-                <Image src="https://picsum.photos/seed/avatar/32/32" alt="User Avatar" width={32} height={32} />
-             </div>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button className="h-8 w-8 rounded-md overflow-hidden focus:outline-none ring-offset-2 ring-offset-background focus:ring-2 focus:ring-ring">
+                    <Image src="https://picsum.photos/seed/avatar/32/32" alt="User Avatar" width={32} height={32} />
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="mr-4" align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                    <Link href="/profiles/setup" className='flex items-center w-full'>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Manage Profiles</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Account</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                     <Link href="/" className='flex items-center w-full'>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Sign out</span>
+                    </Link>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
