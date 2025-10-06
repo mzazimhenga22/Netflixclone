@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft, X } from 'lucide-react';
 import Image from 'next/image';
 import type { Movie } from '@/types';
+import { useWatchHistory } from '@/hooks/useWatchHistory';
 
 // Custom Netflix-style SVG Icons
 const PlayIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -56,6 +57,9 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   const playerRef = useRef<HTMLDivElement>(null);
   const controlsTimeoutRef = useRef<number | null>(null);
 
+  const { history, updateWatchHistory } = useWatchHistory();
+  const watchHistoryItem = history.find(item => item.id === media.id);
+
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -67,6 +71,30 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   const isTvShow = media.media_type === 'tv';
   const title = media.title || media.name;
   const description = media.overview;
+
+  // Jump to saved time on initial load
+  useEffect(() => {
+    if (videoRef.current && watchHistoryItem) {
+      videoRef.current.currentTime = watchHistoryItem.progress;
+    }
+  }, [watchHistoryItem]);
+  
+  // Save progress to watch history
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (videoRef.current && !videoRef.current.paused && videoRef.current.duration > 0) {
+        const currentTime = videoRef.current.currentTime;
+        const duration = videoRef.current.duration;
+        // Only save if watched for at least 60s and not finished
+        if (currentTime > 60 && currentTime / duration < 0.98) {
+          updateWatchHistory(media.id, currentTime, duration, media.media_type);
+        }
+      }
+    }, 5000); // Save every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [media.id, media.media_type, updateWatchHistory]);
+
 
   const formatTime = (seconds: number) => {
     if (isNaN(seconds)) return '0:00';
