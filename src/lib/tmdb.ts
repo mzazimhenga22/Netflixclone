@@ -9,11 +9,13 @@ async function fetchFromTmdb<T>(endpoint: string): Promise<T[]> {
   try {
     const res = await fetch(`${BASE_URL}${endpoint}`);
     if (!res.ok) {
-      console.error(`Failed to fetch from ${endpoint}:`, res.statusText);
+      console.error(`Failed to fetch from ${endpoint}:`, res.status, res.statusText);
+      const errorBody = await res.text();
+      console.error("Error body:", errorBody);
       return [];
     }
     const data = await res.json();
-    return data.results as T[];
+    return (data.results || []) as T[];
   } catch (error) {
     console.error(`Error fetching from ${endpoint}:`, error);
     return [];
@@ -30,4 +32,23 @@ export async function getPopularMovies(): Promise<Movie[]> {
 
 export async function getMoviesByGenre(genreId: number): Promise<Movie[]> {
     return fetchFromTmdb<Movie>(`/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&language=en-US&page=1`);
+}
+
+export async function getSimilar(id: number, mediaType: 'movie' | 'tv' | undefined): Promise<Movie[]> {
+  const type = mediaType || (await getMediaType(id));
+  if (!type) return [];
+  return fetchFromTmdb<Movie>(`/${type}/${id}/similar?api_key=${API_KEY}&language=en-US&page=1`);
+}
+
+// Helper to determine media type if not provided (less efficient)
+async function getMediaType(id: number): Promise<'movie' | 'tv' | null> {
+    try {
+        let res = await fetch(`${BASE_URL}/movie/${id}?api_key=${API_KEY}`);
+        if (res.ok) return 'movie';
+        res = await fetch(`${BASE_URL}/tv/${id}?api_key=${API_KEY}`);
+        if (res.ok) return 'tv';
+        return null;
+    } catch {
+        return null;
+    }
 }

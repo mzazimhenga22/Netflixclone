@@ -5,9 +5,9 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Plus, Play, ThumbsUp, Volume2, X } from 'lucide-react';
 import type { Movie } from '@/types';
-import { TMDB_IMAGE_BASE_URL } from '@/lib/tmdb';
-import MovieRow from './MovieRow';
+import { getSimilar, TMDB_IMAGE_BASE_URL } from '@/lib/tmdb';
 import { useEffect, useState } from 'react';
+import { genres } from '@/lib/genres';
 
 interface MovieModalProps {
   movie: Movie;
@@ -18,20 +18,24 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
   const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
 
   useEffect(() => {
-    // In a real app, you would fetch similar movies from TMDB API
-    // For now, we'll just simulate with some mock data structure
     const fetchSimilar = async () => {
-      // This is just a placeholder, replace with actual API call
-      // const similar = await getSimilarMovies(movie.id);
-      // setSimilarMovies(similar.slice(0, 3));
+      const similar = await getSimilar(movie.id, movie.media_type);
+      setSimilarMovies(similar.slice(0, 9)); // Get top 9 similar titles
     };
 
     fetchSimilar();
-  }, [movie.id]);
+  }, [movie.id, movie.media_type]);
 
   const posterUrl = movie.backdrop_path
     ? `${TMDB_IMAGE_BASE_URL}${movie.backdrop_path}`
     : `https://picsum.photos/seed/${movie.id}/1280/720`;
+  
+  const movieYear = movie.release_date?.substring(0, 4) || movie.first_air_date?.substring(0,4);
+  
+  const getGenreNames = (ids?: number[]) => {
+    if (!ids) return '';
+    return ids.map(id => genres[id]).filter(Boolean).join(', ');
+  }
 
   return (
     <div className="text-white">
@@ -72,7 +76,7 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
         <div className="col-span-2">
           <div className="flex items-center gap-3 text-base mb-4">
             <span className="text-green-400 font-semibold">{(movie.vote_average * 10).toFixed(0)}% Match</span>
-            <span>{movie.release_date?.substring(0, 4)}</span>
+            <span>{movieYear}</span>
             <span className="border px-1.5 text-sm">16+</span>
             <span className="border px-1.5 text-sm">HD</span>
           </div>
@@ -82,7 +86,7 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
         </div>
         <div className="text-sm">
             <p className="text-muted-foreground">
-                <span className="font-semibold text-white/80">Genres:</span> {movie.genre_ids?.join(', ')}
+                <span className="font-semibold text-white/80">Genres:</span> {getGenreNames(movie.genre_ids)}
             </p>
             <p className="text-muted-foreground mt-2">
                 <span className="font-semibold text-white/80">Available in:</span> English, Español
@@ -93,22 +97,25 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
       {similarMovies.length > 0 && (
         <div className="p-10 pt-0">
             <h3 className="text-2xl font-bold mb-4">More Like This</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {similarMovies.map((similarMovie) => (
-                    <div key={similarMovie.id} className="bg-secondary rounded-lg overflow-hidden">
+                    <div key={similarMovie.id} className="bg-secondary rounded-lg overflow-hidden group">
                         <div className="relative aspect-video">
                             <Image src={`${TMDB_IMAGE_BASE_URL}${similarMovie.backdrop_path}`} alt={similarMovie.title || similarMovie.name || ""} fill className="object-cover" />
-                             <div className="absolute top-2 right-2">
+                             <div className="absolute top-2 right-2 z-10">
                                  <Button size="icon" variant="outline" className="h-8 w-8 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70">
                                     <Plus className="h-5 w-5" />
                                 </Button>
                             </div>
+                            <div className="absolute bottom-0 left-0 p-2 bg-gradient-to-t from-black/80 to-transparent w-full">
+                               <h4 className="font-bold truncate">{similarMovie.title || similarMovie.name}</h4>
+                            </div>
                         </div>
-                        <div className="p-3">
-                            <div className="flex items-center gap-3 text-sm mb-2">
+                        <div className="p-3 space-y-2">
+                            <div className="flex items-center gap-3 text-sm">
                                 <span className="text-green-400 font-semibold">{(similarMovie.vote_average * 10).toFixed(0)}% Match</span>
                                 <span className="border px-1 text-xs">16+</span>
-                                <span>{similarMovie.release_date?.substring(0,4)}</span>
+                                <span>{similarMovie.release_date?.substring(0,4) || similarMovie.first_air_date?.substring(0,4)}</span>
                             </div>
                             <p className="text-xs text-white/80 line-clamp-3">
                                 {similarMovie.overview}
