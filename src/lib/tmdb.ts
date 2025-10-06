@@ -42,12 +42,24 @@ export async function getPopularTvShows(): Promise<Movie[]> {
     return fetchFromTmdb<Movie>(`/tv/popular?api_key=${API_KEY}&language=en-US&page=1`) as Promise<Movie[]>;
 }
 
-export async function getMoviesByGenre(genreId: number): Promise<Movie[]> {
-    return fetchFromTmdb<Movie>(`/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&language=en-US&page=1`) as Promise<Movie[]>;
+export async function getMoviesByGenre(genreId: number, count: number = 20): Promise<Movie[]> {
+    const pagesToFetch = Math.ceil(count / 20);
+    const promises = [];
+    for (let i = 1; i <= pagesToFetch; i++) {
+        promises.push(fetchFromTmdb<Movie>(`/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&language=en-US&page=${i}`) as Promise<Movie[]>);
+    }
+    const results = await Promise.all(promises);
+    return results.flat().slice(0, count);
 }
 
-export async function getTvShowsByGenre(genreId: number): Promise<Movie[]> {
-    return fetchFromTmdb<Movie>(`/discover/tv?api_key=${API_KEY}&with_genres=${genreId}&language=en-US&page=1`) as Promise<Movie[]>;
+export async function getTvShowsByGenre(genreId: number, count: number = 20): Promise<Movie[]> {
+    const pagesToFetch = Math.ceil(count / 20);
+    const promises = [];
+    for (let i = 1; i <= pagesToFetch; i++) {
+        promises.push(fetchFromTmdb<Movie>(`/discover/tv?api_key=${API_KEY}&with_genres=${genreId}&language=en-US&page=${i}`) as Promise<Movie[]>);
+    }
+    const results = await Promise.all(promises);
+    return results.flat().slice(0, count);
 }
 
 export async function getSimilar(id: number, mediaType: 'movie' | 'tv' | undefined): Promise<Movie[]> {
@@ -106,3 +118,5 @@ async function getMediaType(id: number): Promise<'movie' | 'tv' | null> {
         return null;
     }
 }
+
+    

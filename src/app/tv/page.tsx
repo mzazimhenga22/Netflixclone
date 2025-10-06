@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Banner from "@/components/browse/Banner";
 import Navbar from "@/components/browse/Navbar";
 import MovieRow from "@/components/browse/MovieRow";
@@ -12,10 +12,17 @@ import { getPopularTvShows, getTvShowsByGenre, getTrendingTvShows, getMovieOrTvD
 import type { Movie } from "@/types";
 import { useProfile } from '@/hooks/useProfile';
 import { useWatchHistory, type WatchHistoryItem } from '@/hooks/useWatchHistory';
-import { genres } from '@/lib/genres';
+import { tvGenres } from '@/lib/tvGenres';
 import React from 'react';
 import { countries } from '@/lib/countries';
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import MovieCard from '@/components/browse/MovieCard';
 
 type MovieCategory = {
   title: string;
@@ -34,12 +41,15 @@ const fetchAndHydrate = async (movieList: Movie[]): Promise<Movie[]> => {
 
 export default function TvPage() {
   const { profile } = useProfile();
-  const { history, removeWatchHistory, setHistory } = useWatchHistory();
+  const { history, removeWatchHistory } = useWatchHistory();
   const [bannerMovie, setBannerMovie] = useState<Movie | null>(null);
   const [categories, setCategories] = useState<MovieCategory[]>([]);
   const [continueWatching, setContinueWatching] = useState<ContinueWatchingMovie[]>([]);
   const [top10, setTop10] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedGenre, setSelectedGenre] = useState<string>('');
+  const [genreShows, setGenreShows] = useState<Movie[]>([]);
+  const [genreLoading, setGenreLoading] = useState(false);
 
   const handleRemoveFromHistory = (id: number) => {
     removeWatchHistory(id);
@@ -133,10 +143,9 @@ export default function TvPage() {
             setTop10(top10Shows.slice(0, 10));
       
             if (profile.favoriteGenreId) {
-              const genreName = genres[profile.favoriteGenreId];
-              const favoriteGenreContent = [...favoriteGenreTv].sort(() => 0.5 - Math.random());
-              if (genreName && favoriteGenreContent.length > 0) {
-                newCategories.push({ title: `TV Shows Because you like ${genreName}`, movies: favoriteGenreContent });
+              const genre = tvGenres.find(g => g.id === profile.favoriteGenreId);
+              if (genre && favoriteGenreTv.length > 0) {
+                newCategories.push({ title: `TV Shows Because you like ${genre.name}`, movies: favoriteGenreTv });
               }
             }
             
@@ -163,16 +172,43 @@ export default function TvPage() {
       }
     };
   
-    fetchMovies();
-  }, [profile]);
+    if (!selectedGenre) {
+        fetchMovies();
+    }
+  }, [profile, selectedGenre]);
   
+  useEffect(() => {
+    const fetchGenreShows = async () => {
+        if (selectedGenre) {
+            setGenreLoading(true);
+            const genreId = parseInt(selectedGenre, 10);
+            const shows = await getTvShowsByGenre(genreId, 50).then(fetchAndHydrate);
+            setGenreShows(shows);
+            setGenreLoading(false);
+        }
+    }
+    fetchGenreShows();
+  }, [selectedGenre]);
+
   const getCountryName = (code: string) => {
     return countries.find(c => c.iso_3166_1 === code)?.english_name || 'the U.S.';
   }
 
+  const handleGenreChange = (genreValue: string) => {
+    if (genreValue === 'all') {
+        setSelectedGenre('');
+        setGenreShows([]);
+    } else {
+        setSelectedGenre(genreValue);
+    }
+  };
+
+  const selectedGenreName = selectedGenre ? tvGenres.find(g => g.id.toString() === selectedGenre)?.name : 'All Genres';
+
+
   if (loading || !profile) {
       return (
-        <div className="flex items-center justify-center h-[400px]">
+         <div className="flex items-center justify-center h-screen bg-black">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
       )
@@ -181,29 +217,73 @@ export default function TvPage() {
   return (
     <div className="bg-background min-h-screen">
       <Navbar />
-      <main className="overflow-x-hidden">
-        <Banner movie={bannerMovie} />
-        <div className="relative -mt-8 md:-mt-20 pb-32">
-          <div className="space-y-8 lg:space-y-12">
-            {continueWatching.length > 0 && (
-                <ContinueWatchingRow 
-                    title="Continue Watching"
-                    movies={continueWatching}
-                    onRemove={handleRemoveFromHistory}
-                />
-            )}
-            {top10.length > 0 && profile.name.toLowerCase() !== 'kids' && (
-                <Top10Row title={`Top 10 TV Shows in ${getCountryName(profile.country)} Today`} movies={top10} />
-            )}
-            {categories.map((category) => (
-              <React.Fragment key={category.title}>
-                <MovieRow title={category.title} movies={category.movies} />
-              </React.Fragment>
-            ))}
+      
+      {!selectedGenre && <Banner movie={bannerMovie} />}
+
+      <div className="pt-8 md:pt-16">
+          <div className="px-4 md:px-16 flex items-center justify-between">
+              <div className="flex items-baseline gap-4">
+                  <h1 className="text-3xl md:text-4xl font-bold">{selectedGenre ? selectedGenreName : "TV Shows"}</h1>
+                  {selectedGenre && (
+                      <button onClick={() => handleGenreChange('all')} className="text-muted-foreground hover:text-white text-sm">
+                          &times; Clear Filter
+                      </button>
+                  )}
+              </div>
+              <Select value={selectedGenre} onValueChange={handleGenreChange}>
+                  <SelectTrigger className="w-[180px] bg-card border-secondary-foreground/20">
+                      <SelectValue placeholder="Genres" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectItem value="all">All Genres</SelectItem>
+                      {tvGenres.map(genre => (
+                          <SelectItem key={genre.id} value={genre.id.toString()}>{genre.name}</SelectItem>
+                      ))}
+                  </SelectContent>
+              </Select>
           </div>
+      </div>
+
+      <main className="overflow-x-hidden">
+        <div className="pb-32">
+          {selectedGenre ? (
+                genreLoading ? (
+                     <div className="flex items-center justify-center h-[40vh]">
+                        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                ) : (
+                    <div className="px-4 md:px-16 pt-8">
+                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                            {genreShows.map(show => (
+                                <MovieCard key={show.id} movie={show} />
+                            ))}
+                        </div>
+                    </div>
+                )
+            ) : (
+                <div className="mt-[-80px] space-y-8 lg:space-y-12">
+                    {continueWatching.length > 0 && (
+                        <ContinueWatchingRow 
+                            title="Continue Watching"
+                            movies={continueWatching}
+                            onRemove={handleRemoveFromHistory}
+                        />
+                    )}
+                    {top10.length > 0 && profile.name.toLowerCase() !== 'kids' && (
+                        <Top10Row title={`Top 10 TV Shows in ${getCountryName(profile.country)} Today`} movies={top10} />
+                    )}
+                    {categories.map((category) => (
+                    <React.Fragment key={category.title}>
+                        <MovieRow title={category.title} movies={category.movies} />
+                    </React.Fragment>
+                    ))}
+                </div>
+            )}
         </div>
       </main>
       <Footer />
     </div>
   );
 }
+
+    

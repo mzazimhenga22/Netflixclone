@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { movieGenres } from '@/lib/movieGenres';
 
 type Profile = {
   id: number;
@@ -25,7 +26,14 @@ export const useProfile = () => {
     try {
       storedProfile = localStorage.getItem('activeProfile');
       if (storedProfile) {
-        setProfile(JSON.parse(storedProfile));
+        const parsedProfile = JSON.parse(storedProfile);
+        // Add a random favorite genre if one doesn't exist
+        if (parsedProfile && typeof parsedProfile.favoriteGenreId === 'undefined') {
+            const randomGenre = movieGenres[Math.floor(Math.random() * movieGenres.length)];
+            parsedProfile.favoriteGenreId = randomGenre.id;
+            localStorage.setItem('activeProfile', JSON.stringify(parsedProfile));
+        }
+        setProfile(parsedProfile);
       } else {
         // If there's no profile and we are not on a public page, redirect to setup
         if (pathname !== '/' && !pathname.startsWith('/signup') && pathname !== '/profiles/setup') {
@@ -43,3 +51,5 @@ export const useProfile = () => {
 
   return { profile };
 };
+
+    

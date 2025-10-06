@@ -1,18 +1,26 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Banner from "@/components/browse/Banner";
 import Navbar from "@/components/browse/Navbar";
 import MovieRow from "@/components/browse/MovieRow";
 import ContinueWatchingRow from '@/components/browse/ContinueWatchingRow';
 import Footer from "@/components/shared/Footer";
-import { getTrending, getMoviesByGenre, getPopularMovies, getMovieOrTvDetails } from "@/lib/tmdb";
+import { getMoviesByGenre, getPopularMovies, getMovieOrTvDetails } from "@/lib/tmdb";
 import type { Movie } from "@/types";
 import { useProfile } from '@/hooks/useProfile';
 import { useWatchHistory, type WatchHistoryItem } from '@/hooks/useWatchHistory';
-import { genres } from '@/lib/genres';
+import { movieGenres } from '@/lib/movieGenres';
 import React from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import MovieCard from '@/components/browse/MovieCard';
 
 type MovieCategory = {
   title: string;
@@ -28,20 +36,22 @@ const fetchAndHydrate = async (movieList: Movie[]): Promise<Movie[]> => {
   return detailedMovies.filter((movie): movie is Movie => movie !== null);
 };
 
-
 export default function MoviesPage() {
   const { profile } = useProfile();
-  const { history, removeWatchHistory, setHistory } = useWatchHistory();
+  const { history, removeWatchHistory } = useWatchHistory();
   const [bannerMovie, setBannerMovie] = useState<Movie | null>(null);
   const [categories, setCategories] = useState<MovieCategory[]>([]);
   const [continueWatching, setContinueWatching] = useState<ContinueWatchingMovie[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedGenre, setSelectedGenre] = useState<string>('');
+  const [genreMovies, setGenreMovies] = useState<Movie[]>([]);
+  const [genreLoading, setGenreLoading] = useState(false);
 
   const handleRemoveFromHistory = (id: number) => {
     removeWatchHistory(id);
     setContinueWatching(prev => prev.filter(m => m.id !== id));
   };
-  
+
   useEffect(() => {
     const fetchContinueWatching = async () => {
       if (history.length > 0) {
@@ -66,7 +76,7 @@ export default function MoviesPage() {
     const fetchMovies = async () => {
       if (!profile) return;
       setLoading(true);
-  
+
       try {
         const isKidsProfile = profile.name.toLowerCase() === 'kids';
 
@@ -94,20 +104,18 @@ export default function MoviesPage() {
 
         } else {
             const [
-              trending, 
               popularMovies,
               favoriteGenreMovies,
               action,
-              comedy, 
-              horror, 
-              romance, 
+              comedy,
+              horror,
+              romance,
               documentaries,
               thriller,
               scifi,
               adventure,
               fantasy
             ] = await Promise.all([
-              getTrending().then(movies => movies.filter(m => m.media_type === 'movie')).then(fetchAndHydrate),
               getPopularMovies().then(fetchAndHydrate),
               profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
               getMoviesByGenre(28).then(fetchAndHydrate), // Action
@@ -120,17 +128,15 @@ export default function MoviesPage() {
               getMoviesByGenre(12).then(fetchAndHydrate), // Adventure
               getMoviesByGenre(14).then(fetchAndHydrate), // Fantasy
             ]);
-            
+
             const newCategories: MovieCategory[] = [
-              { title: "Trending Now", movies: trending },
               { title: "Popular Movies", movies: popularMovies },
             ];
-      
+
             if (profile.favoriteGenreId) {
-              const genreName = genres[profile.favoriteGenreId];
-              const favoriteGenreContent = [...favoriteGenreMovies].sort(() => 0.5 - Math.random());
-              if (genreName) {
-                newCategories.push({ title: `Because you like ${genreName}`, movies: favoriteGenreContent });
+              const favoriteGenre = movieGenres.find(g => g.id === profile.favoriteGenreId);
+              if (favoriteGenre) {
+                newCategories.push({ title: `Because you like ${favoriteGenre.name}`, movies: favoriteGenreMovies });
               }
             }
 
@@ -143,9 +149,9 @@ export default function MoviesPage() {
             newCategories.push({ title: "Thrillers", movies: thriller });
             newCategories.push({ title: "Romance Movies", movies: romance });
             newCategories.push({ title: "Documentaries", movies: documentaries });
-      
+
             setCategories(newCategories);
-      
+
             if (popularMovies.length > 0) {
               setBannerMovie(popularMovies[Math.floor(Math.random() * popularMovies.length)]);
             }
@@ -156,42 +162,111 @@ export default function MoviesPage() {
         setLoading(false);
       }
     };
+
+    if (!selectedGenre) {
+        fetchMovies();
+    }
+  }, [profile, selectedGenre]);
   
-    fetchMovies();
-  }, [profile]);
-  
+  useEffect(() => {
+    const fetchGenreMovies = async () => {
+        if (selectedGenre) {
+            setGenreLoading(true);
+            const genreId = parseInt(selectedGenre, 10);
+            const movies = await getMoviesByGenre(genreId, 50).then(fetchAndHydrate);
+            setGenreMovies(movies);
+            setGenreLoading(false);
+        }
+    }
+    fetchGenreMovies();
+  }, [selectedGenre]);
 
   if (loading || !profile) {
       return (
-        <div className="flex items-center justify-center h-[400px]">
+        <div className="flex items-center justify-center h-screen bg-black">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
       )
   }
+  
+  const handleGenreChange = (genreValue: string) => {
+    if (genreValue === 'all') {
+        setSelectedGenre('');
+        setGenreMovies([]);
+    } else {
+        setSelectedGenre(genreValue);
+    }
+  };
+
+  const selectedGenreName = selectedGenre ? movieGenres.find(g => g.id.toString() === selectedGenre)?.name : 'All Genres';
 
   return (
     <div className="bg-background min-h-screen">
       <Navbar />
+      
+        {!selectedGenre && <Banner movie={bannerMovie} />}
+      
+        <div className="pt-8 md:pt-16">
+            <div className="px-4 md:px-16 flex items-center justify-between">
+                <div className="flex items-baseline gap-4">
+                    <h1 className="text-3xl md:text-4xl font-bold">{selectedGenre ? selectedGenreName : "Movies"}</h1>
+                    {selectedGenre && (
+                        <button onClick={() => handleGenreChange('all')} className="text-muted-foreground hover:text-white text-sm">
+                            &times; Clear Filter
+                        </button>
+                    )}
+                </div>
+                <Select value={selectedGenre} onValueChange={handleGenreChange}>
+                    <SelectTrigger className="w-[180px] bg-card border-secondary-foreground/20">
+                        <SelectValue placeholder="Genres" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Genres</SelectItem>
+                        {movieGenres.map(genre => (
+                            <SelectItem key={genre.id} value={genre.id.toString()}>{genre.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+        </div>
+
       <main className="overflow-x-hidden">
-        <Banner movie={bannerMovie} />
-        <div className="relative -mt-8 md:-mt-20 pb-32">
-          <div className="space-y-8 lg:space-y-12">
-            {continueWatching.length > 0 && (
-                <ContinueWatchingRow 
-                    title="Continue Watching"
-                    movies={continueWatching}
-                    onRemove={handleRemoveFromHistory}
-                />
+        <div className="pb-32">
+            {selectedGenre ? (
+                genreLoading ? (
+                     <div className="flex items-center justify-center h-[40vh]">
+                        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                ) : (
+                    <div className="px-4 md:px-16 pt-8">
+                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                            {genreMovies.map(movie => (
+                                <MovieCard key={movie.id} movie={movie} />
+                            ))}
+                        </div>
+                    </div>
+                )
+            ) : (
+                <div className="mt-[-80px] space-y-8 lg:space-y-12">
+                    {continueWatching.length > 0 && (
+                        <ContinueWatchingRow
+                            title="Continue Watching"
+                            movies={continueWatching}
+                            onRemove={handleRemoveFromHistory}
+                        />
+                    )}
+                    {categories.map((category) => (
+                    <React.Fragment key={category.title}>
+                        <MovieRow title={category.title} movies={category.movies} />
+                    </React.Fragment>
+                    ))}
+                </div>
             )}
-            {categories.map((category) => (
-              <React.Fragment key={category.title}>
-                <MovieRow title={category.title} movies={category.movies} />
-              </React.Fragment>
-            ))}
-          </div>
         </div>
       </main>
       <Footer />
     </div>
   );
 }
+
+    
