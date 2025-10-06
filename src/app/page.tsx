@@ -7,6 +7,8 @@ import Footer from "@/components/shared/Footer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import TrendingNow from "@/components/landing/TrendingNow";
+import FeatureGrid from "@/components/landing/FeatureGrid";
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find(p => p.id === 'landing-hero');
@@ -54,9 +56,37 @@ export default function Home() {
             </form>
           </div>
         </section>
+
+        <section className="py-12 md:py-20 border-b-8 border-[#232323]">
+          <TrendingNow />
+        </section>
+
+        <section className="py-12 md:py-20 border-b-8 border-[#232323]">
+            <FeatureGrid />
+        </section>
         
         <Faq />
 
+        <div className="py-12 md:py-16 text-center border-t-8 border-[#232323]">
+            <form className="max-w-xl mx-auto">
+              <h3 className="text-lg md:text-xl mb-4 px-8">
+                Ready to watch? Enter your email to create or restart your membership.
+              </h3>
+              <div className="flex flex-col md:flex-row gap-2">
+                <Input
+                  type="email"
+                  placeholder="Email address"
+                  className="flex-grow bg-black/70 border-white/50 h-14 text-lg"
+                  name="email"
+                />
+                <Button asChild type="submit" size="lg" className="h-14 text-2xl font-semibold px-6">
+                  <Link href="/signup/registration">
+                    Get Started <ChevronRight className="ml-1 h-7 w-7" />
+                  </Link>
+                </Button>
+              </div>
+            </form>
+        </div>
       </main>
       <div className="w-full h-2 bg-[#232323]" />
       <Footer />
