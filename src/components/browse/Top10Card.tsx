@@ -30,6 +30,10 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
     ? `${TMDB_IMAGE_BASE_URL.replace('original', 'w500')}${movie.poster_path}`
     : `https://picsum.photos/seed/${movie.id}/400/600`;
 
+  const backdropUrl = movie.backdrop_path
+    ? `${TMDB_IMAGE_BASE_URL}${movie.backdrop_path}`
+    : `https://picsum.photos/seed/${movie.id}/300/168`;
+
   const findScrollableAncestor = (el: HTMLElement | null): HTMLElement | null => {
     let node = el?.parentElement ?? null;
     while (node && node !== document.body) {
@@ -43,15 +47,15 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
   
-    const scale = 1.6;
+    const scale = 1.5;
     const scaledWidth = rect.width * scale;
-    const scaledHeight = 'auto'; // Let height be auto
+    const scaledHeight = scaledWidth / (16 / 9);
 
     const cardCenterX = rect.left + rect.width / 2;
     const cardCenterY = rect.top + rect.height / 2;
 
     let left = cardCenterX - scaledWidth / 2;
-    let top = cardCenterY - (rect.height * scale) / 2;
+    let top = cardCenterY - scaledHeight / 2;
 
     const scrollable = findScrollableAncestor(cardRef.current);
     const viewportRect = scrollable ? scrollable.getBoundingClientRect() : { left: 0, width: window.innerWidth, top: 0, height: window.innerHeight };
@@ -156,7 +160,7 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
     <>
       <div 
         ref={cardRef} 
-        className="flex items-center h-full cursor-pointer"
+        className="flex items-center h-full cursor-pointer group"
         onMouseEnter={handleCardEnter}
         onMouseLeave={handleCardLeave}
         onClick={handleOpenModal}
@@ -212,9 +216,9 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
                 role="dialog"
                 aria-label={`${movie.title || movie.name} preview`}
               >
-                <div className="relative w-full aspect-[2/3] cursor-pointer" onClick={handleOpenModal}>
+                <div className="relative w-full aspect-video cursor-pointer" onClick={handleOpenModal}>
                     <Image
-                      src={posterUrl}
+                      src={backdropUrl}
                       alt={`${movie.title || movie.name} preview`}
                       fill
                       className="object-cover w-full h-full transition-all duration-300 ease-in-out"
@@ -271,5 +275,7 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
 };
 
 export default Top10Card;
+
+    
 
     
