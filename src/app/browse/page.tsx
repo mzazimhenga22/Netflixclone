@@ -16,6 +16,8 @@ export default async function BrowsePage() {
   const scifi = await getMoviesByGenre(genreMap["Sci-Fi & Fantasy"]);
   const action = await getMoviesByGenre(genreMap["Action & Adventure"]);
 
+  const bannerMovie = trending.length > 0 ? trending[Math.floor(Math.random() * trending.length)] : null;
+
   const movieCategories: { title: string; movies: Movie[] }[] = [
     { title: "Trending Now", movies: trending },
     { title: "Popular on StreamClone", movies: popular },
@@ -27,7 +29,7 @@ export default async function BrowsePage() {
     <div className="bg-background min-h-screen">
       <Navbar />
       <main className="overflow-x-hidden">
-        <Banner />
+        <Banner movie={bannerMovie} />
         <div className="relative -mt-8 md:-mt-20 pb-32">
           <div className="space-y-8 lg:space-y-12">
             {movieCategories.map((category) => (

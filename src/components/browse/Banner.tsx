@@ -1,40 +1,34 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import MovieModal from './MovieModal';
 import { Info, Play, Volume2 } from 'lucide-react';
-import { getTrendingMovies, TMDB_IMAGE_BASE_URL } from '@/lib/tmdb';
+import { TMDB_IMAGE_BASE_URL } from '@/lib/tmdb';
 import type { Movie } from '@/types';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const Banner = () => {
-  const [bannerMovie, setBannerMovie] = useState<Movie | null>(null);
+interface BannerProps {
+    movie: Movie | null;
+}
+
+const Banner = ({ movie: bannerMovie }: BannerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    const fetchBannerMovie = async () => {
-      const movies = await getTrendingMovies();
-      // Select a random movie to feature in the banner
-      if (movies.length > 0) {
-        const movie = movies[Math.floor(Math.random() * movies.length)];
-        setBannerMovie(movie);
-      }
-    };
-    fetchBannerMovie();
-  }, []);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   
   if (!bannerMovie) {
     return (
-        <div className="relative h-[56.25vw] min-h-[400px] max-h-[800px] w-full flex items-center justify-center">
-            <p>Loading banner...</p>
+        <div className="relative h-[56.25vw] min-h-[400px] max-h-[800px] w-full">
+            <Skeleton className="w-full h-full" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/20" />
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent" />
         </div>
     );
   }
