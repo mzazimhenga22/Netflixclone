@@ -38,7 +38,7 @@ const Navbar = () => {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${isScrolled ? 'bg-black' : 'bg-gradient-to-b from-black/70 to-transparent'}`}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center h-16">
         <div className="flex items-center space-x-8">
           <Link href="/browse">
             <Logo className="h-6 w-auto" />
@@ -53,6 +53,7 @@ const Navbar = () => {
             ))}
           </ul>
         </div>
+        <div className="flex-grow" />
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon" className="text-white hover:text-white">
             <Search className="h-5 w-5" />
