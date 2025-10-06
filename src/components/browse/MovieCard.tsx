@@ -31,17 +31,19 @@ const MovieCard = ({ movie }: MovieCardProps) => {
         
         {/* Expanded state on hover */}
         <div className="absolute top-0 left-0 right-0 invisible opacity-0 group-hover/item:visible group-hover/item:opacity-100 transition-all duration-500 transform scale-75 group-hover/item:scale-125 group-hover/item:delay-500 origin-bottom shadow-2xl rounded-lg z-50">
-          <div className="relative aspect-video w-full">
-               <Image
-                src={movie.posterUrl}
-                alt={`${movie.title} preview`}
-                fill
-                className="object-cover rounded-t-md"
-              />
-              <div className="absolute bottom-2 left-3">
-                  <h3 className="text-white text-lg font-bold drop-shadow-lg">{movie.title}</h3>
-              </div>
-          </div>
+          <DialogTrigger asChild>
+            <div className="relative aspect-video w-full cursor-pointer">
+                <Image
+                  src={movie.posterUrl}
+                  alt={`${movie.title} preview`}
+                  fill
+                  className="object-cover rounded-t-md"
+                />
+                <div className="absolute bottom-2 left-3">
+                    <h3 className="text-white text-lg font-bold drop-shadow-lg">{movie.title}</h3>
+                </div>
+            </div>
+          </DialogTrigger>
           <div className="p-3 bg-card rounded-b-md">
               <div className="flex items-center gap-2">
                   <Button size="icon" className="h-8 w-8 rounded-full bg-white text-black hover:bg-white/80">
