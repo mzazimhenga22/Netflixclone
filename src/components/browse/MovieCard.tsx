@@ -117,7 +117,6 @@ export default function MovieCard({ movie }: MovieCardProps) {
         className="group/item relative aspect-video bg-zinc-900 rounded-md transition-transform duration-300 ease-in-out cursor-pointer"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        style={{ zIndex: showPreview ? 100 : 1 }}
       >
         <Image
           src={movie.posterUrl}
