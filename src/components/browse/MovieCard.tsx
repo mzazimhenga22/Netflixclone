@@ -34,6 +34,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
   const openModal = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setShowPreview(false);
     setShowModal(true);
   };
 
@@ -71,10 +72,12 @@ export default function MovieCard({ movie }: MovieCardProps) {
       hoverTimerRef.current = null;
     }
     hoverTimerRef.current = window.setTimeout(() => {
-      const p = computePosition();
-      if (!p) return;
-      setPosition(p);
-      setShowPreview(true);
+      if(isHovering) {
+        const p = computePosition();
+        if (!p) return;
+        setPosition(p);
+        setShowPreview(true);
+      }
     }, 500);
   };
 
@@ -84,7 +87,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
       clearTimeout(hoverTimerRef.current);
       hoverTimerRef.current = null;
     }
-    setTimeout(() => setShowPreview(false), 120);
+    setShowPreview(false);
   };
 
   useEffect(() => {
@@ -97,14 +100,6 @@ export default function MovieCard({ movie }: MovieCardProps) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-  const onOverlayMouseEnter = () => {
-    setIsHovering(true);
-  };
-  const onOverlayMouseLeave = () => {
-    setIsHovering(false);
-    setShowPreview(false);
-  };
 
   const motionSettings = {
     initial: { opacity: 0, scale: 0.985, y: 10 },
@@ -159,8 +154,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
                 animate={motionSettings.animate}
                 exit={motionSettings.exit}
                 transition={motionSettings.transition}
-                onMouseEnter={onOverlayMouseEnter}
-                onMouseLeave={onOverlayMouseLeave}
+                onMouseEnter={startHover}
+                onMouseLeave={stopHover}
                 style={{
                   position: "fixed",
                   top: position.top,
