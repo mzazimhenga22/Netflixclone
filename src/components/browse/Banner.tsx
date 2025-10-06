@@ -1,33 +1,45 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Info, Play, Volume2 } from 'lucide-react';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { getTrendingMovies, TMDB_IMAGE_BASE_URL } from '@/lib/tmdb';
 
-const Banner = () => {
-  const bannerImage = PlaceHolderImages.find(p => p.id === 'browse-banner');
+const Banner = async () => {
+  const movies = await getTrendingMovies();
+  // Select a random movie to feature in the banner
+  const bannerMovie = movies[Math.floor(Math.random() * movies.length)];
+
+  if (!bannerMovie) {
+    return (
+        <div className="relative h-[56.25vw] min-h-[400px] max-h-[800px] w-full flex items-center justify-center">
+            <p>Could not load banner.</p>
+        </div>
+    );
+  }
+
+  const title = bannerMovie.title || bannerMovie.name;
+  const description = bannerMovie.overview;
+  const imageUrl = `${TMDB_IMAGE_BASE_URL}${bannerMovie.backdrop_path}`;
+
 
   return (
     <div className="relative h-[56.25vw] min-h-[400px] max-h-[800px] w-full">
-      {bannerImage && (
         <Image
-          src={bannerImage.imageUrl}
-          alt={bannerImage.description}
+          src={imageUrl}
+          alt={title || 'Movie banner'}
           fill
           className="object-cover"
-          data-ai-hint={bannerImage.imageHint}
           priority
         />
-      )}
       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/20" />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent" />
 
       <div className="absolute bottom-[10%] md:bottom-[20%] left-4 md:left-16 right-4 md:right-auto z-10">
         <div className="max-w-lg">
           <h1 className="text-2xl md:text-5xl lg:text-6xl font-black">
-            Movie Title of the Banner
+            {title}
           </h1>
-          <p className="hidden md:block text-sm md:text-base max-w-md text-white/90 mt-2 md:mt-4">
-            This is a short and compelling description of the movie or show. It's captivating and makes you want to watch it right away.
+          <p className="hidden md:block text-sm md:text-base max-w-md text-white/90 mt-2 md:mt-4 line-clamp-3">
+            {description}
           </p>
         </div>
         <div className="flex items-center space-x-3 mt-4 md:mt-6">
