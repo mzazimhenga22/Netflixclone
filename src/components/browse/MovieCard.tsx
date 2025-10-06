@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Plus, ChevronDown, ThumbsUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import MovieModal from "./MovieModal";
 import type { Movie } from "@/types";
 
@@ -44,7 +44,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
     const cardCenterY = rect.top + rect.height / 2;
 
     let left = cardCenterX - scaledWidth / 2;
-    let top = cardCenterY - scaledHeight / 2;
+    let top = cardCenterY - scaledHeight / 2 + window.scrollY;
 
     const scrollable = findScrollableAncestor(cardRef.current);
     const viewportRect = scrollable ? scrollable.getBoundingClientRect() : { left: 0, width: window.innerWidth, top: 0, height: window.innerHeight };
@@ -55,13 +55,13 @@ export default function MovieCard({ movie }: MovieCardProps) {
     if (left < viewportLeft) left = viewportLeft;
     if (left + scaledWidth > viewportRight) left = Math.max(viewportRight - scaledWidth, viewportLeft);
     
-    if (top < (viewportRect.top ?? 0) + margin) top = (viewportRect.top ?? 0) + margin;
-    if (top + scaledHeight > (viewportRect.top ?? 0) + (viewportRect.height ?? window.innerHeight) - margin) {
-        top = Math.max((viewportRect.top ?? 0) + (viewportRect.height ?? window.innerHeight) - scaledHeight - margin, (viewportRect.top ?? 0) + margin);
+    if (top < (viewportRect.top ?? 0) + margin + window.scrollY) top = (viewportRect.top ?? 0) + margin + window.scrollY;
+    if (top + scaledHeight > (viewportRect.top ?? 0) + (viewportRect.height ?? window.innerHeight) - margin + window.scrollY) {
+        top = Math.max((viewportRect.top ?? 0) + (viewportRect.height ?? window.innerHeight) - scaledHeight - margin + window.scrollY, (viewportRect.top ?? 0) + margin + window.scrollY);
     }
   
     setPosition({ 
-      top: top + window.scrollY, 
+      top, 
       left: left + window.scrollX, 
       width: scaledWidth, 
       height: scaledHeight 
@@ -150,7 +150,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
           src={movie.posterUrl}
           alt={movie.title}
           width={300}
-          height={450}
+          height={168}
           className="object-cover rounded-md w-full h-full"
           data-ai-hint={movie.imageHint}
           priority
@@ -217,11 +217,9 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
                       <div className="ml-auto">
                         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                          <DialogTrigger asChild>
                             <Button onClick={handleOpenModal} size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
                               <ChevronDown className="h-5 w-5" />
                             </Button>
-                          </DialogTrigger>
                            <DialogContent className="p-0 max-w-4xl bg-card border-0">
                                 <DialogTitle>
                                     <span className="sr-only">{movie.title}</span>
