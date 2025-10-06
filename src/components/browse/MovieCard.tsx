@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -170,7 +171,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
                   top: position.top,
                   left: position.left,
                   width: position.width,
-                  height: position.height,
+                  height: 'auto',
                   zIndex: 9999,
                   willChange: "transform, opacity",
                   transformOrigin: "center center",
@@ -255,3 +256,5 @@ export default function MovieCard({ movie }: MovieCardProps) {
     </>
   );
 }
+
+    
