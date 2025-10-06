@@ -101,7 +101,7 @@ export default function VideoPlayer({ src, title }: VideoPlayerProps) {
     }
   };
 
-- const toggleMute = () => {
+  const toggleMute = () => {
     if (videoRef.current) {
       const newMuted = !isMuted;
       videoRef.current.muted = newMuted;
