@@ -23,7 +23,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
   const openModal = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowPreview(false);
+    setShowPreview(false); // Close preview when modal opens
     setShowModal(true);
   };
   const closeModal = () => setShowModal(false);
@@ -45,61 +45,43 @@ export default function MovieCard({ movie }: MovieCardProps) {
     return { top: Math.round(top), left: Math.round(left), width: Math.round(overlayWidth), height: Math.round(overlayHeight) };
   };
 
-  const showWithDelay = (delay = 200) => {
-    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    hoverTimeoutRef.current = setTimeout(() => {
-      const p = computePosition();
-      if (!p) return;
-      setPosition(p);
-      setShowPreview(true);
-    }, delay);
-  };
-
-  const cancelShow = () => {
+  const handleMouseEnter = () => {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
+    }
+    hoverTimeoutRef.current = setTimeout(() => {
+      const p = computePosition();
+      if (p) {
+        setPosition(p);
+        setShowPreview(true);
+      }
+    }, 200);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
     }
     setShowPreview(false);
   };
 
-  // Use pointer events which are more reliable across devices
-  const handlePointerEnter = () => showWithDelay(200);
-  const handlePointerLeave = () => cancelShow();
-
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        cancelShow();
+        setShowPreview(false);
         closeModal();
       }
     };
     window.addEventListener("keydown", onKey);
-
-    // If preview is visible, keep position up to date on scroll/resize
-    const onScrollOrResize = () => {
-      if (showPreview) {
-        const p = computePosition();
-        if (p) setPosition(p);
-      }
-    };
-    window.addEventListener("resize", onScrollOrResize);
-    window.addEventListener("scroll", onScrollOrResize, true);
-
     return () => {
       window.removeEventListener("keydown", onKey);
-      window.removeEventListener("resize", onScrollOrResize);
-      window.removeEventListener("scroll", onScrollOrResize, true);
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
     };
-  }, [showPreview]);
+  }, []);
 
   const motionSettings = {
-    initial: { opacity: 0, scale: 1, y: 0 },
+    initial: { opacity: 0, scale: 1 },
     animate: { opacity: 1, scale: 1.15, y: -10 },
-    exit: { opacity: 0, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 1 },
     transition: { type: "spring", stiffness: 150, damping: 25, duration: 0.4 },
   };
 
@@ -108,8 +90,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
       <div
         ref={cardRef}
         className="group/item relative aspect-video bg-zinc-900 rounded-md transition-transform duration-300 ease-in-out cursor-pointer"
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={handlePointerLeave}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         data-movie-card={movie.id}
       >
         <Image
@@ -129,8 +111,6 @@ export default function MovieCard({ movie }: MovieCardProps) {
               animate={motionSettings.animate}
               exit={motionSettings.exit}
               transition={motionSettings.transition}
-              onPointerEnter={handlePointerEnter} // keep open when pointer moves to the overlay
-              onPointerLeave={handlePointerLeave}
               style={{
                 position: "fixed",
                 top: position.top,
@@ -141,6 +121,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
                 borderRadius: "0.5rem",
               }}
               className="bg-zinc-900 overflow-hidden"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
               <div className="relative w-full cursor-pointer aspect-video" onClick={openModal}>
                 {movie.previewUrl ? (
