@@ -1,13 +1,12 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Logo from '@/components/Logo';
-import { PlusCircle, Pencil, Lock, Unlock } from 'lucide-react';
+import { PlusCircle, Pencil, Lock } from 'lucide-react';
 import ProfileForm from '@/components/profiles/ProfileForm';
 
 type Profile = {
@@ -16,12 +15,13 @@ type Profile = {
   avatar: string;
   pin?: string;
   isLocked: boolean;
+  favoriteGenreId?: number; // e.g., 28 for Action, 878 for Sci-Fi
 };
 
 const initialProfiles: Profile[] = [
-  { id: 1, name: 'John', avatar: 'https://picsum.photos/seed/avatar1/200/200', pin: '1234', isLocked: true },
-  { id: 2, name: 'Jane', avatar: 'https://picsum.photos/seed/avatar2/200/200', isLocked: false },
-  { id: 3, name: 'Kids', avatar: 'https://picsum.photos/seed/avatar3/200/200', isLocked: false },
+  { id: 1, name: 'John', avatar: 'https://picsum.photos/seed/avatar1/200/200', pin: '1234', isLocked: true, favoriteGenreId: 28 }, // Action
+  { id: 2, name: 'Jane', avatar: 'https://picsum.photos/seed/avatar2/200/200', isLocked: false, favoriteGenreId: 878 }, // Sci-Fi
+  { id: 3, name: 'Kids', avatar: 'https://picsum.photos/seed/avatar3/200/200', isLocked: false, favoriteGenreId: 16 }, // Animation
 ];
 
 export default function ProfileSetupPage() {
@@ -32,13 +32,24 @@ export default function ProfileSetupPage() {
   const [pin, setPin] = useState('');
   const [pinError, setPinError] = useState(false);
 
+  const handleProfileSelect = (profile: Profile) => {
+    if (isEditing) {
+      setEditingProfile(profile);
+    } else if (profile.isLocked) {
+      setSelectedProfile(profile);
+    } else {
+      localStorage.setItem('activeProfile', JSON.stringify(profile));
+      window.location.href = '/browse';
+    }
+  };
+
   const handleSaveProfile = (profileData: Omit<Profile, 'id'> & { id?: number }) => {
     if (profileData.id) {
       // Edit existing profile
       setProfiles(profiles.map(p => p.id === profileData.id ? { ...p, ...profileData } : p));
     } else {
       // Add new profile
-      const newProfile = { ...profileData, id: Date.now() };
+      const newProfile = { ...profileData, id: Date.now(), favoriteGenreId: [28, 878, 35, 18, 53][Math.floor(Math.random() * 5)] }; // Assign a random genre
       setProfiles([...profiles, newProfile]);
     }
     setEditingProfile(null);
@@ -52,13 +63,8 @@ export default function ProfileSetupPage() {
   const handlePinSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedProfile && selectedProfile.pin === pin) {
-        // Normally you'd navigate away here, for now we just log it
-        console.log(`PIN correct for ${selectedProfile.name}, navigating to browse...`);
-        // router.push('/browse');
-        // For demo, just clear the pin screen
-        setSelectedProfile(null);
-        setPin('');
-        setPinError(false);
+        localStorage.setItem('activeProfile', JSON.stringify(selectedProfile));
+        window.location.href = '/browse';
     } else {
       setPinError(true);
       setPin('');
@@ -125,16 +131,7 @@ export default function ProfileSetupPage() {
           {profiles.map((profile) => (
             <div
               key={profile.id}
-              onClick={() => {
-                if (isEditing) {
-                  setEditingProfile(profile);
-                } else if (profile.isLocked) {
-                  setSelectedProfile(profile);
-                } else {
-                  // Navigate to /browse
-                  window.location.href = '/browse';
-                }
-              }}
+              onClick={() => handleProfileSelect(profile)}
               className="group flex flex-col items-center gap-2 cursor-pointer"
             >
               <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-md overflow-hidden border-2 border-transparent group-hover:border-white transition">
@@ -171,4 +168,3 @@ export default function ProfileSetupPage() {
     </div>
   );
 }
-
