@@ -31,25 +31,9 @@ type Notification = {
 };
 
 const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const { profile } = useProfile();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -111,7 +95,7 @@ const Navbar = () => {
   const navItems = ['Home', 'TV Shows', 'Movies', 'New & Popular', 'My List'];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${isScrolled ? 'bg-black' : 'bg-gradient-to-b from-black/70 to-transparent'}`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 bg-gradient-to-b from-black/70 to-transparent`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center h-16">
         <div className="flex items-center space-x-8">
           <Link href="/browse">
@@ -245,6 +229,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
-    
-    
