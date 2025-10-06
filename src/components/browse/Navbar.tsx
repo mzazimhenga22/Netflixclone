@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Bell, Search, User, LogOut, Settings } from 'lucide-react';
+import { Bell, Search, User, LogOut, Settings, Gamepad2, ScrollText } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -43,21 +43,26 @@ const Navbar = () => {
           <Link href="/browse">
             <Logo className="h-6 w-auto" />
           </Link>
-          <ul className="hidden md:flex items-center space-x-4">
-            {navItems.map((item) => (
-              <li key={item}>
-                <Link href={item === 'TMDB' ? '/tmdb' : '#'} className="text-sm text-white/90 hover:text-white/70 transition-colors font-semibold">
-                  {item}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <nav className="hidden md:block">
+            <ul className="flex items-center space-x-4">
+              {navItems.map((item) => (
+                <li key={item}>
+                  <Link href={'#'} className="text-sm text-white/90 hover:text-white/70 transition-colors font-semibold">
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
+        
         <div className="flex-grow" />
+
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon" className="text-white hover:text-white">
             <Search className="h-5 w-5" />
           </Button>
+          <span className="hidden lg:block">Kids</span>
           <Button variant="ghost" size="icon" className="text-white hover:text-white">
             <Bell className="h-5 w-5" />
           </Button>
@@ -77,8 +82,16 @@ const Navbar = () => {
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
+                  <Gamepad2 className="mr-2 h-4 w-4" />
+                  <span>Transfer Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Account</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <ScrollText className="mr-2 h-4 w-4" />
+                  <span>Viewing Activity</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
