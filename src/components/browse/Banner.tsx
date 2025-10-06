@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Info, Play } from 'lucide-react';
+import { Info, Play, Volume2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const Banner = () => {
@@ -21,20 +21,32 @@ const Banner = () => {
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background to-transparent" />
       <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-background to-transparent" />
 
-      <div className="absolute bottom-[20%] md:bottom-[30%] left-4 md:left-16 space-y-2 md:space-y-4 max-w-lg z-10">
-        <h1 className="text-2xl md:text-5xl lg:text-6xl font-black">
-          Movie Title of the Banner
-        </h1>
-        <p className="hidden md:block text-sm md:text-base max-w-md text-white/90">
-          This is a short and compelling description of the movie or show. It's captivating and makes you want to watch it right away.
-        </p>
-        <div className="flex items-center space-x-3">
-          <Button size="lg" className="bg-white text-black hover:bg-white/80 font-bold">
-            <Play className="mr-2 h-6 w-6" /> Play
-          </Button>
-          <Button size="lg" className="bg-gray-500/70 text-white hover:bg-gray-500/50 backdrop-blur-sm font-bold">
-            <Info className="mr-2 h-6 w-6" /> More Info
-          </Button>
+      <div className="absolute bottom-[10%] md:bottom-[20%] left-4 md:left-16 right-4 md:right-16 z-10">
+        <div className="max-w-lg">
+          <h1 className="text-2xl md:text-5xl lg:text-6xl font-black">
+            Movie Title of the Banner
+          </h1>
+          <p className="hidden md:block text-sm md:text-base max-w-md text-white/90 mt-2 md:mt-4">
+            This is a short and compelling description of the movie or show. It's captivating and makes you want to watch it right away.
+          </p>
+        </div>
+        <div className="flex items-center justify-between mt-4 md:mt-6">
+            <div className="flex items-center space-x-3">
+              <Button size="lg" className="bg-white text-black hover:bg-white/80 font-bold">
+                <Play className="mr-2 h-6 w-6" /> Play
+              </Button>
+              <Button size="lg" className="bg-gray-500/70 text-white hover:bg-gray-500/50 backdrop-blur-sm font-bold">
+                <Info className="mr-2 h-6 w-6" /> More Info
+              </Button>
+            </div>
+            <div className="flex items-center space-x-3">
+                <Button variant="outline" size="icon" className="h-11 w-11 rounded-full border-2 border-white/40 bg-black/30 text-white hover:border-white hover:bg-black/50">
+                    <Volume2 className="h-6 w-6" />
+                </Button>
+                <div className="bg-black/30 border-l-4 border-white/40 px-4 py-2 text-sm font-semibold">
+                    16+
+                </div>
+            </div>
         </div>
       </div>
     </div>
