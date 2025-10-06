@@ -217,35 +217,32 @@ export default function TvPage() {
   return (
     <div className="bg-background min-h-screen">
       <Navbar />
-      
-      <main className="overflow-x-hidden">
-        <Banner movie={bannerMovie} />
-      
-        <div className="relative -mt-8 md:-mt-20 z-10">
-            <div className="px-4 md:px-16 py-4 flex items-center justify-between bg-background/20 backdrop-blur-sm">
-                <div className="flex items-baseline gap-4">
-                    <h1 className="text-2xl md:text-3xl font-bold">{selectedGenre ? selectedGenreName : "TV Shows"}</h1>
-                    {selectedGenre && (
-                        <button onClick={() => handleGenreChange('all')} className="text-muted-foreground hover:text-white text-sm">
-                            &times; Clear Filter
-                        </button>
-                    )}
-                </div>
-                <Select value={selectedGenre} onValueChange={handleGenreChange}>
-                    <SelectTrigger className="w-[180px] bg-card border-secondary-foreground/20">
-                        <SelectValue placeholder="Genres" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Genres</SelectItem>
-                        {tvGenres.map(genre => (
-                            <SelectItem key={genre.id} value={genre.id.toString()}>{genre.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+      <main className="overflow-x-hidden pt-16">
+        <div className="px-4 md:px-16 py-4 flex items-center justify-between">
+            <div className="flex items-baseline gap-4">
+                <h1 className="text-2xl md:text-3xl font-bold">{selectedGenre ? selectedGenreName : "TV Shows"}</h1>
+                {selectedGenre && (
+                    <button onClick={() => handleGenreChange('all')} className="text-muted-foreground hover:text-white text-sm">
+                        &times; Clear Filter
+                    </button>
+                )}
             </div>
+            <Select value={selectedGenre} onValueChange={handleGenreChange}>
+                <SelectTrigger className="w-[180px] bg-card border-secondary-foreground/20">
+                    <SelectValue placeholder="Genres" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Genres</SelectItem>
+                    {tvGenres.map(genre => (
+                        <SelectItem key={genre.id} value={genre.id.toString()}>{genre.name}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
         </div>
+
+        <Banner movie={bannerMovie} />
         
-        <div className="pb-32">
+        <div className="pb-32 -mt-8 md:-mt-20 relative">
           {selectedGenre ? (
                 genreLoading ? (
                      <div className="flex items-center justify-center h-[40vh]">
