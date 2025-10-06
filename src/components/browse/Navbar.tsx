@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Bell, Search, Gamepad2, ScrollText } from 'lucide-react';
+import { Bell, Gamepad2, ScrollText } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
@@ -20,6 +20,7 @@ import { Skeleton } from '../ui/skeleton';
 import { getTrending, getMovieOrTvDetails } from '@/lib/tmdb';
 import type { Movie } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
+import SearchInput from './SearchInput';
 
 type Notification = {
   id: number;
@@ -128,9 +129,7 @@ const Navbar = () => {
         <div className="flex-grow" />
 
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="text-white hover:text-white">
-            <Search className="h-5 w-5" />
-          </Button>
+          <SearchInput />
           <span className="hidden lg:block text-sm">Kids</span>
           
           <DropdownMenu>

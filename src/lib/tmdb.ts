@@ -26,6 +26,11 @@ async function fetchFromTmdb<T>(endpoint: string, isSingleItem = false): Promise
   }
 }
 
+export async function searchMulti(query: string): Promise<Movie[]> {
+  const results = await fetchFromTmdb<Movie>(`/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=en-US&page=1`) as Promise<Movie[]>;
+  return (await results).filter(item => item.media_type === 'movie' || item.media_type === 'tv');
+}
+
 export async function getTrending(): Promise<Movie[]> {
   return fetchFromTmdb<Movie>(`/trending/all/week?api_key=${API_KEY}&language=en-US`) as Promise<Movie[]>;
 }
@@ -118,5 +123,3 @@ async function getMediaType(id: number): Promise<'movie' | 'tv' | null> {
         return null;
     }
 }
-
-    
