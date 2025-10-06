@@ -142,7 +142,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
     <>
       <div
         ref={cardRef}
-        className="group relative aspect-[2/3] bg-zinc-900 rounded-md transition-transform duration-300 ease-out will-change-transform"
+        className="group relative aspect-video bg-zinc-900 rounded-md transition-transform duration-300 ease-out will-change-transform"
         onMouseEnter={handleCardEnter}
         onMouseLeave={handleCardLeave}
       >
