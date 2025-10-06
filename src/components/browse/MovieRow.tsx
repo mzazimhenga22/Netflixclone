@@ -1,3 +1,4 @@
+
 // components/MovieRow.tsx
 import React from "react";
 import {
@@ -8,14 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import MovieCard from "./MovieCard";
-
-interface Movie {
-  id: number;
-  title: string;
-  posterUrl: string;
-  imageHint?: string;
-  previewUrl?: string;
-}
+import type { Movie } from "@/types";
 
 interface MovieRowProps {
   title: string;

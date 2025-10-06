@@ -1,11 +1,13 @@
+
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import type { Movie } from "@/types";
 
 const landscapeImages = PlaceHolderImages.filter(img => !img.id.startsWith('movie-poster'));
 const posterImages = PlaceHolderImages.filter(img => img.id.startsWith('movie-poster'));
 
 const allMovieImages = [...landscapeImages, ...posterImages];
 
-export const movieCategories = [
+export const movieCategories: { title: string; movies: Movie[] }[] = [
   {
     title: "Trending Now",
     movies: allMovieImages.slice(0, 10).map((img, index) => ({

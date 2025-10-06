@@ -5,13 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Plus, Play, ThumbsUp, Volume2, X } from 'lucide-react';
 import { movieCategories } from '@/lib/data';
-
-interface Movie {
-  id: number;
-  title: string;
-  posterUrl: string;
-  imageHint: string;
-}
+import type { Movie } from '@/types';
 
 interface MovieModalProps {
   movie: Movie;
