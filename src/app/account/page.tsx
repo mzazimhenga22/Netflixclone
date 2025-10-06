@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
 export default function AccountPage() {
     const { profile } = useProfile();
@@ -15,7 +16,7 @@ export default function AccountPage() {
     if (!profile) {
         return (
           <div className="flex items-center justify-center h-screen bg-black">
-              <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <LoadingSpinner />
           </div>
         )
     }

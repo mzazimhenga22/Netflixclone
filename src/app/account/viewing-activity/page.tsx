@@ -10,6 +10,7 @@ import type { Movie } from '@/types';
 import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
 type HistoryMovie = Movie & { watchedAt: number };
 
@@ -54,7 +55,7 @@ export default function ViewingActivityPage() {
   if (loading || !profile) {
     return (
       <div className="flex items-center justify-center h-screen bg-black">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <LoadingSpinner />
       </div>
     )
   }

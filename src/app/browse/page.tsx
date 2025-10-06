@@ -15,6 +15,7 @@ import { useWatchHistory, type WatchHistoryItem } from '@/hooks/useWatchHistory'
 import { genres } from '@/lib/genres';
 import React from 'react';
 import { countries } from '@/lib/countries';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
 
 type MovieCategory = {
@@ -197,7 +198,7 @@ export default function BrowsePage() {
   if (loading || !profile) {
       return (
         <div className="flex items-center justify-center h-screen bg-black">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <LoadingSpinner />
         </div>
       )
   }

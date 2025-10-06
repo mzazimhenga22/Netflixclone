@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import MovieCard from '@/components/browse/MovieCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
 type MovieCategory = {
   title: string;
@@ -185,7 +186,7 @@ export default function MoviesPage() {
   if (loading || !profile) {
       return (
         <div className="flex items-center justify-center h-screen bg-black">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <LoadingSpinner />
         </div>
       )
   }
@@ -206,14 +207,6 @@ export default function MoviesPage() {
       <Navbar />
       <main className="overflow-x-hidden">
         <div className="relative">
-            <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/70 to-transparent z-20" />
-            
-            {!bannerMovie ? (
-                <Skeleton className="w-full h-[56.25vw] min-h-[400px] max-h-[800px]" />
-            ) : (
-                <Banner movie={bannerMovie} />
-            )}
-
             <div className="absolute top-20 left-4 md:left-16 z-30">
                 <div className="flex items-baseline gap-6">
                     <h1 className="text-3xl md:text-5xl font-bold">
@@ -237,13 +230,20 @@ export default function MoviesPage() {
                     </button>
                 )}
             </div>
+            
+            {!bannerMovie ? (
+                <Skeleton className="w-full h-[56.25vw] min-h-[400px] max-h-[800px]" />
+            ) : (
+                <Banner movie={bannerMovie} />
+            )}
+
         </div>
         
         <div className="pb-32 -mt-8 md:-mt-20 relative z-10">
             {selectedGenre ? (
                 genreLoading ? (
                      <div className="flex items-center justify-center h-[40vh]">
-                        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        <LoadingSpinner />
                     </div>
                 ) : (
                     <div className="px-4 md:px-16 pt-8">

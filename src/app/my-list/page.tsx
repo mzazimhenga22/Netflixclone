@@ -9,6 +9,7 @@ import { useMyList } from '@/hooks/useMyList';
 import { getMovieOrTvDetails } from '@/lib/tmdb';
 import type { Movie } from '@/types';
 import { useProfile } from '@/hooks/useProfile';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
 export default function MyListPage() {
   const { profile } = useProfile();
@@ -41,7 +42,7 @@ export default function MyListPage() {
   if (loading || !profile) {
     return (
       <div className="flex items-center justify-center h-screen bg-black">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <LoadingSpinner />
       </div>
     )
 }

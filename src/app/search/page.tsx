@@ -11,6 +11,7 @@ import { searchMulti, getMovieOrTvDetails } from '@/lib/tmdb';
 import type { Movie } from '@/types';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
 const fetchAndHydrate = async (movieList: Movie[]): Promise<Movie[]> => {
   const detailedMovies = await Promise.all(
@@ -51,7 +52,7 @@ function SearchResults() {
   if (!profile) {
     return (
       <div className="flex items-center justify-center h-screen bg-black">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <LoadingSpinner />
       </div>
     );
   }
@@ -93,7 +94,7 @@ export default function SearchPage() {
     return (
         <Suspense fallback={
             <div className="flex items-center justify-center h-screen bg-black">
-                <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                <LoadingSpinner />
             </div>
         }>
             <SearchResults />
