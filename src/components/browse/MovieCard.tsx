@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import MovieModal from "./MovieModal";
 import type { Movie } from "@/types";
 import { cn } from "@/lib/utils";
+import { TMDB_IMAGE_BASE_URL } from "@/lib/tmdb";
 
 interface MovieCardProps {
   movie: Movie;
@@ -23,6 +24,10 @@ export default function MovieCard({ movie }: MovieCardProps) {
   const showTimeoutRef = useRef<number | null>(null);
   const hideTimeoutRef = useRef<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const posterUrl = movie.backdrop_path 
+    ? `${TMDB_IMAGE_BASE_URL}${movie.backdrop_path}`
+    : `https://picsum.photos/seed/${movie.id}/300/168`;
 
   const findScrollableAncestor = (el: HTMLElement | null): HTMLElement | null => {
     let node = el?.parentElement ?? null;
@@ -156,12 +161,11 @@ export default function MovieCard({ movie }: MovieCardProps) {
         onClick={handleOpenModal}
       >
         <Image
-          src={movie.posterUrl}
-          alt={movie.title}
+          src={posterUrl}
+          alt={movie.title || movie.name || "Movie poster"}
           width={300}
           height={168}
           className="object-cover rounded-md w-full h-full"
-          data-ai-hint={movie.imageHint}
           priority
         />
       </div>
@@ -169,7 +173,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         {isModalOpen && (
             <DialogContent className={cn("p-0 w-[90vw] max-w-[90vw] bg-card border-0 rounded-lg overflow-hidden max-h-[90vh] overflow-y-auto hide-scrollbar")}>
-                <DialogTitle className="sr-only">{movie.title}</DialogTitle>
+                <DialogTitle className="sr-only">{movie.title || movie.name}</DialogTitle>
                 <MovieModal movie={movie} onClose={closeModal} />
             </DialogContent>
         )}
@@ -195,27 +199,15 @@ export default function MovieCard({ movie }: MovieCardProps) {
                 }}
                 className="bg-zinc-900/95 backdrop-blur-sm rounded-xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.6)] overflow-hidden ring-1 ring-white/10 flex flex-col"
                 role="dialog"
-                aria-label={`${movie.title} preview`}
+                aria-label={`${movie.title || movie.name} preview`}
               >
                 <div className="relative w-full aspect-video cursor-pointer" onClick={handleOpenModal}>
-                  {movie.previewUrl ? (
-                    <video
-                      src={movie.previewUrl}
-                      autoPlay
-                      muted
-                      playsInline
-                      loop
-                      poster={movie.posterUrl}
-                      className="object-cover w-full h-full transition-all duration-300 ease-in-out"
-                    />
-                  ) : (
                     <Image
-                      src={movie.posterUrl}
-                      alt={`${movie.title} preview`}
+                      src={posterUrl}
+                      alt={`${movie.title || movie.name} preview`}
                       fill
                       className="object-cover w-full h-full transition-all duration-300 ease-in-out"
                     />
-                  )}
                 </div>
 
                 <div className="p-3 bg-zinc-900 text-white flex-grow flex flex-col justify-between">
@@ -243,17 +235,18 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
                   <div className="space-y-1 mt-2">
                     <div className="flex items-center gap-3 text-sm text-white/80">
-                      <span className="text-green-400 font-semibold">98% Match</span>
+                      <span className="text-green-400 font-semibold">{movie.vote_average.toFixed(1)}/10 Rating</span>
                       <span className="border px-1 text-[11px] rounded-sm">16+</span>
-                      <span>2h 15m</span>
+                      <span>{movie.release_date?.substring(0,4)}</span>
                     </div>
 
                     <div className="flex flex-wrap gap-2 text-xs text-white/70">
-                      <span>Action</span>
-                      <span className="text-white/40">•</span>
-                      <span>Sci-Fi</span>
-                      <span className="text-white/40">•</span>
-                      <span>Thriller</span>
+                       {movie.genre_ids?.slice(0,3).map((genre, index) => (
+                          <React.Fragment key={genre}>
+                            <span>Genre {genre}</span>
+                            {index < 2 && <span className="text-white/40">•</span>}
+                          </React.Fragment>
+                       ))}
                     </div>
                   </div>
                 </div>
