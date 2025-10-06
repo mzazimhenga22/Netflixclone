@@ -46,14 +46,14 @@ const Navbar = () => {
 
             if (randomTrendingItem) {
                  const details = await getMovieOrTvDetails(randomTrendingItem.id, randomTrendingItem.media_type);
-                 if (details && details.release_date) {
+                 if (details && (details.release_date || details.first_air_date)) {
                      generatedNotifications.push({
                         id: details.id,
-                        title: `Coming Soon: ${details.title}`,
-                        description: `Arriving on ${new Date(details.release_date).toLocaleDateString()}`,
+                        title: `Coming Soon: ${details.title || details.name}`,
+                        description: `Arriving on ${new Date(details.release_date! || details.first_air_date!).toLocaleDateString()}`,
                         image: `https://image.tmdb.org/t/p/w200${details.backdrop_path}`,
-                        time: formatDistanceToNow(new Date(details.release_date), { addSuffix: true }),
-                        media_type: 'movie'
+                        time: formatDistanceToNow(new Date(details.release_date! || details.first_air_date!), { addSuffix: true }),
+                        media_type: details.media_type
                     });
                  }
             }
@@ -217,8 +217,10 @@ const Navbar = () => {
                   <span>Transfer Profile</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <svg className="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4s-4 1.79-4 4s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                    <span>Account</span>
+                    <Link href="/account" className='flex items-center w-full'>
+                        <svg className="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4s-4 1.79-4 4s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Account</span>
+                    </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <ScrollText className="mr-2 h-4 w-4" />
