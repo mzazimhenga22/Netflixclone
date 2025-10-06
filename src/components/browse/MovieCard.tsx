@@ -38,7 +38,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
   
     const scale = 1.5;
     const scaledWidth = rect.width * scale;
-    const scaledHeight = scaledWidth / (16/9); // maintain aspect ratio
+    const scaledHeight = scaledWidth / (16/9);
 
     const cardCenterX = rect.left + rect.width / 2;
     const cardCenterY = rect.top + rect.height / 2;
@@ -217,7 +217,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
                             <Button onClick={handleOpenModal} size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
                               <ChevronDown className="h-5 w-5" />
                             </Button>
-                           <DialogContent className="p-0 w-[90vw] max-w-[90vw] h-[90vh] bg-card border-0 rounded-lg overflow-y-auto">
+                           <DialogContent className="p-0 w-[90vw] max-w-[90vw] bg-card border-0 rounded-lg">
                                 <DialogTitle>
                                     <span className="sr-only">{movie.title}</span>
                                 </DialogTitle>
