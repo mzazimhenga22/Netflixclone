@@ -3,9 +3,10 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, ArrowLeft } from 'lucide-react';
+import { Play, Pause, Volume2, Volume1, VolumeX, Maximize, Minimize, ArrowLeft, RotateCcw, RotateCw, Captions, Settings2, GalleryVertical, FastForward, Rewind } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from '@/lib/utils';
 
 interface VideoPlayerProps {
@@ -27,9 +28,10 @@ export default function VideoPlayer({ src, title }: VideoPlayerProps) {
   const controlsTimeoutRef = useRef<number | null>(null);
 
   const formatTime = (seconds: number) => {
+    if (isNaN(seconds)) return '0:00';
     const date = new Date(seconds * 1000);
     const hh = date.getUTCHours();
-    const mm = date.getUTCMinutes();
+    const mm = date.getUTCMMinutes();
     const ss = date.getUTCSeconds().toString().padStart(2, '0');
     if (hh) {
       return `${hh}:${mm.toString().padStart(2, '0')}:${ss}`;
@@ -42,9 +44,11 @@ export default function VideoPlayer({ src, title }: VideoPlayerProps) {
       clearTimeout(controlsTimeoutRef.current);
     }
     setShowControls(true);
-    controlsTimeoutRef.current = window.setTimeout(() => {
-      setShowControls(false);
-    }, 3000);
+    if(videoRef.current && !videoRef.current.paused) {
+      controlsTimeoutRef.current = window.setTimeout(() => {
+        setShowControls(false);
+      }, 3000);
+    }
   }, []);
 
   useEffect(() => {
@@ -53,14 +57,22 @@ export default function VideoPlayer({ src, title }: VideoPlayerProps) {
 
     const handleTimeUpdate = () => setProgress(video.currentTime);
     const handleDurationChange = () => setDuration(video.duration);
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
+    const handlePlay = () => {
+      setIsPlaying(true);
+      resetControlsTimeout();
+    };
+    const handlePause = () => {
+      setIsPlaying(false);
+      if(controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+      setShowControls(true);
+    };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('durationchange', handleDurationChange);
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
 
+    // Start with controls visible
     resetControlsTimeout();
 
     return () => {
@@ -90,10 +102,9 @@ export default function VideoPlayer({ src, title }: VideoPlayerProps) {
   const togglePlay = () => {
     if (videoRef.current) {
       videoRef.current.paused ? videoRef.current.play() : videoRef.current.pause();
-      setIsPlaying(!videoRef.current.paused);
     }
   };
-
+  
   const handleSeek = (value: number[]) => {
     if (videoRef.current) {
       videoRef.current.currentTime = value[0];
@@ -101,9 +112,17 @@ export default function VideoPlayer({ src, title }: VideoPlayerProps) {
     }
   };
 
+  const handleSeekRelative = (offset: number) => {
+    if (videoRef.current) {
+      const newTime = Math.max(0, Math.min(duration, videoRef.current.currentTime + offset));
+      videoRef.current.currentTime = newTime;
+      setProgress(newTime);
+    }
+  }
+
   const toggleMute = () => {
     if (videoRef.current) {
-      const newMuted = !isMuted;
+      const newMuted = !videoRef.current.muted;
       videoRef.current.muted = newMuted;
       setIsMuted(newMuted);
       if(!newMuted && volume === 0) {
@@ -118,14 +137,15 @@ export default function VideoPlayer({ src, title }: VideoPlayerProps) {
       const newVolume = value[0];
       videoRef.current.volume = newVolume;
       setVolume(newVolume);
-      if (newVolume > 0 && isMuted) {
+      if (newVolume > 0 && videoRef.current.muted) {
         videoRef.current.muted = false;
         setIsMuted(false);
-      } else if (newVolume === 0 && !isMuted) {
-          setIsMuted(true);
       }
     }
   };
+  
+  const VolumeIcon = isMuted || volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
+
 
   const toggleFullscreen = () => {
     const player = playerRef.current;
@@ -133,12 +153,10 @@ export default function VideoPlayer({ src, title }: VideoPlayerProps) {
 
     if (!document.fullscreenElement) {
       player.requestFullscreen().catch(err => {
-        alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
       });
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen();
-      setIsFullscreen(false);
     }
   };
 
@@ -151,63 +169,98 @@ export default function VideoPlayer({ src, title }: VideoPlayerProps) {
   }, []);
 
   return (
-    <div ref={playerRef} className="w-full h-screen bg-black flex justify-center items-center relative group" onMouseMove={resetControlsTimeout}>
+    <div 
+      ref={playerRef} 
+      className="w-full h-screen bg-black flex justify-center items-center relative group/player" 
+      onMouseMove={resetControlsTimeout}
+      onMouseLeave={() => { if (controlsTimeoutRef.current && isPlaying) clearTimeout(controlsTimeoutRef.current); setShowControls(true); }}
+    >
       <video
         ref={videoRef}
         src={src}
         className="w-full h-full object-contain"
         autoPlay
         onClick={togglePlay}
+        onDoubleClick={toggleFullscreen}
       />
-      <div className={cn("absolute inset-0 bg-black/30 transition-opacity duration-300", showControls ? "opacity-100" : "opacity-0 pointer-events-none")}>
+      <div 
+        className={cn(
+            "absolute inset-0 transition-opacity duration-300", 
+            showControls ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}
+      >
+        {/* Top Gradient */}
+        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/60 to-transparent" />
+
         {/* Back Button */}
-        <div className="absolute top-5 left-5 z-20">
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-white h-12 w-12">
-            <ArrowLeft className="h-8 w-8" />
+        <div className="absolute top-5 left-5 md:top-8 md:left-12 z-20">
+          <Button variant="ghost" size="icon" onClick={() => router.back()} className="text-white h-10 w-10 md:h-12 md:w-12">
+            <ArrowLeft className="h-6 w-6 md:h-8 md:w-8" />
           </Button>
         </div>
         
-         {/* Title */}
-        <div className="absolute top-8 left-24 z-20">
-          <h1 className="text-white text-2xl font-bold">{title}</h1>
-        </div>
-
         {/* Bottom Controls */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 z-20 bg-gradient-to-t from-black/70 to-transparent">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-4 text-white">
-                <span>{formatTime(progress)}</span>
-                <Slider
-                    value={[progress]}
-                    max={duration}
-                    step={1}
-                    onValueChange={handleSeek}
-                    className="w-full cursor-pointer"
-                />
-                <span>{formatTime(duration)}</span>
+        <div className="absolute bottom-0 left-0 right-0 p-3 md:p-5 z-20 bg-gradient-to-t from-black/70 to-transparent">
+          {/* Progress Bar */}
+          <div className="flex items-center gap-4 text-white text-xs font-light">
+              <span className="w-12 text-center">{formatTime(progress)}</span>
+              <Slider
+                  value={[progress]}
+                  max={duration}
+                  step={1}
+                  onValueChange={handleSeek}
+                  className="w-full cursor-pointer [&>span:first-child>span]:bg-primary"
+              />
+              <span className="w-12 text-center">{formatTime(duration)}</span>
+          </div>
+
+          {/* Control Icons */}
+          <div className="flex justify-between items-center mt-2">
+            <div className="flex items-center gap-1 md:gap-3">
+              <Button variant="ghost" size="icon" onClick={togglePlay} className="text-white">
+                {isPlaying ? <Pause className="h-6 w-6 md:h-8 md:w-8" /> : <Play className="h-6 w-6 md:h-8 md:w-8" />}
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => handleSeekRelative(-10)} className="text-white">
+                <Rewind className="h-5 w-5 md:h-6 md:w-6" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => handleSeekRelative(10)} className="text-white">
+                <FastForward className="h-5 w-5 md:h-6 md:w-6" />
+              </Button>
+               <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="text-white">
+                    <VolumeIcon className="h-5 w-5 md:h-7 md:w-7" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-2 bg-black/70 border-none mb-2">
+                    <Slider
+                      orientation="vertical"
+                      value={[isMuted ? 0 : volume]}
+                      max={1}
+                      step={0.05}
+                      onValueChange={handleVolumeChange}
+                      className="h-24 w-2"
+                    />
+                </PopoverContent>
+              </Popover>
             </div>
 
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" onClick={togglePlay} className="text-white">
-                  {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8" />}
-                </Button>
+            <div className="text-white text-sm md:text-lg font-semibold truncate px-4 flex-1 text-center">
+              {title}
+            </div>
 
-                <div className="flex items-center gap-2 w-32">
-                  <Button variant="ghost" size="icon" onClick={toggleMute} className="text-white">
-                    {isMuted || volume === 0 ? <VolumeX className="h-6 w-6" /> : <Volume2 className="h-6 w-6" />}
-                  </Button>
-                  <Slider
-                    value={[isMuted ? 0 : volume]}
-                    max={1}
-                    step={0.05}
-                    onValueChange={handleVolumeChange}
-                    className="cursor-pointer"
-                  />
-                </div>
-              </div>
+            <div className="flex items-center gap-1 md:gap-3">
+               <Button variant="ghost" size="icon" className="text-white">
+                <GalleryVertical className="h-5 w-5 md:h-6 md:w-6" />
+              </Button>
+               <Button variant="ghost" size="icon" className="text-white">
+                <Captions className="h-5 w-5 md:h-6 md:w-6" />
+              </Button>
+               <Button variant="ghost" size="icon" className="text-white">
+                <Settings2 className="h-5 w-5 md:h-6 md:w-6" />
+              </Button>
               <Button variant="ghost" size="icon" onClick={toggleFullscreen} className="text-white">
-                {isFullscreen ? <Minimize className="h-7 w-7" /> : <Maximize className="h-7 w-7" />}
+                {isFullscreen ? <Minimize className="h-6 w-6 md:h-7 md:w-7" /> : <Maximize className="h-6 w-6 md:h-7 md:w-7" />}
               </Button>
             </div>
           </div>
@@ -216,3 +269,5 @@ export default function VideoPlayer({ src, title }: VideoPlayerProps) {
     </div>
   );
 }
+
+    
