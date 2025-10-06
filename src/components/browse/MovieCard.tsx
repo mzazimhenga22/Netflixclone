@@ -20,21 +20,19 @@ const MovieCard = ({ movie }: MovieCardProps) => {
         <Image
           src={movie.posterUrl}
           alt={movie.title}
-          width={300}
-          height={169}
-          className="object-cover rounded-md w-full h-full"
+          fill
+          className="object-cover rounded-md"
           data-ai-hint={movie.imageHint}
         />
       
       {/* Expanded state on hover */}
-      <div className="absolute top-0 left-0 right-0 invisible opacity-0 group-hover/item:visible group-hover/item:opacity-100 transition-all duration-500 transform scale-75 group-hover/item:scale-125 group-hover/item:delay-500 origin-bottom shadow-2xl rounded-lg group-hover/item:z-50 group-hover/item:[&~*]:z-50 group-[:hover]:z-50">
+      <div className="absolute top-0 left-0 right-0 invisible opacity-0 group-hover/item:visible group-hover/item:opacity-100 transition-all duration-500 transform scale-75 group-hover/item:scale-125 group-hover/item:delay-500 origin-bottom shadow-2xl rounded-lg z-50">
         <div className="relative aspect-video w-full">
              <Image
               src={movie.posterUrl}
               alt={`${movie.title} preview`}
-              width={300}
-              height={169}
-              className="object-cover rounded-t-md w-full h-full"
+              fill
+              className="object-cover rounded-t-md"
             />
             <div className="absolute bottom-2 left-3">
                 <h3 className="text-white text-lg font-bold drop-shadow-lg">{movie.title}</h3>
