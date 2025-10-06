@@ -8,12 +8,14 @@ export default function BrowsePage() {
   return (
     <div className="bg-background min-h-screen">
       <Navbar />
-      <main className="overflow-hidden">
+      <main>
         <Banner />
-        <div className="relative z-10 -mt-8 md:-mt-36 pb-16 space-y-8 lg:space-y-12">
-          {movieCategories.map((category) => (
-            <MovieRow key={category.title} title={category.title} movies={category.movies} />
-          ))}
+        <div className="relative z-10 -mt-8 md:-mt-36 pb-16">
+          <div className="space-y-8 lg:space-y-12">
+            {movieCategories.map((category) => (
+              <MovieRow key={category.title} title={category.title} movies={category.movies} />
+            ))}
+          </div>
         </div>
       </main>
       <Footer />
