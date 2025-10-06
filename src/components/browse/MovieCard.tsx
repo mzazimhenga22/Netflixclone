@@ -106,7 +106,11 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
   useEffect(() => {
     const handleScroll = () => showPreview && setShowPreview(false);
-    const handleResize = () => showPreview && calculatePosition();
+    const handleResize = () => {
+        if (showPreview) {
+            calculatePosition();
+        }
+    };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("resize", handleResize);
