@@ -32,17 +32,16 @@ const Top10Row: React.FC<Top10RowProps> = ({ title, movies }) => {
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-8">
+        <CarouselContent className="-ml-4">
           {validMovies.map((movie, index) => (
             <CarouselItem
               key={movie.id}
-              className="pl-8"
-              style={{ flex: '0 0 auto' }} // Prevent shrinking
+              className="pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
             >
               <Top10Card movie={movie} rank={index + 1} />
             </CarouselItem>
           ))}
-           <CarouselItem className="pl-8">
+           <CarouselItem className="pl-4 basis-1/6">
             <div className="h-full aspect-[2/3]" />
           </CarouselItem>
         </CarouselContent>
