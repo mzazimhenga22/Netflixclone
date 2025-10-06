@@ -12,4 +12,5 @@ export interface Movie {
   last_air_date?: string; // For TV shows, from details endpoint
   genre_ids?: number[];
   media_type?: 'movie' | 'tv';
+  certification?: string;
 }

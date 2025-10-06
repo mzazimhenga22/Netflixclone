@@ -76,9 +76,11 @@ const Banner = ({ movie: bannerMovie }: BannerProps) => {
           <Button variant="outline" size="icon" className="h-11 w-11 rounded-full border-2 border-white/40 bg-black/30 text-white hover:border-white hover:bg-black/50">
               <Volume2 className="h-6 w-6" />
           </Button>
-          <div className="bg-black/30 border-l-4 border-white/40 px-4 py-2 text-sm font-semibold">
-              16+
-          </div>
+          {bannerMovie.certification && (
+             <div className="bg-black/30 border-l-4 border-white/40 px-4 py-2 text-sm font-semibold">
+                {bannerMovie.certification}
+            </div>
+          )}
         </div>
       </div>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

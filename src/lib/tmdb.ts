@@ -56,12 +56,39 @@ export async function getSimilar(id: number, mediaType: 'movie' | 'tv' | undefin
   return fetchFromTmdb<Movie>(`/${type}/${id}/similar?api_key=${API_KEY}&language=en-US&page=1`) as Promise<Movie[]>;
 }
 
+async function getCertification(id: number, mediaType: 'movie' | 'tv'): Promise<string | undefined> {
+    try {
+        let endpoint = '';
+        if (mediaType === 'movie') {
+            endpoint = `/movie/${id}/release_dates?api_key=${API_KEY}`;
+        } else {
+            endpoint = `/tv/${id}/content_ratings?api_key=${API_KEY}`;
+        }
+
+        const data = await fetchFromTmdb<any>(endpoint, true);
+        if (!data || !data.results) return undefined;
+
+        if (mediaType === 'movie') {
+            const usRelease = data.results.find((r: any) => r.iso_3166_1 === 'US');
+            return usRelease?.release_dates[0]?.certification || undefined;
+        } else {
+            const usRating = data.results.find((r: any) => r.iso_3166_1 === 'US');
+            return usRating?.rating || undefined;
+        }
+    } catch (error) {
+        console.error(`Failed to fetch certification for ${mediaType} ${id}:`, error);
+        return undefined;
+    }
+}
+
+
 export async function getMovieOrTvDetails(id: number, mediaType?: 'movie' | 'tv'): Promise<Movie | null> {
     const type = mediaType || await getMediaType(id);
     if (!type) return null;
     const details = await fetchFromTmdb<Movie>(`/${type}/${id}?api_key=${API_KEY}&language=en-US`, true) as Movie | null;
     if (details) {
         details.media_type = type; // Ensure media_type is set
+        details.certification = await getCertification(id, type);
     }
     return details;
 }
