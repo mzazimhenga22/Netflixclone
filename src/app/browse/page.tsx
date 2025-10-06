@@ -12,6 +12,7 @@ import type { Movie } from "@/types";
 import { useProfile } from '@/hooks/useProfile';
 import { genres } from '@/lib/genres';
 import React from 'react';
+import { countries } from '@/lib/countries';
 
 
 type MovieCategory = {
@@ -45,7 +46,7 @@ export default function BrowsePage() {
           documentaries
         ] = await Promise.all([
           getTrending(),
-          getTrendingTvShows(),
+          getTrendingTvShows(profile.country),
           getPopularMovies(),
           getPopularTvShows(),
           profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId) : Promise.resolve([]),
@@ -92,6 +93,10 @@ export default function BrowsePage() {
     fetchMovies();
   }, [profile]);
   
+  const getCountryName = (code: string) => {
+    return countries.find(c => c.iso_3166_1 === code)?.english_name || 'the U.S.';
+  }
+
   if (loading || !profile) {
       return (
         <div className="flex items-center justify-center min-h-screen bg-black text-white">
@@ -114,7 +119,7 @@ export default function BrowsePage() {
               <React.Fragment key={category.title}>
                 <MovieRow title={category.title} movies={category.movies} />
                 {index === 0 && top10.length > 0 && (
-                   <Top10Row title="Top 10 TV Shows in the U.S. Today" movies={top10} />
+                   <Top10Row title={`Top 10 TV Shows in ${getCountryName(profile.country)} Today`} movies={top10} />
                 )}
               </React.Fragment>
             ))}

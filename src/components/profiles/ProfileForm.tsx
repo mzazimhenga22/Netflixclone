@@ -10,6 +10,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import Logo from '@/components/Logo';
 import { Trash2 } from 'lucide-react';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -20,6 +27,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { countries } from '@/lib/countries';
 
 type Profile = {
   id: number;
@@ -27,11 +35,12 @@ type Profile = {
   avatar: string;
   pin?: string;
   isLocked: boolean;
+  country: string;
 };
 
 interface ProfileFormProps {
   profile?: Profile;
-  onSave: (profileData: Omit<Profile, 'id'> & { id?: number }) => void;
+  onSave: (profileData: Omit<Profile, 'id' | 'favoriteGenreId'> & { id?: number }) => void;
   onCancel: () => void;
   onDelete: (id: number) => void;
 }
@@ -52,6 +61,7 @@ export default function ProfileForm({ profile, onSave, onCancel, onDelete }: Pro
   const [avatar, setAvatar] = useState(profile?.avatar || avatars[0]);
   const [isLocked, setIsLocked] = useState(profile?.isLocked || false);
   const [pin, setPin] = useState(profile?.pin || '');
+  const [country, setCountry] = useState(profile?.country || 'US');
 
   const handleSave = () => {
     onSave({
@@ -60,6 +70,7 @@ export default function ProfileForm({ profile, onSave, onCancel, onDelete }: Pro
       avatar,
       isLocked,
       pin: isLocked ? pin : undefined,
+      country,
     });
   };
 
@@ -85,6 +96,20 @@ export default function ProfileForm({ profile, onSave, onCancel, onDelete }: Pro
                     placeholder="Name"
                     className="bg-gray-700 border-none h-12 text-lg"
                 />
+              </div>
+
+              <div className="space-y-2">
+                 <Label htmlFor="country" className="text-gray-400">Region</Label>
+                 <Select value={country} onValueChange={setCountry}>
+                    <SelectTrigger className="w-full bg-gray-700 border-none h-12 text-lg">
+                        <SelectValue placeholder="Select a country" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-64">
+                        {countries.map(c => (
+                            <SelectItem key={c.iso_3166_1} value={c.iso_3166_1}>{c.english_name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-4">

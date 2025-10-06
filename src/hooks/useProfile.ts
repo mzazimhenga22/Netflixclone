@@ -11,6 +11,7 @@ type Profile = {
   pin?: string;
   isLocked: boolean;
   favoriteGenreId?: number;
+  country: string; // ISO 3166-1 code
 };
 
 export const useProfile = () => {

@@ -26,8 +26,8 @@ export async function getTrending(): Promise<Movie[]> {
   return fetchFromTmdb<Movie>(`/trending/all/week?api_key=${API_KEY}&language=en-US`) as Promise<Movie[]>;
 }
 
-export async function getTrendingTvShows(): Promise<Movie[]> {
-  return fetchFromTmdb<Movie>(`/trending/tv/day?api_key=${API_KEY}&language=en-US`) as Promise<Movie[]>;
+export async function getTrendingTvShows(region: string = 'US'): Promise<Movie[]> {
+  return fetchFromTmdb<Movie>(`/trending/tv/day?api_key=${API_KEY}&language=en-US&region=${region}`) as Promise<Movie[]>;
 }
 
 export async function getPopularMovies(): Promise<Movie[]> {

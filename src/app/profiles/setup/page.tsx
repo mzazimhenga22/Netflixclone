@@ -15,13 +15,14 @@ type Profile = {
   avatar: string;
   pin?: string;
   isLocked: boolean;
-  favoriteGenreId?: number; // e.g., 28 for Action, 878 for Sci-Fi
+  favoriteGenreId?: number;
+  country: string; // ISO 3166-1 code
 };
 
 const initialProfiles: Profile[] = [
-  { id: 1, name: 'John', avatar: 'https://picsum.photos/seed/avatar1/200/200', pin: '1234', isLocked: true, favoriteGenreId: 28 }, // Action
-  { id: 2, name: 'Jane', avatar: 'https://picsum.photos/seed/avatar2/200/200', isLocked: false, favoriteGenreId: 878 }, // Sci-Fi
-  { id: 3, name: 'Kids', avatar: 'https://picsum.photos/seed/avatar3/200/200', isLocked: false, favoriteGenreId: 16 }, // Animation
+  { id: 1, name: 'John', avatar: 'https://picsum.photos/seed/avatar1/200/200', pin: '1234', isLocked: true, favoriteGenreId: 28, country: 'US' }, // Action
+  { id: 2, name: 'Jane', avatar: 'https://picsum.photos/seed/avatar2/200/200', isLocked: false, favoriteGenreId: 878, country: 'GB' }, // Sci-Fi
+  { id: 3, name: 'Kids', avatar: 'https://picsum.photos/seed/avatar3/200/200', isLocked: false, favoriteGenreId: 16, country: 'US' }, // Animation
 ];
 
 export default function ProfileSetupPage() {
@@ -46,10 +47,15 @@ export default function ProfileSetupPage() {
   const handleSaveProfile = (profileData: Omit<Profile, 'id'> & { id?: number }) => {
     if (profileData.id) {
       // Edit existing profile
-      setProfiles(profiles.map(p => p.id === profileData.id ? { ...p, ...profileData } : p));
+      setProfiles(profiles.map(p => p.id === profileData.id ? { ...p, ...profileData } as Profile : p));
     } else {
       // Add new profile
-      const newProfile = { ...profileData, id: Date.now(), favoriteGenreId: [28, 878, 35, 18, 53][Math.floor(Math.random() * 5)] }; // Assign a random genre
+      const newProfile: Profile = { 
+        ...profileData, 
+        id: Date.now(), 
+        favoriteGenreId: [28, 878, 35, 18, 53][Math.floor(Math.random() * 5)], // Assign a random genre
+        country: profileData.country || 'US',
+      };
       setProfiles([...profiles, newProfile]);
     }
     setEditingProfile(null);
