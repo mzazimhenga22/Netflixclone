@@ -28,7 +28,7 @@ const StatusBadge = ({ movie }: StatusBadgeProps) => {
   }
 
   return (
-    <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-sm z-10">
+    <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-semibold px-1.5 py-0.5 rounded-sm z-10">
       {badgeText}
     </div>
   );
