@@ -26,7 +26,7 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
       >
         {rank}
       </div>
-      <div className="absolute left-10 w-[140px] h-[210px] rounded-md overflow-hidden transition-transform duration-300 ease-in-out group-hover:scale-110 shadow-lg">
+      <div className="absolute left-8 w-[140px] h-[210px] rounded-md overflow-hidden transition-transform duration-300 ease-in-out group-hover:scale-110 shadow-lg">
         <Image
           src={posterUrl}
           alt={movie.title || movie.name || 'Movie poster'}

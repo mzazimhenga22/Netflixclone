@@ -11,6 +11,8 @@ import { getTrending, getMoviesByGenre, getPopularMovies, getPopularTvShows, get
 import type { Movie } from "@/types";
 import { useProfile } from '@/hooks/useProfile';
 import { genres } from '@/lib/genres';
+import React from 'react';
+
 
 type MovieCategory = {
   title: string;
