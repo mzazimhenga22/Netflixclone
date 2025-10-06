@@ -24,34 +24,57 @@ export default function BrowsePage() {
 
   useEffect(() => {
     const fetchMovies = async () => {
-      setLoading(true);
       if (!profile) return;
-
-      const trending = await getTrendingMovies();
-      const popular = await getPopularMovies();
-      
-      const newCategories: MovieCategory[] = [
-        { title: "Trending Now", movies: trending },
-        { title: "Popular on StreamClone", movies: popular },
-      ];
-
-      if (profile.favoriteGenreId) {
-        const genreName = genres[profile.favoriteGenreId];
-        if (genreName) {
-            const favoriteGenreMovies = await getMoviesByGenre(profile.favoriteGenreId);
-            newCategories.push({ title: genreName, movies: favoriteGenreMovies });
+      setLoading(true);
+  
+      try {
+        const [
+          trending, 
+          popular, 
+          favoriteGenreMovies, 
+          comedy, 
+          horror, 
+          romance, 
+          documentaries
+        ] = await Promise.all([
+          getTrendingMovies(),
+          getPopularMovies(),
+          profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId) : Promise.resolve([]),
+          getMoviesByGenre(35), // Comedy
+          getMoviesByGenre(27), // Horror
+          getMoviesByGenre(10749), // Romance
+          getMoviesByGenre(99), // Documentary
+        ]);
+        
+        const newCategories: MovieCategory[] = [
+          { title: "Trending Now", movies: trending },
+          { title: "Popular on StreamClone", movies: popular },
+        ];
+  
+        if (profile.favoriteGenreId) {
+          const genreName = genres[profile.favoriteGenreId];
+          if (genreName) {
+            newCategories.push({ title: `Because you like ${genreName}`, movies: favoriteGenreMovies });
+          }
         }
-      }
 
-      setCategories(newCategories);
-
-      if (trending.length > 0) {
-        setBannerMovie(trending[Math.floor(Math.random() * trending.length)]);
+        newCategories.push({ title: "Comedies", movies: comedy });
+        newCategories.push({ title: "Scary Movies", movies: horror });
+        newCategories.push({ title: "Romance", movies: romance });
+        newCategories.push({ title: "Documentaries", movies: documentaries });
+  
+        setCategories(newCategories);
+  
+        if (trending.length > 0) {
+          setBannerMovie(trending[Math.floor(Math.random() * trending.length)]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch movies for browse page:", error);
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
-
+  
     fetchMovies();
   }, [profile]);
   
