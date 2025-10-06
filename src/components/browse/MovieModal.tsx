@@ -26,7 +26,7 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
           data-ai-hint={movie.imageHint}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 z-10">
             <Button size="icon" variant="ghost" onClick={onClose} className="h-9 w-9 rounded-full bg-black/50 text-white hover:bg-black/70">
               <X className="h-6 w-6" />
             </Button>
