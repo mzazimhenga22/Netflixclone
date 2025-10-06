@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import MovieCard from '@/components/browse/MovieCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type MovieCategory = {
   title: string;
@@ -203,32 +204,42 @@ export default function MoviesPage() {
   return (
     <div className="bg-background min-h-screen">
       <Navbar />
-      <main className="overflow-x-hidden pt-16">
-        <div className="px-4 md:px-16 py-4 flex items-center justify-between">
-            <div className="flex items-baseline gap-4">
-                <h1 className="text-2xl md:text-3xl font-bold">{selectedGenre ? selectedGenreName : "Movies"}</h1>
-                {selectedGenre && (
-                    <button onClick={() => handleGenreChange('all')} className="text-muted-foreground hover:text-white text-sm">
+      <main className="overflow-x-hidden">
+        <div className="relative">
+            <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/70 to-transparent z-20" />
+            
+            {!bannerMovie ? (
+                <Skeleton className="w-full h-[56.25vw] min-h-[400px] max-h-[800px]" />
+            ) : (
+                <Banner movie={bannerMovie} />
+            )}
+
+            <div className="absolute top-20 left-4 md:left-16 z-30">
+                <div className="flex items-baseline gap-6">
+                    <h1 className="text-3xl md:text-5xl font-bold">
+                        {selectedGenre ? selectedGenreName : "Movies"}
+                    </h1>
+                     <Select value={selectedGenre} onValueChange={handleGenreChange}>
+                        <SelectTrigger className="w-[180px] bg-card/80 border-white/40 text-base font-bold">
+                            <SelectValue placeholder="Genres" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Genres</SelectItem>
+                            {movieGenres.map(genre => (
+                                <SelectItem key={genre.id} value={genre.id.toString()}>{genre.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                 {selectedGenre && (
+                    <button onClick={() => handleGenreChange('all')} className="text-muted-foreground hover:text-white text-sm mt-2 bg-black/50 px-2 py-1 rounded-md">
                         &times; Clear Filter
                     </button>
                 )}
             </div>
-            <Select value={selectedGenre} onValueChange={handleGenreChange}>
-                <SelectTrigger className="w-[180px] bg-card border-secondary-foreground/20">
-                    <SelectValue placeholder="Genres" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">All Genres</SelectItem>
-                    {movieGenres.map(genre => (
-                        <SelectItem key={genre.id} value={genre.id.toString()}>{genre.name}</SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
         </div>
-
-        <Banner movie={bannerMovie} />
         
-        <div className="pb-32 -mt-8 md:-mt-20 relative">
+        <div className="pb-32 -mt-8 md:-mt-20 relative z-10">
             {selectedGenre ? (
                 genreLoading ? (
                      <div className="flex items-center justify-center h-[40vh]">
