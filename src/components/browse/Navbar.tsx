@@ -17,34 +17,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '../ui/skeleton';
+import { getTrending, getMovieOrTvDetails } from '@/lib/tmdb';
+import type { Movie } from '@/types';
+import { formatDistanceToNow } from 'date-fns';
 
-const notifications = [
-  {
-    id: 1,
-    title: "New Arrival: Rebel Moon",
-    description: "Zack Snyder's latest sci-fi epic has landed. Watch it now!",
-    image: "https://image.tmdb.org/t/p/w200/ui4DrH1cKk2vkHshcUcBFCQbt7k.jpg",
-    time: "2 days ago",
-  },
-  {
-    id: 2,
-    title: "Coming Soon: The Witcher Season 4",
-    description: "Geralt's journey continues. Arriving next month.",
-    image: "https://image.tmdb.org/t/p/w200/cZ0d3rtvXQoJGvDHf3Y1gJ0wIz.jpg",
-    time: "1 week ago",
-  },
-    {
-    id: 3,
-    title: "Top 10 In Your Region",
-    description: "See what's trending in the United States today.",
-    image: "https://image.tmdb.org/t/p/w200/m1CYYy5p62v6s2sJ2f3tH2e1yVD.jpg",
-    time: "3 weeks ago",
-  },
-];
+type Notification = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  time: string;
+  media_type?: 'movie' | 'tv';
+};
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { profile } = useProfile();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,6 +49,63 @@ const Navbar = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+        setLoadingNotifications(true);
+        try {
+            const trending = await getTrending();
+            const upcomingMovies = await getMovieOrTvDetails(trending[Math.floor(Math.random() * trending.length)]?.id, 'movie');
+            
+            const generatedNotifications: Notification[] = [];
+
+            if (trending.length > 0) {
+                const newArrival = trending[0];
+                generatedNotifications.push({
+                    id: newArrival.id,
+                    title: `New Arrival: ${newArrival.title || newArrival.name}`,
+                    description: "Just landed in your region. Watch it now!",
+                    image: `https://image.tmdb.org/t/p/w200${newArrival.backdrop_path}`,
+                    time: "1 day ago",
+                    media_type: newArrival.media_type,
+                });
+            }
+
+            if (upcomingMovies) {
+                 generatedNotifications.push({
+                    id: upcomingMovies.id,
+                    title: `Coming Soon: ${upcomingMovies.title}`,
+                    description: `Arriving on ${new Date(upcomingMovies.release_date!).toLocaleDateString()}`,
+                    image: `https://image.tmdb.org/t/p/w200${upcomingMovies.backdrop_path}`,
+                    time: formatDistanceToNow(new Date(upcomingMovies.release_date!), { addSuffix: true }),
+                    media_type: 'movie'
+                });
+            }
+            
+             if (trending.length > 1) {
+                const top10 = trending[1];
+                 generatedNotifications.push({
+                    id: top10.id,
+                    title: `Trending Now`,
+                    description: `${top10.title || top10.name} is climbing the charts!`,
+                    image: `https://image.tmdb.org/t/p/w200${top10.backdrop_path}`,
+                    time: "3 days ago",
+                    media_type: top10.media_type,
+                });
+            }
+
+
+            setNotifications(generatedNotifications);
+
+        } catch (error) {
+            console.error("Failed to fetch notifications", error);
+        } finally {
+            setLoadingNotifications(false);
+        }
+    };
+
+    fetchNotifications();
   }, []);
 
   const navItems = ['Home', 'TV Shows', 'Movies', 'New & Popular', 'My List'];
@@ -99,20 +146,38 @@ const Navbar = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="mr-4 w-80 md:w-96 bg-black/90 border-white/20 text-white" align="end">
               <DropdownMenuLabel className="py-3">Notifications</DropdownMenuLabel>
-              {notifications.map((notification) => (
-                <DropdownMenuItem key={notification.id} className="p-2 focus:bg-white/10 cursor-pointer">
-                  <div className="flex gap-3 items-start">
-                    <div className="w-24 h-14 relative flex-shrink-0">
-                      <Image src={notification.image} alt={notification.title} fill className="object-cover rounded-sm"/>
+              {loadingNotifications ? (
+                <div className="p-2 space-y-2">
+                    {[...Array(3)].map((_, i) => (
+                        <div key={i} className="flex gap-3 items-start">
+                            <Skeleton className="w-24 h-14 flex-shrink-0" />
+                            <div className="flex-grow space-y-2">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-3/4" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+              ) : notifications.length > 0 ? (
+                notifications.map((notification) => (
+                  <DropdownMenuItem key={notification.id} className="p-2 focus:bg-white/10 cursor-pointer">
+                    <div className="flex gap-3 items-start">
+                      <div className="w-24 h-14 relative flex-shrink-0">
+                        <Image src={notification.image} alt={notification.title} fill className="object-cover rounded-sm"/>
+                      </div>
+                      <div className="flex-grow">
+                        <p className="text-sm font-semibold leading-tight">{notification.title}</p>
+                        <p className="text-xs text-white/70 mt-1">{notification.description}</p>
+                        <p className="text-xs text-white/50 mt-2">{notification.time}</p>
+                      </div>
                     </div>
-                    <div className="flex-grow">
-                      <p className="text-sm font-semibold leading-tight">{notification.title}</p>
-                      <p className="text-xs text-white/70 mt-1">{notification.description}</p>
-                      <p className="text-xs text-white/50 mt-2">{notification.time}</p>
-                    </div>
-                  </div>
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <DropdownMenuItem className="p-4 text-center text-sm text-white/70">
+                    No new notifications.
                 </DropdownMenuItem>
-              ))}
+              )}
                <DropdownMenuSeparator className="bg-white/20" />
                 <DropdownMenuItem className="justify-center p-2 focus:bg-white/10 cursor-pointer">
                   <span className="text-sm">View All</span>
