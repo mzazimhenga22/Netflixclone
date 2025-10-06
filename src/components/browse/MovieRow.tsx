@@ -21,7 +21,7 @@ interface MovieRowProps {
 
 const MovieRow = ({ title, movies }: MovieRowProps) => {
   return (
-    <div className="pl-4 md:pl-16">
+    <div className="pl-4 md:pl-16 group relative">
       <h2 className="text-xl md:text-2xl font-bold mb-4">{title}</h2>
       <Carousel
         opts={{
