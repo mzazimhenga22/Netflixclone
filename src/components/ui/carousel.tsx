@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -206,7 +207,7 @@ const CarouselPrevious = React.forwardRef<
       variant={variant}
       size={size}
       className={cn(
-        "absolute rounded-md h-full px-2 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-black/60 to-transparent hover:bg-gradient-to-r hover:from-black/80 hover:to-transparent hover:text-white",
+        "absolute rounded-none h-full px-2 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-black/60 to-transparent hover:bg-gradient-to-r hover:from-black/80 hover:to-transparent hover:text-white",
         orientation === "horizontal"
           ? "left-0 top-1/2 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -235,7 +236,7 @@ const CarouselNext = React.forwardRef<
       variant={variant}
       size={size}
       className={cn(
-        "absolute rounded-md h-full px-2 opacity-0 group-hover:opacity-100 bg-gradient-to-l from-black/60 to-transparent hover:bg-gradient-to-l hover:from-black/80 hover:to-transparent hover:text-white",
+        "absolute rounded-none h-full px-2 opacity-0 group-hover:opacity-100 bg-gradient-to-l from-black/60 to-transparent hover:bg-gradient-to-l hover:from-black/80 hover:to-transparent hover:text-white",
         orientation === "horizontal"
           ? "right-0 top-1/2 -translate-y-1/2"
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
