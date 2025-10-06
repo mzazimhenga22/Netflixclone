@@ -65,6 +65,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
   };
 
   const scheduleShow = () => {
+    if (isModalOpen) return; // Do not show preview if modal is open
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
@@ -89,7 +90,10 @@ export default function MovieCard({ movie }: MovieCardProps) {
     }, delay);
   };
 
-  const handleCardEnter = () => scheduleShow();
+  const handleCardEnter = () => {
+      if (isModalOpen) return;
+      scheduleShow();
+  };
   const handleCardLeave = () => scheduleHide();
 
   const handleOverlayEnter = () => {
@@ -129,10 +133,13 @@ export default function MovieCard({ movie }: MovieCardProps) {
   const handleOpenModal = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (showTimeoutRef.current) clearTimeout(showTimeoutRef.current);
-    if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
     setShowPreview(false);
     setIsModalOpen(true);
   };
+
+  const closeModal = () => {
+      setIsModalOpen(false);
+  }
 
   return (
     <>
@@ -153,6 +160,15 @@ export default function MovieCard({ movie }: MovieCardProps) {
           priority
         />
       </div>
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        {isModalOpen && (
+            <DialogContent className="p-0 w-[90vw] max-w-[90vw] bg-card border-0 rounded-lg overflow-hidden">
+                <DialogTitle className="sr-only">{movie.title}</DialogTitle>
+                <MovieModal movie={movie} onClose={closeModal} />
+            </DialogContent>
+        )}
+      </Dialog>
 
       {typeof document !== "undefined" &&
         createPortal(
@@ -198,7 +214,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
                 </div>
 
                 <div className="p-3 bg-zinc-900 text-white flex-grow flex flex-col justify-between">
-                   <div>
+                   <div className="flex-grow">
                     <div className="flex items-center gap-2">
                       <Button size="icon" className="h-9 w-9 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform">
                         <Play className="h-5 w-5 fill-black" />
@@ -213,17 +229,9 @@ export default function MovieCard({ movie }: MovieCardProps) {
                       </Button>
 
                       <div className="ml-auto">
-                        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                            <Button onClick={handleOpenModal} size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
-                              <ChevronDown className="h-5 w-5" />
-                            </Button>
-                           <DialogContent className="p-0 w-[90vw] max-w-[90vw] bg-card border-0 rounded-lg">
-                                <DialogTitle>
-                                    <span className="sr-only">{movie.title}</span>
-                                </DialogTitle>
-                                <MovieModal movie={movie} onClose={() => setIsModalOpen(false)} />
-                            </DialogContent>
-                        </Dialog>
+                        <Button onClick={handleOpenModal} size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
+                          <ChevronDown className="h-5 w-5" />
+                        </Button>
                       </div>
                     </div>
                   </div>
