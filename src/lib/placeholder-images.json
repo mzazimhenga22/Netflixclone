@@ -1,3 +1,76 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "landing-hero",
+      "description": "Abstract background for landing page hero",
+      "imageUrl": "https://images.unsplash.com/photo-1636545948913-c238e8a1b4bb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxhYnN0cmFjdCUyMGRhcmt8ZW58MHx8fHwxNzU5Njc3ODMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract dark"
+    },
+    {
+      "id": "browse-banner",
+      "description": "Banner image for a trending show on the browse page",
+      "imageUrl": "https://images.unsplash.com/photo-1718046263737-553dfecb126e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtb3ZpZSUyMHNjZW5lfGVufDB8fHx8MTc1OTc1MzAxNXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "movie scene"
+    },
+    {
+      "id": "movie-poster-1",
+      "description": "Poster for a movie",
+      "imageUrl": "https://images.unsplash.com/photo-1590179068383-b9c69aacebd3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtb3ZpZSUyMHBvc3RlcnxlbnwwfHx8fDE3NTk2ODM3MTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "movie poster"
+    },
+    {
+      "id": "movie-poster-2",
+      "description": "Poster for a movie",
+      "imageUrl": "https://images.unsplash.com/photo-1614215669710-7668c7352a7d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxhY3Rpb24lMjBtb3ZpZXxlbnwwfHx8fDE3NTk2Nzg1NDJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "action movie"
+    },
+    {
+      "id": "movie-poster-3",
+      "description": "Poster for a movie",
+      "imageUrl": "https://images.unsplash.com/photo-1572700432881-42c60fe8c869?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxkcmFtYSUyMG1vdmllfGVufDB8fHx8MTc1OTcwODk2Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "drama movie"
+    },
+    {
+      "id": "movie-poster-4",
+      "description": "Poster for a movie",
+      "imageUrl": "https://images.unsplash.com/photo-1578374173708-9939b63ef7ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzY2ktZmklMjBtb3ZpZXxlbnwwfHx8fDE3NTk3MDg5NjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sci-fi movie"
+    },
+    {
+      "id": "movie-poster-5",
+      "description": "Poster for a movie",
+      "imageUrl": "https://images.unsplash.com/photo-1611349005647-aec2a9c25b0b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxjb21lZHklMjBtb3ZpZXxlbnwwfHx8fDE3NTk3NTc4MDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "comedy movie"
+    },
+    {
+      "id": "movie-poster-6",
+      "description": "Poster for a movie",
+      "imageUrl": "https://images.unsplash.com/photo-1758525862250-5d1f64dc140b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0aHJpbGxlciUyMG1vdmllfGVufDB8fHx8MTc1OTY5MTE5Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "thriller movie"
+    },
+    {
+      "id": "movie-poster-7",
+      "description": "Poster for a movie",
+      "imageUrl": "https://images.unsplash.com/photo-1602737337930-b4f775f99f77?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxob3Jyb3IlMjBtb3ZpZXxlbnwwfHx8fDE3NTk3MDg5NjJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "horror movie"
+    },
+    {
+      "id": "movie-poster-8",
+      "description": "Poster for a movie",
+      "imageUrl": "https://images.unsplash.com/photo-1663869025988-771b0d7f8a89?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxyb21hbmNlJTIwbW92aWV8ZW58MHx8fHwxNzU5Nzc1NTQ1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "romance movie"
+    },
+    {
+      "id": "movie-poster-9",
+      "description": "Poster for a movie",
+      "imageUrl": "https://images.unsplash.com/photo-1748229988456-9a6fe997cf0e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZmFudGFzeSUyMG1vdmllfGVufDB8fHx8MTc1OTY2MDE3Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fantasy movie"
+    },
+    {
+      "id": "movie-poster-10",
+      "description": "Poster for a movie",
+      "imageUrl": "https://images.unsplash.com/photo-1598899450636-3c62c5332a35?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhbmltYXRpb24lMjBtb3ZpZXxlbnwwfHx8fDE3NTk2ODYzNTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "animation movie"
+    }
+  ]
 }
