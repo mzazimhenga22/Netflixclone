@@ -213,8 +213,10 @@ const Navbar = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <Gamepad2 className="mr-2 h-4 w-4" />
-                  <span>Transfer Profile</span>
+                  <Link href="/profiles/transfer" className='flex items-center w-full'>
+                    <Gamepad2 className="mr-2 h-4 w-4" />
+                    <span>Transfer Profile</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <Link href="/account" className='flex items-center w-full'>
