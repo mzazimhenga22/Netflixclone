@@ -45,7 +45,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
     const cardCenterY = rect.top + rect.height / 2;
 
     let left = cardCenterX - scaledWidth / 2;
-    let top = cardCenterY - scaledHeight / 2 + window.scrollY;
+    let top = cardCenterY - scaledHeight / 2;
 
     const scrollable = findScrollableAncestor(cardRef.current);
     const viewportRect = scrollable ? scrollable.getBoundingClientRect() : { left: 0, width: window.innerWidth, top: 0, height: window.innerHeight };
@@ -56,13 +56,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
     if (left < viewportLeft) left = viewportLeft;
     if (left + scaledWidth > viewportRight) left = Math.max(viewportRight - scaledWidth, viewportLeft);
     
-    if (top < (viewportRect.top ?? 0) + margin + window.scrollY) top = (viewportRect.top ?? 0) + margin + window.scrollY;
-    if (top + scaledHeight > (viewportRect.top ?? 0) + (viewportRect.height ?? window.innerHeight) - margin + window.scrollY) {
-        top = Math.max((viewportRect.top ?? 0) + (viewportRect.height ?? window.innerHeight) - scaledHeight - margin + window.scrollY, (viewportRect.top ?? 0) + margin + window.scrollY);
-    }
-  
     setPosition({ 
-      top, 
+      top: top + window.scrollY, 
       left: left + window.scrollX, 
       width: scaledWidth, 
       height: scaledHeight 
@@ -146,6 +141,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
         className="group relative aspect-video bg-zinc-900 rounded-md transition-transform duration-300 ease-out will-change-transform"
         onMouseEnter={handleCardEnter}
         onMouseLeave={handleCardLeave}
+        onClick={handleOpenModal}
       >
         <Image
           src={movie.posterUrl}
@@ -256,5 +252,3 @@ export default function MovieCard({ movie }: MovieCardProps) {
     </>
   );
 }
-
-    
