@@ -1,13 +1,13 @@
+
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { ArrowLeft, X } from 'lucide-react';
 import Image from 'next/image';
+import type { Movie } from '@/types';
 
 // Custom Netflix-style SVG Icons
 const PlayIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -47,18 +47,16 @@ const Forward10Icon = () => (
 
 interface VideoPlayerProps {
   src: string;
-  title: string;
-  description?: string;
+  media: Movie;
 }
 
-export default function VideoPlayer({ src, title, description }: VideoPlayerProps) {
+export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
   const controlsTimeoutRef = useRef<number | null>(null);
 
   const [isPlaying, setIsPlaying] = useState(true);
-  const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -66,6 +64,10 @@ export default function VideoPlayer({ src, title, description }: VideoPlayerProp
   const [showControls, setShowControls] = useState(true);
   const [isEpisodesPanelOpen, setIsEpisodesPanelOpen] = useState(false);
   
+  const isTvShow = media.media_type === 'tv';
+  const title = media.title || media.name;
+  const description = media.overview;
+
   const formatTime = (seconds: number) => {
     if (isNaN(seconds)) return '0:00';
     const date = new Date(seconds * 1000);
@@ -141,15 +143,6 @@ export default function VideoPlayer({ src, title, description }: VideoPlayerProp
     }
   }, [duration]);
 
-  const handleVolumeChange = (value: number[]) => {
-    if (videoRef.current) {
-      const newVolume = value[0];
-      videoRef.current.volume = newVolume;
-      setVolume(newVolume);
-      setIsMuted(newVolume === 0);
-    }
-  };
-  
   const toggleMute = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     const video = videoRef.current;
@@ -157,7 +150,6 @@ export default function VideoPlayer({ src, title, description }: VideoPlayerProp
     const newMuted = !isMuted;
     video.muted = newMuted;
     setIsMuted(newMuted);
-    if (!newMuted && volume === 0) handleVolumeChange([0.5]);
   };
 
   const toggleFullscreen = useCallback((e?: React.MouseEvent) => {
@@ -189,41 +181,45 @@ export default function VideoPlayer({ src, title, description }: VideoPlayerProp
   }, [togglePlay, handleSeekRelative, toggleFullscreen, resetControlsTimeout]);
 
 
-  const VolumeIcon = isMuted || volume === 0 ? VolumeMutedIcon : VolumeHighIcon;
-
   return (
     <div ref={playerRef} className="w-full h-screen bg-black flex justify-center items-center relative select-none overflow-hidden cursor-none" onDoubleClick={toggleFullscreen}>
       <video ref={videoRef} src={src} className="w-full h-full object-contain" autoPlay onClick={togglePlay}/>
       
-      {/* Dimmer Overlay */}
-      <div className={cn('absolute inset-0 bg-black/40 transition-opacity duration-500 z-10', showControls ? 'opacity-100' : 'opacity-0 pointer-events-none')} />
+      {/* Dimmer & Info Overlay */}
+      <div className={cn('absolute inset-0 bg-black/40 transition-opacity duration-500 z-10', (showControls || !isPlaying) ? 'opacity-100' : 'opacity-0 pointer-events-none')} />
 
       {/* Main Controls Overlay */}
-      <div className={cn('absolute inset-0 transition-opacity duration-500 z-20', showControls ? 'opacity-100' : 'opacity-0 pointer-events-none')} >
+      <div className={cn('absolute inset-0 transition-opacity duration-500 z-20', (showControls || !isPlaying) ? 'opacity-100' : 'opacity-0 pointer-events-none')} >
         {/* Top bar */}
         <div className="absolute top-0 left-0 right-0 p-5 md:p-8 flex items-center justify-between">
-          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); router.back(); }} className="text-white h-12 w-12 hover:bg-white/20">
+          <button onClick={(e) => { e.stopPropagation(); router.back(); }} className="text-white h-12 w-12 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
             <ArrowLeft className="h-8 w-8" />
-          </Button>
+          </button>
           <div className="flex items-center gap-4">
-             {/* Episode Season Selector */}
-             <Button variant="outline" className="bg-black/50 border-white/50 text-white hover:bg-black/80">
-                Season 1 <svg width="1em" height="1em" viewBox="0 0 24 24" className="ml-2 h-4 w-4"><path fill="currentColor" d="m7 10l5 5l5-5z"></path></svg>
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => setIsEpisodesPanelOpen(false)} className={cn("text-white h-12 w-12 hover:bg-white/20", isEpisodesPanelOpen ? "visible" : "invisible")}>
-                <X className="h-8 w-8" />
-            </Button>
+             {isTvShow && (
+                 <>
+                    <button className="bg-black/50 border border-white/50 text-white px-4 py-2 rounded-md text-sm flex items-center gap-2 hover:bg-black/80">
+                        Season 1 <svg width="1em" height="1em" viewBox="0 0 24 24" className="ml-2 h-4 w-4"><path fill="currentColor" d="m7 10l5 5l5-5z"></path></svg>
+                    </button>
+                    <button onClick={() => setIsEpisodesPanelOpen(false)} className={cn("text-white h-12 w-12 flex items-center justify-center hover:bg-white/20", isEpisodesPanelOpen ? "visible" : "invisible")}>
+                        <X className="h-8 w-8" />
+                    </button>
+                 </>
+             )}
           </div>
         </div>
 
         {/* Info Overlay on Left */}
         <div className="absolute left-5 md:left-8 bottom-28 md:bottom-32 text-white max-w-md">
-            <p className="text-lg">Hometown Cha-Cha-Cha</p>
-            <div className="flex items-center gap-2 text-sm text-white/80">
-                <span>Season 1</span><span className="text-xs">•</span><span>2021</span><span className="text-xs">•</span><span>Drama</span>
+            {isTvShow && <p className="text-lg">Hometown Cha-Cha-Cha</p> }
+             <div className="flex items-center gap-2 text-sm text-white/80">
+                {isTvShow && <><span>Season 1</span><span className="text-xs">•</span></>}
+                <span>{media.release_date?.substring(0,4) || media.first_air_date?.substring(0,4)}</span>
+                {isTvShow && <span className="text-xs">•</span>}
+                {isTvShow && <span>Drama</span>}
             </div>
             <h1 className="text-4xl md:text-5xl font-bold my-2">{title}</h1>
-            <p className="text-base text-white/90 line-clamp-3">{description || "Before Hye-jin makes things official with Du-sik, there's something she needs to do first. Attempts to keep their relationship a secret backfire on them."}</p>
+            <p className="text-base text-white/90 line-clamp-3">{description}</p>
         </div>
         
         {/* Center Controls */}
@@ -243,24 +239,33 @@ export default function VideoPlayer({ src, title, description }: VideoPlayerProp
 
         {/* Bottom Bar */}
         <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 text-white">
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-semibold">{formatTime(progress)}</span>
-            <Slider value={[progress]} max={duration} step={0.1} onValueChange={handleSeek} className="w-full cursor-pointer [&>span:first-child>span]:bg-primary"/>
-            <span className="text-sm font-semibold">{formatTime(duration - progress)}</span>
-          </div>
-
-          <div className="flex justify-end items-center mt-4">
+            <div className="w-full relative group">
+                <Slider 
+                    value={[progress]} 
+                    max={duration} 
+                    step={0.1} 
+                    onValueChange={handleSeek} 
+                    className="w-full cursor-pointer h-1 [&>span:first-child]:h-1 [&>span:first-child>span]:bg-primary [&>span:nth-child(2)]:h-3 [&>span:nth-child(2)]:w-3 [&>span:nth-child(2)]:opacity-0 group-hover:[&>span:nth-child(2)]:opacity-100"
+                />
+            </div>
+          <div className="flex justify-between items-center mt-4">
+             <div className="flex items-center gap-4">
+                 <button onClick={(e) => toggleMute(e)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full">
+                    {isMuted ? <VolumeMutedIcon className="h-6 w-6" /> : <VolumeHighIcon className="h-6 w-6" />}
+                 </button>
+             </div>
             <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); }} className="h-10 w-10 hover:bg-white/20"><NextEpisodeIcon className="h-6 w-6" /></Button>
-                <Button variant="ghost" size="icon" onClick={() => setIsEpisodesPanelOpen(p => !p)} className="h-10 w-10 hover:bg-white/20"><EpisodesIcon className="h-6 w-6" /></Button>
-                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); }} className="h-10 w-10 hover:bg-white/20"><CaptionsIcon className="h-6 w-6" /></Button>
-                <Button variant="ghost" size="icon" onClick={(e) => toggleFullscreen(e)} className="h-10 w-10 hover:bg-white/20">{isFullscreen ? <FullscreenExitIcon className="h-6 w-6" /> : <FullscreenEnterIcon className="h-6 w-6" />}</Button>
+                {isTvShow && <button className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><NextEpisodeIcon className="h-6 w-6" /></button>}
+                {isTvShow && <button onClick={() => setIsEpisodesPanelOpen(p => !p)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><EpisodesIcon className="h-6 w-6" /></button>}
+                <button className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><CaptionsIcon className="h-6 w-6" /></button>
+                <button onClick={(e) => toggleFullscreen(e)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full">{isFullscreen ? <FullscreenExitIcon className="h-6 w-6" /> : <FullscreenEnterIcon className="h-6 w-6" />}</button>
             </div>
           </div>
         </div>
       </div>
       
       {/* Episodes Panel */}
+      {isTvShow && (
        <div className={cn(
         'absolute top-0 right-0 h-full w-[420px] bg-black/80 backdrop-blur-md transition-transform duration-500 ease-in-out z-30 p-8 pt-24 overflow-y-auto',
         isEpisodesPanelOpen ? 'translate-x-0' : 'translate-x-full'
@@ -271,7 +276,7 @@ export default function VideoPlayer({ src, title, description }: VideoPlayerProp
                 <div key={i} className={cn("flex gap-4 p-2 rounded-md cursor-pointer", i === 10 ? "bg-white/20" : "hover:bg-white/10")}>
                     <span className="text-xl text-white/80 w-8 text-center pt-1">{i+1}</span>
                     <div className="relative w-40 h-24 rounded-md overflow-hidden">
-                        <Image src={`https://picsum.photos/seed/ep${i+1}/160/90`} alt={`Episode ${i+1}`} layout="fill" objectFit="cover" />
+                        <Image src={`https://picsum.photos/seed/ep${i+1}/160/90`} alt={`Episode ${i+1}`} fill objectFit="cover" />
                         <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                             <PlayIcon className="h-8 w-8 text-white/80" />
                         </div>
@@ -284,8 +289,7 @@ export default function VideoPlayer({ src, title, description }: VideoPlayerProp
             ))}
         </div>
       </div>
+       )}
     </div>
   );
 }
-
-    
