@@ -97,22 +97,28 @@ export default function MoviesPage() {
               trending, 
               popularMovies,
               favoriteGenreMovies,
+              action,
               comedy, 
               horror, 
               romance, 
               documentaries,
-              action,
               thriller,
+              scifi,
+              adventure,
+              fantasy
             ] = await Promise.all([
               getTrending().then(movies => movies.filter(m => m.media_type === 'movie')).then(fetchAndHydrate),
               getPopularMovies().then(fetchAndHydrate),
               profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
+              getMoviesByGenre(28).then(fetchAndHydrate), // Action
               getMoviesByGenre(35).then(fetchAndHydrate), // Comedy
               getMoviesByGenre(27).then(fetchAndHydrate), // Horror
               getMoviesByGenre(10749).then(fetchAndHydrate), // Romance
               getMoviesByGenre(99).then(fetchAndHydrate), // Documentary
-              getMoviesByGenre(28).then(fetchAndHydrate), // Action
               getMoviesByGenre(53).then(fetchAndHydrate), // Thriller
+              getMoviesByGenre(878).then(fetchAndHydrate), // Sci-Fi
+              getMoviesByGenre(12).then(fetchAndHydrate), // Adventure
+              getMoviesByGenre(14).then(fetchAndHydrate), // Fantasy
             ]);
             
             const newCategories: MovieCategory[] = [
@@ -129,6 +135,9 @@ export default function MoviesPage() {
             }
 
             newCategories.push({ title: "Action Movies", movies: action });
+            newCategories.push({ title: "Adventure", movies: adventure });
+            newCategories.push({ title: "Fantasy", movies: fantasy });
+            newCategories.push({ title: "Sci-Fi", movies: scifi });
             newCategories.push({ title: "Comedies", movies: comedy });
             newCategories.push({ title: "Scary Movies", movies: horror });
             newCategories.push({ title: "Thrillers", movies: thriller });
@@ -154,7 +163,7 @@ export default function MoviesPage() {
 
   if (loading || !profile) {
       return (
-        <div className="flex items-center justify-center h-screen bg-black">
+        <div className="flex items-center justify-center h-[400px]">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
       )

@@ -102,16 +102,26 @@ export default function TvPage() {
               top10Shows,
               popularTv, 
               favoriteGenreTv,
+              actionAdventure,
+              animation,
               comedy, 
+              crime,
+              documentary,
               drama,
+              mystery,
               scifi,
               reality
             ] = await Promise.all([
               getTrendingTvShows(profile.country).then(fetchAndHydrate),
               getPopularTvShows().then(fetchAndHydrate),
               profile.favoriteGenreId ? getTvShowsByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
-              getTvShowsByGenre(35).then(fetchAndHydrate), // Comedy
-              getTvShowsByGenre(18).then(fetchAndHydrate), // Drama
+              getTvShowsByGenre(10759).then(fetchAndHydrate), // Action & Adventure
+              getTvShowsByGenre(16).then(fetchAndHydrate),    // Animation
+              getTvShowsByGenre(35).then(fetchAndHydrate),   // Comedy
+              getTvShowsByGenre(80).then(fetchAndHydrate),    // Crime
+              getTvShowsByGenre(99).then(fetchAndHydrate),    // Documentary
+              getTvShowsByGenre(18).then(fetchAndHydrate),    // Drama
+              getTvShowsByGenre(9648).then(fetchAndHydrate),  // Mystery
               getTvShowsByGenre(10765).then(fetchAndHydrate), // Sci-Fi & Fantasy
               getTvShowsByGenre(10764).then(fetchAndHydrate), // Reality
             ]);
@@ -129,9 +139,14 @@ export default function TvPage() {
                 newCategories.push({ title: `TV Shows Because you like ${genreName}`, movies: favoriteGenreContent });
               }
             }
-
+            
+            newCategories.push({ title: "Action & Adventure", movies: actionAdventure });
+            newCategories.push({ title: "Animation", movies: animation });
             newCategories.push({ title: "TV Comedies", movies: comedy });
+            newCategories.push({ title: "Crime TV", movies: crime });
+            newCategories.push({ title: "Documentaries", movies: documentary });
             newCategories.push({ title: "TV Dramas", movies: drama });
+            newCategories.push({ title: "Mystery", movies: mystery });
             newCategories.push({ title: "Sci-Fi & Fantasy", movies: scifi });
             newCategories.push({ title: "Reality TV", movies: reality });
       
@@ -157,7 +172,7 @@ export default function TvPage() {
 
   if (loading || !profile) {
       return (
-        <div className="flex items-center justify-center h-screen bg-black">
+        <div className="flex items-center justify-center h-[400px]">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
       )
