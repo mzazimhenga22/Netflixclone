@@ -28,7 +28,7 @@ const LandingHeader = () => {
             </SelectContent>
           </Select>
           <Button asChild>
-            <Link href="/browse">Sign In</Link>
+            <Link href="/signup/registration">Sign In</Link>
           </Button>
         </div>
       </div>

@@ -43,9 +43,10 @@ export default function Home() {
                   type="email"
                   placeholder="Email address"
                   className="flex-grow bg-black/70 border-white/50 h-14 text-lg"
+                  name="email"
                 />
                 <Button asChild type="submit" size="lg" className="h-14 text-2xl font-semibold px-6">
-                  <Link href="/browse">
+                  <Link href="/signup/registration">
                     Get Started <ChevronRight className="ml-1 h-7 w-7" />
                   </Link>
                 </Button>
