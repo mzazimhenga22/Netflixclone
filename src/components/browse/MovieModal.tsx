@@ -9,6 +9,13 @@ import type { Movie } from '@/types';
 import { getSimilar, TMDB_IMAGE_BASE_URL } from '@/lib/tmdb';
 import { useEffect, useState } from 'react';
 import { genres } from '@/lib/genres';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface MovieModalProps {
   movie: Movie;
@@ -17,6 +24,7 @@ interface MovieModalProps {
 
 const MovieModal = ({ movie, onClose }: MovieModalProps) => {
   const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
+  const isTvShow = movie.media_type === 'tv' || !movie.release_date;
 
   useEffect(() => {
     const fetchSimilar = async () => {
@@ -37,6 +45,13 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
     if (!ids) return '';
     return ids.map(id => genres[id]).filter(Boolean).join(', ');
   }
+
+  const episodesPlaceholder = Array.from({ length: 8 }, (_, i) => ({
+    id: i + 1,
+    title: `Episode ${i + 1}`,
+    description: "As a crisis looms, the group must make a difficult choice. A surprising ally emerges, but can they be trusted?",
+    thumbnail: `https://picsum.photos/seed/ep${i + movie.id}/320/180`,
+  }));
 
   return (
     <div className="text-white">
@@ -97,8 +112,43 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
         </div>
       </div>
 
+       {isTvShow && (
+        <div className="p-10 pt-0 border-b border-secondary">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-2xl font-bold">Episodes</h3>
+             <Select defaultValue="season1">
+                <SelectTrigger className="w-[180px] bg-secondary border-secondary-foreground/20">
+                    <SelectValue placeholder="Season" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="season1">Season 1</SelectItem>
+                    <SelectItem value="season2">Season 2</SelectItem>
+                    <SelectItem value="season3">Season 3</SelectItem>
+                </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-3">
+            {episodesPlaceholder.map((ep, index) => (
+              <div key={ep.id} className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer gap-4">
+                <span className="text-xl text-muted-foreground font-bold w-8 text-center">{index + 1}</span>
+                <div className="relative w-40 h-20 rounded-md overflow-hidden flex-shrink-0">
+                    <Image src={ep.thumbnail} alt={ep.title} fill className="object-cover" />
+                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <Play className="h-8 w-8 text-white" />
+                    </div>
+                </div>
+                <div className="flex-grow">
+                    <h4 className="font-bold">{ep.title}</h4>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{ep.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {similarMovies.length > 0 && (
-        <div className="p-10 pt-0">
+        <div className="p-10">
             <h3 className="text-2xl font-bold mb-4">More Like This</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {similarMovies.map((similarMovie) => (
