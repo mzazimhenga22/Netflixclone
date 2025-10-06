@@ -1,4 +1,3 @@
-
 // components/MovieRow.tsx
 import React from "react";
 import {
@@ -23,7 +22,7 @@ const MovieRow: React.FC<MovieRowProps> = ({ title, movies }) => {
   if (validMovies.length === 0) return null;
 
   return (
-    <div className="pl-4 md:pl-16 group relative z-10 hover:z-20"> {/* allow overlays to escape */}
+    <div className="pl-4 md:pl-16 relative group z-10 hover:z-20"> {/* allow overlays to escape */}
       <h2 className="text-xl md:text-2xl font-bold mb-4">{title}</h2>
 
       <Carousel
@@ -52,8 +51,8 @@ const MovieRow: React.FC<MovieRowProps> = ({ title, movies }) => {
 
         {/* navigation buttons (hidden on small screens) */}
         <div className="hidden md:block">
-          <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
-          <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
+          <CarouselPrevious />
+          <CarouselNext />
         </div>
       </Carousel>
     </div>
