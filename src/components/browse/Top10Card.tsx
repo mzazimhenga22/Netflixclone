@@ -16,7 +16,7 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
     : `https://picsum.photos/seed/${movie.id}/400/600`;
 
   return (
-    <div className="group flex items-center h-full cursor-pointer">
+    <div className="flex items-center h-full cursor-pointer group">
       <div 
         className="text-[200px] font-black text-transparent transition-transform duration-300 ease-in-out group-hover:scale-105" 
         style={{
@@ -26,12 +26,12 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
       >
         {rank}
       </div>
-      <div className="relative -ml-8 w-[140px] h-[210px] rounded-md overflow-hidden transition-transform duration-300 ease-in-out group-hover:scale-110 shadow-lg">
+      <div className="relative -ml-8 w-[150px] h-[225px] rounded-md overflow-hidden transition-transform duration-300 ease-in-out group-hover:scale-110 shadow-lg">
         <Image
           src={posterUrl}
           alt={movie.title || movie.name || 'Movie poster'}
-          width={140}
-          height={210}
+          width={150}
+          height={225}
           className="object-cover w-full h-full"
         />
       </div>

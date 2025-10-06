@@ -23,7 +23,7 @@ const Top10Row: React.FC<Top10RowProps> = ({ title, movies }) => {
   if (validMovies.length === 0) return null;
 
   return (
-    <div className="pl-4 md:pl-16 group relative z-10 hover:z-20">
+    <div className="pl-4 md:pl-16 relative z-10 hover:z-20">
       <h2 className="text-xl md:text-2xl font-bold mb-4">{title}</h2>
       <Carousel
         opts={{
@@ -36,7 +36,7 @@ const Top10Row: React.FC<Top10RowProps> = ({ title, movies }) => {
           {validMovies.map((movie, index) => (
             <CarouselItem
               key={movie.id}
-              className="pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
+              className="pl-4 basis-1/2 sm:basis-[38%] md:basis-1/4 lg:basis-1/5 xl:basis-[18%]"
             >
               <Top10Card movie={movie} rank={index + 1} />
             </CarouselItem>
