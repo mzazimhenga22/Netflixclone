@@ -7,7 +7,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Plus, ChevronDown, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import MovieModal from "./MovieModal";
 import type { Movie } from "@/types";
 
@@ -160,6 +160,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="p-0 max-w-4xl bg-card border-0">
+                               <DialogTitle className="sr-only">{movie.title}</DialogTitle>
                                <MovieModal movie={movie} onClose={() => {}} />
                             </DialogContent>
                         </Dialog>
