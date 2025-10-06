@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import MovieModal from "./MovieModal";
 import type { Movie } from "@/types";
+import { cn } from "@/lib/utils";
 
 interface MovieCardProps {
   movie: Movie;
@@ -38,7 +39,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
   
     const scale = 1.5;
     const scaledWidth = rect.width * scale;
-    const scaledHeight = scaledWidth / (16/9);
+    const scaledHeight = rect.height * scale;
 
     const cardCenterX = rect.left + rect.width / 2;
     const cardCenterY = rect.top + rect.height / 2;
@@ -130,15 +131,19 @@ export default function MovieCard({ movie }: MovieCardProps) {
     transition: { type: "spring", stiffness: 220, damping: 26, duration: 0.28 },
   };
 
-  const handleOpenModal = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const openModal = () => {
     if (showTimeoutRef.current) clearTimeout(showTimeoutRef.current);
     setShowPreview(false);
     setIsModalOpen(true);
+  }
+
+  const handleOpenModal = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    openModal();
   };
 
   const closeModal = () => {
-      setIsModalOpen(false);
+    setIsModalOpen(false);
   }
 
   return (
@@ -163,7 +168,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         {isModalOpen && (
-            <DialogContent className="p-0 w-[90vw] max-w-[90vw] bg-card border-0 rounded-lg overflow-hidden">
+            <DialogContent className={cn("p-0 w-[90vw] max-w-[90vw] bg-card border-0 rounded-lg overflow-hidden max-h-[90vh] overflow-y-auto hide-scrollbar")}>
                 <DialogTitle className="sr-only">{movie.title}</DialogTitle>
                 <MovieModal movie={movie} onClose={closeModal} />
             </DialogContent>
