@@ -160,30 +160,28 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
     <>
       <div 
         ref={cardRef} 
-        className="flex items-center h-full cursor-pointer"
+        className="group flex items-end cursor-pointer h-full"
         onMouseEnter={handleCardEnter}
         onMouseLeave={handleCardLeave}
         onClick={handleOpenModal}
       >
-        <div className='group'>
-            <div 
-              className="text-[200px] font-black text-transparent transition-transform duration-300 ease-in-out group-hover:scale-105" 
-              style={{
-                  WebkitTextStroke: '2px rgba(120, 120, 120, 0.8)',
-                  lineHeight: '1',
-              }}
-            >
-              {rank}
-            </div>
-            <div className="relative -ml-8 w-[150px] h-[225px] rounded-md overflow-hidden transition-transform duration-300 ease-in-out group-hover:scale-110 shadow-lg">
-              <Image
-                src={posterUrl}
-                alt={movie.title || movie.name || 'Movie poster'}
-                width={150}
-                height={225}
-                className="object-cover w-full h-full"
-              />
-            </div>
+        <div 
+          className="text-[200px] font-black text-transparent transition-transform duration-300 ease-in-out group-hover:scale-105" 
+          style={{
+              WebkitTextStroke: '2px rgba(120, 120, 120, 0.8)',
+              lineHeight: '0.8',
+          }}
+        >
+          {rank}
+        </div>
+        <div className="relative -ml-8 w-[150px] h-[225px] rounded-md overflow-hidden transition-transform duration-300 ease-in-out group-hover:scale-110 shadow-lg">
+          <Image
+            src={posterUrl}
+            alt={movie.title || movie.name || 'Movie poster'}
+            width={150}
+            height={225}
+            className="object-cover w-full h-full"
+          />
         </div>
       </div>
 
@@ -277,7 +275,5 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
 };
 
 export default Top10Card;
-
-    
 
     
