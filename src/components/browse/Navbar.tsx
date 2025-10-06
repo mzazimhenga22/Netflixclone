@@ -18,6 +18,30 @@ import {
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '../ui/skeleton';
 
+const notifications = [
+  {
+    id: 1,
+    title: "New Arrival: Rebel Moon",
+    description: "Zack Snyder's latest sci-fi epic has landed. Watch it now!",
+    image: "https://image.tmdb.org/t/p/w200/ui4DrH1cKk2vkHshcUcBFCQbt7k.jpg",
+    time: "2 days ago",
+  },
+  {
+    id: 2,
+    title: "Coming Soon: The Witcher Season 4",
+    description: "Geralt's journey continues. Arriving next month.",
+    image: "https://image.tmdb.org/t/p/w200/cZ0d3rtvXQoJGvDHf3Y1gJ0wIz.jpg",
+    time: "1 week ago",
+  },
+    {
+    id: 3,
+    title: "Top 10 In Your Region",
+    description: "See what's trending in the United States today.",
+    image: "https://image.tmdb.org/t/p/w200/m1CYYy5p62v6s2sJ2f3tH2e1yVD.jpg",
+    time: "3 weeks ago",
+  },
+];
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { profile } = useProfile();
@@ -66,9 +90,36 @@ const Navbar = () => {
             <Search className="h-5 w-5" />
           </Button>
           <span className="hidden lg:block text-sm">Kids</span>
-          <Button variant="ghost" size="icon" className="text-white hover:text-white">
-            <Bell className="h-5 w-5" />
-          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-white hover:text-white">
+                <Bell className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="mr-4 w-80 md:w-96 bg-black/90 border-white/20 text-white" align="end">
+              <DropdownMenuLabel className="py-3">Notifications</DropdownMenuLabel>
+              {notifications.map((notification) => (
+                <DropdownMenuItem key={notification.id} className="p-2 focus:bg-white/10 cursor-pointer">
+                  <div className="flex gap-3 items-start">
+                    <div className="w-24 h-14 relative flex-shrink-0">
+                      <Image src={notification.image} alt={notification.title} fill className="object-cover rounded-sm"/>
+                    </div>
+                    <div className="flex-grow">
+                      <p className="text-sm font-semibold leading-tight">{notification.title}</p>
+                      <p className="text-xs text-white/70 mt-1">{notification.description}</p>
+                      <p className="text-xs text-white/50 mt-2">{notification.time}</p>
+                    </div>
+                  </div>
+                </DropdownMenuItem>
+              ))}
+               <DropdownMenuSeparator className="bg-white/20" />
+                <DropdownMenuItem className="justify-center p-2 focus:bg-white/10 cursor-pointer">
+                  <span className="text-sm">View All</span>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button className="h-8 w-8 rounded-md overflow-hidden focus:outline-none ring-offset-2 ring-offset-background focus:ring-2 focus:ring-ring">
