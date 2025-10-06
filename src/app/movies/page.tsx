@@ -204,12 +204,13 @@ export default function MoviesPage() {
     <div className="bg-background min-h-screen">
       <Navbar />
       
-        {!selectedGenre && <Banner movie={bannerMovie} />}
+      <main className="overflow-x-hidden">
+        <Banner movie={bannerMovie} />
       
-        <div className="pt-8 md:pt-16">
-            <div className="px-4 md:px-16 flex items-center justify-between">
+        <div className="relative -mt-8 md:-mt-20 z-10">
+            <div className="px-4 md:px-16 py-4 flex items-center justify-between bg-background/20 backdrop-blur-sm">
                 <div className="flex items-baseline gap-4">
-                    <h1 className="text-3xl md:text-4xl font-bold">{selectedGenre ? selectedGenreName : "Movies"}</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold">{selectedGenre ? selectedGenreName : "Movies"}</h1>
                     {selectedGenre && (
                         <button onClick={() => handleGenreChange('all')} className="text-muted-foreground hover:text-white text-sm">
                             &times; Clear Filter
@@ -229,8 +230,7 @@ export default function MoviesPage() {
                 </Select>
             </div>
         </div>
-
-      <main className="overflow-x-hidden">
+        
         <div className="pb-32">
             {selectedGenre ? (
                 genreLoading ? (
@@ -247,7 +247,7 @@ export default function MoviesPage() {
                     </div>
                 )
             ) : (
-                <div className="mt-[-80px] space-y-8 lg:space-y-12">
+                <div className="pt-8 space-y-8 lg:space-y-12">
                     {continueWatching.length > 0 && (
                         <ContinueWatchingRow
                             title="Continue Watching"
@@ -268,5 +268,3 @@ export default function MoviesPage() {
     </div>
   );
 }
-
-    
