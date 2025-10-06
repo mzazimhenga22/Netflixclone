@@ -80,4 +80,25 @@ body {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
+  
+  .spinner-group {
+    animation: spin 1.15s linear infinite;
+  }
+
+  .spinner-arc {
+    transform-origin: center;
+    /* makes the arc sweep and look Netflixy */
+    animation: pulseArc 1.6s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes pulseArc {
+    0% { stroke-dasharray: calc(var(--circumference) * 0.25) var(--circumference); }
+    50% { stroke-dasharray: calc(var(--circumference) * 0.45) var(--circumference); }
+    100% { stroke-dasharray: calc(var(--circumference) * 0.25) var(--circumference); }
+  }
 }
