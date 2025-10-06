@@ -1,7 +1,7 @@
 "use client"
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Plus, Play, ChevronDown, ThumbsUp } from 'lucide-react';
+import { Plus, Play, ChevronDown, ThumbsUp, ThumbsDown } from 'lucide-react';
 
 interface Movie {
   id: number;
@@ -22,12 +22,12 @@ const MovieCard = ({ movie }: MovieCardProps) => {
           alt={movie.title}
           width={300}
           height={450}
-          className="object-cover rounded-md w-full h-full transition-opacity group-hover:opacity-0"
+          className="object-cover rounded-md w-full h-full"
           data-ai-hint={movie.imageHint}
         />
       
       {/* Expanded state on hover */}
-      <div className="absolute top-0 left-0 right-0 invisible group-hover:visible transition-all duration-300 transform scale-0 group-hover:scale-100 origin-bottom">
+      <div className="absolute top-0 left-0 right-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100 origin-bottom shadow-2xl rounded-md">
         <div className="relative aspect-video w-full">
              <Image
               src={movie.posterUrl.replace('/450', '/300')} // Use a wider image if available
@@ -50,6 +50,9 @@ const MovieCard = ({ movie }: MovieCardProps) => {
                 </Button>
                 <Button size="icon" variant="outline" className="h-8 w-8 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70">
                     <ThumbsUp className="h-4 w-4" />
+                </Button>
+                 <Button size="icon" variant="outline" className="h-8 w-8 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70">
+                    <ThumbsDown className="h-4 w-4" />
                 </Button>
                 <Button size="icon" variant="outline" className="h-8 w-8 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70 ml-auto">
                     <ChevronDown className="h-4 w-4" />
