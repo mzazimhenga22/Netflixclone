@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -33,7 +34,7 @@ const Navbar = () => {
     };
   }, []);
 
-  const navItems = ['Home', 'TV Shows', 'Movies', 'New & Popular', 'My List', 'TMDB'];
+  const navItems = ['Home', 'TV Shows', 'Movies', 'New & Popular', 'My List'];
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${isScrolled ? 'bg-black' : 'bg-gradient-to-b from-black/70 to-transparent'}`}>
