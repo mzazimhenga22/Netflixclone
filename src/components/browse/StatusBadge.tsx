@@ -9,19 +9,29 @@ interface StatusBadgeProps {
 }
 
 const StatusBadge = ({ movie }: StatusBadgeProps) => {
-  const releaseDateStr = movie.release_date || movie.first_air_date;
-  if (!releaseDateStr) return null;
-
-  const releaseDate = parseISO(releaseDateStr);
-  const daysSinceRelease = differenceInDays(new Date(), releaseDate);
-
   let badgeText: string | null = null;
 
-  if (daysSinceRelease >= 0 && daysSinceRelease <= 30) {
-    badgeText = "New";
+  // Check for "New Season" first for TV shows
+  if (movie.media_type === 'tv' && movie.last_air_date) {
+    const lastAirDate = parseISO(movie.last_air_date);
+    const daysSinceLastAir = differenceInDays(new Date(), lastAirDate);
+    if (daysSinceLastAir >= 0 && daysSinceLastAir <= 60) { // New season if last episode aired recently
+      badgeText = "New Season";
+    }
   }
 
-  // Future logic can be added here for "New Season", "Leaving Soon", etc.
+  // If not a new season, check if it's just "New"
+  if (!badgeText) {
+    const releaseDateStr = movie.release_date || movie.first_air_date;
+    if (releaseDateStr) {
+        const releaseDate = parseISO(releaseDateStr);
+        const daysSinceRelease = differenceInDays(new Date(), releaseDate);
+        if (daysSinceRelease >= 0 && daysSinceRelease <= 30) {
+            badgeText = "New";
+        }
+    }
+  }
+
 
   if (!badgeText) {
     return null;

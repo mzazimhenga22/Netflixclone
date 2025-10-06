@@ -15,7 +15,11 @@ async function fetchFromTmdb<T>(endpoint: string, isSingleItem = false): Promise
       return isSingleItem ? (null as T) : [];
     }
     const data = await res.json();
-    return isSingleItem ? data : (data.results || []) as T[];
+    // For lists, the results are in a 'results' property. For single items, it's the root object.
+    if (isSingleItem) {
+      return data;
+    }
+    return (data.results || []) as T[];
   } catch (error) {
     console.error(`Error fetching from ${endpoint}:`, error);
     return isSingleItem ? (null as T) : [];
@@ -52,10 +56,14 @@ export async function getSimilar(id: number, mediaType: 'movie' | 'tv' | undefin
   return fetchFromTmdb<Movie>(`/${type}/${id}/similar?api_key=${API_KEY}&language=en-US&page=1`) as Promise<Movie[]>;
 }
 
-export async function getMovieOrTvDetails(id: number): Promise<Movie | null> {
-    const type = await getMediaType(id);
+export async function getMovieOrTvDetails(id: number, mediaType?: 'movie' | 'tv'): Promise<Movie | null> {
+    const type = mediaType || await getMediaType(id);
     if (!type) return null;
-    return fetchFromTmdb<Movie>(`/${type}/${id}?api_key=${API_KEY}&language=en-US`, true) as Promise<Movie | null>;
+    const details = await fetchFromTmdb<Movie>(`/${type}/${id}?api_key=${API_KEY}&language=en-US`, true) as Movie | null;
+    if (details) {
+        details.media_type = type; // Ensure media_type is set
+    }
+    return details;
 }
 
 

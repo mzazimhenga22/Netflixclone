@@ -7,7 +7,7 @@ import Navbar from "@/components/browse/Navbar";
 import MovieRow from "@/components/browse/MovieRow";
 import Top10Row from '@/components/browse/Top10Row';
 import Footer from "@/components/shared/Footer";
-import { getTrending, getMoviesByGenre, getPopularMovies, getPopularTvShows, getTvShowsByGenre, getTrendingTvShows } from "@/lib/tmdb";
+import { getTrending, getMoviesByGenre, getPopularMovies, getPopularTvShows, getTvShowsByGenre, getTrendingTvShows, getMovieOrTvDetails } from "@/lib/tmdb";
 import type { Movie } from "@/types";
 import { useProfile } from '@/hooks/useProfile';
 import { genres } from '@/lib/genres';
@@ -19,6 +19,14 @@ type MovieCategory = {
   title: string;
   movies: Movie[];
 };
+
+const fetchAndHydrate = async (movieList: Movie[]): Promise<Movie[]> => {
+  const detailedMovies = await Promise.all(
+    movieList.map(movie => getMovieOrTvDetails(movie.id, movie.media_type))
+  );
+  return detailedMovies.filter((movie): movie is Movie => movie !== null);
+};
+
 
 export default function BrowsePage() {
   const { profile } = useProfile();
@@ -45,16 +53,16 @@ export default function BrowsePage() {
           romance, 
           documentaries
         ] = await Promise.all([
-          getTrending(),
-          getTrendingTvShows(profile.country),
-          getPopularMovies(),
-          getPopularTvShows(),
-          profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId) : Promise.resolve([]),
-          profile.favoriteGenreId ? getTvShowsByGenre(profile.favoriteGenreId) : Promise.resolve([]),
-          getMoviesByGenre(35), // Comedy
-          getMoviesByGenre(27), // Horror
-          getMoviesByGenre(10749), // Romance
-          getMoviesByGenre(99), // Documentary
+          getTrending().then(fetchAndHydrate),
+          getTrendingTvShows(profile.country).then(fetchAndHydrate),
+          getPopularMovies().then(fetchAndHydrate),
+          getPopularTvShows().then(fetchAndHydrate),
+          profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
+          profile.favoriteGenreId ? getTvShowsByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
+          getMoviesByGenre(35).then(fetchAndHydrate), // Comedy
+          getMoviesByGenre(27).then(fetchAndHydrate), // Horror
+          getMoviesByGenre(10749).then(fetchAndHydrate), // Romance
+          getMoviesByGenre(99).then(fetchAndHydrate), // Documentary
         ]);
         
         const newCategories: MovieCategory[] = [
