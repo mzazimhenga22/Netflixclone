@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from 'next/image';
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Plus, ChevronDown, ThumbsUp } from "lucide-react";
+import { Play, Plus, Check, ChevronDown, ThumbsUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import MovieModal from "./MovieModal";
@@ -13,6 +13,7 @@ import { TMDB_IMAGE_BASE_URL } from '@/lib/tmdb';
 import type { Movie } from '@/types';
 import { cn } from "@/lib/utils";
 import StatusBadge from "./StatusBadge";
+import { useMyList } from "@/hooks/useMyList";
 
 interface Top10CardProps {
   movie: Movie;
@@ -26,6 +27,9 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
   const showTimeoutRef = useRef<number | null>(null);
   const hideTimeoutRef = useRef<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { myList, addToMyList, removeFromMyList } = useMyList();
+  const isInList = myList.includes(movie.id);
+
 
   const posterUrl = movie.poster_path
     ? `${TMDB_IMAGE_BASE_URL.replace('original', 'w500')}${movie.poster_path}`
@@ -56,7 +60,7 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
     const cardCenterY = rect.top + rect.height / 2;
 
     let left = cardCenterX - scaledWidth / 2;
-    let top = cardCenterY - scaledHeight / 2 - 20; // Adjusted to lift it up slightly
+    let top = cardCenterY - scaledHeight / 2 - 40; // Adjusted to lift it up slightly
 
     const scrollable = findScrollableAncestor(cardRef.current);
     const viewportRect = scrollable ? scrollable.getBoundingClientRect() : { left: 0, width: window.innerWidth, top: 0, height: window.innerHeight };
@@ -157,6 +161,16 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
     setIsModalOpen(false);
   }
 
+  const handleToggleList = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isInList) {
+      removeFromMyList(movie.id);
+    } else {
+      addToMyList(movie.id);
+    }
+  };
+
+
   return (
     <>
       <div 
@@ -235,8 +249,8 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
                         <Play className="h-5 w-5 fill-black" />
                       </Button>
 
-                      <Button size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
-                        <Plus className="h-5 w-5" />
+                      <Button onClick={handleToggleList} size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
+                        {isInList ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
                       </Button>
 
                       <Button size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
@@ -278,5 +292,3 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
 };
 
 export default Top10Card;
-
-    

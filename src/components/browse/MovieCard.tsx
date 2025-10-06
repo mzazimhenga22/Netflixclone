@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Plus, ChevronDown, ThumbsUp } from "lucide-react";
+import { Play, Plus, Check, ChevronDown, ThumbsUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import MovieModal from "./MovieModal";
@@ -13,6 +13,7 @@ import type { Movie } from "@/types";
 import { cn } from "@/lib/utils";
 import { TMDB_IMAGE_BASE_URL } from "@/lib/tmdb";
 import StatusBadge from "./StatusBadge";
+import { useMyList } from "@/hooks/useMyList";
 
 interface MovieCardProps {
   movie: Movie;
@@ -25,6 +26,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
   const showTimeoutRef = useRef<number | null>(null);
   const hideTimeoutRef = useRef<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { myList, addToMyList, removeFromMyList } = useMyList();
+  const isInList = myList.includes(movie.id);
 
   const posterUrl = movie.backdrop_path 
     ? `${TMDB_IMAGE_BASE_URL}${movie.backdrop_path}`
@@ -152,6 +155,16 @@ export default function MovieCard({ movie }: MovieCardProps) {
     setIsModalOpen(false);
   }
 
+  const handleToggleList = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isInList) {
+      removeFromMyList(movie.id);
+    } else {
+      addToMyList(movie.id);
+    }
+  };
+
+
   return (
     <>
       <div
@@ -220,8 +233,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
                         <Play className="h-5 w-5 fill-black" />
                       </Button>
 
-                      <Button size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
-                        <Plus className="h-5 w-5" />
+                      <Button onClick={handleToggleList} size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
+                        {isInList ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
                       </Button>
 
                       <Button size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">

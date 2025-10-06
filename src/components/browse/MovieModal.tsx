@@ -4,7 +4,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Plus, Play, ThumbsUp, Volume2, X } from 'lucide-react';
+import { Plus, Play, ThumbsUp, Volume2, X, Check } from 'lucide-react';
 import type { Movie } from '@/types';
 import { getSimilar, TMDB_IMAGE_BASE_URL } from '@/lib/tmdb';
 import { useEffect, useState } from 'react';
@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useMyList } from '@/hooks/useMyList';
 
 interface MovieModalProps {
   movie: Movie;
@@ -25,6 +26,8 @@ interface MovieModalProps {
 const MovieModal = ({ movie, onClose }: MovieModalProps) => {
   const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
   const isTvShow = movie.media_type === 'tv' || !movie.release_date;
+  const { myList, addToMyList, removeFromMyList } = useMyList();
+  const isInList = myList.includes(movie.id);
 
   useEffect(() => {
     const fetchSimilar = async () => {
@@ -53,6 +56,24 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
     thumbnail: `https://picsum.photos/seed/ep${i + movie.id}/320/180`,
   }));
 
+  const handleToggleList = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isInList) {
+      removeFromMyList(movie.id);
+    } else {
+      addToMyList(movie.id);
+    }
+  };
+
+  const handleSimilarToggleList = (e: React.MouseEvent, similarMovieId: number) => {
+    e.stopPropagation();
+    if (myList.includes(similarMovieId)) {
+        removeFromMyList(similarMovieId);
+    } else {
+        addToMyList(similarMovieId);
+    }
+  };
+
   return (
     <div className="text-white">
       <div className="relative aspect-video">
@@ -76,8 +97,8 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
                 <Play className="mr-2 h-7 w-7" /> Play
               </Link>
             </Button>
-            <Button size="icon" variant="outline" className="h-11 w-11 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70">
-              <Plus className="h-7 w-7" />
+            <Button onClick={handleToggleList} size="icon" variant="outline" className="h-11 w-11 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70">
+              {isInList ? <Check className="h-7 w-7" /> : <Plus className="h-7 w-7" />}
             </Button>
             <Button size="icon" variant="outline" className="h-11 w-11 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70">
               <ThumbsUp className="h-7 w-7" />
@@ -156,8 +177,8 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
                         <div className="relative aspect-video">
                             <Image src={`${TMDB_IMAGE_BASE_URL}${similarMovie.backdrop_path}`} alt={similarMovie.title || similarMovie.name || ""} fill className="object-cover" />
                              <div className="absolute top-2 right-2 z-10">
-                                 <Button size="icon" variant="outline" className="h-8 w-8 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70">
-                                    <Plus className="h-5 w-5" />
+                                 <Button onClick={(e) => handleSimilarToggleList(e, similarMovie.id)} size="icon" variant="outline" className="h-8 w-8 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70">
+                                    {myList.includes(similarMovie.id) ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
                                 </Button>
                             </div>
                             <div className="absolute bottom-0 left-0 p-2 bg-gradient-to-t from-black/80 to-transparent w-full">

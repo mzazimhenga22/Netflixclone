@@ -92,7 +92,14 @@ const Navbar = () => {
     fetchNotifications();
   }, []);
 
-  const navItems = ['Home', 'TV Shows', 'Movies', 'New & Popular', 'My List'];
+  const navItems = [
+    { name: 'Home', href: '/browse' },
+    { name: 'TV Shows', href: '#' },
+    { name: 'Movies', href: '#' },
+    { name: 'New & Popular', href: '#' },
+    { name: 'My List', href: '/my-list' }
+ ];
+
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 bg-gradient-to-b from-black/70 to-transparent`}>
@@ -104,9 +111,9 @@ const Navbar = () => {
           <nav className="hidden md:block">
             <ul className="flex items-center space-x-4">
               {navItems.map((item) => (
-                <li key={item}>
-                  <Link href={'#'} className="text-sm text-white/90 hover:text-white/70 transition-colors font-semibold">
-                    {item}
+                <li key={item.name}>
+                  <Link href={item.href} className="text-sm text-white/90 hover:text-white/70 transition-colors font-semibold">
+                    {item.name}
                   </Link>
                 </li>
               ))}
