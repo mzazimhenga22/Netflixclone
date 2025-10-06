@@ -40,10 +40,24 @@ const Navbar = () => {
         setLoadingNotifications(true);
         try {
             const trending = await getTrending();
-            const upcomingMovies = await getMovieOrTvDetails(trending[Math.floor(Math.random() * trending.length)]?.id, 'movie');
+            const randomTrendingItem = trending.length > 0 ? trending[Math.floor(Math.random() * trending.length)] : null;
             
             const generatedNotifications: Notification[] = [];
 
+            if (randomTrendingItem) {
+                 const details = await getMovieOrTvDetails(randomTrendingItem.id, randomTrendingItem.media_type);
+                 if (details && details.release_date) {
+                     generatedNotifications.push({
+                        id: details.id,
+                        title: `Coming Soon: ${details.title}`,
+                        description: `Arriving on ${new Date(details.release_date).toLocaleDateString()}`,
+                        image: `https://image.tmdb.org/t/p/w200${details.backdrop_path}`,
+                        time: formatDistanceToNow(new Date(details.release_date), { addSuffix: true }),
+                        media_type: 'movie'
+                    });
+                 }
+            }
+            
             if (trending.length > 0) {
                 const newArrival = trending[0];
                 generatedNotifications.push({
@@ -53,17 +67,6 @@ const Navbar = () => {
                     image: `https://image.tmdb.org/t/p/w200${newArrival.backdrop_path}`,
                     time: "1 day ago",
                     media_type: newArrival.media_type,
-                });
-            }
-
-            if (upcomingMovies) {
-                 generatedNotifications.push({
-                    id: upcomingMovies.id,
-                    title: `Coming Soon: ${upcomingMovies.title}`,
-                    description: `Arriving on ${new Date(upcomingMovies.release_date!).toLocaleDateString()}`,
-                    image: `https://image.tmdb.org/t/p/w200${upcomingMovies.backdrop_path}`,
-                    time: formatDistanceToNow(new Date(upcomingMovies.release_date!), { addSuffix: true }),
-                    media_type: 'movie'
                 });
             }
             
@@ -80,7 +83,8 @@ const Navbar = () => {
             }
 
 
-            setNotifications(generatedNotifications);
+            setNotifications(generatedNotifications.filter(n => n.image.endsWith('.jpg') || n.image.endsWith('.png')));
+
 
         } catch (error) {
             console.error("Failed to fetch notifications", error);
