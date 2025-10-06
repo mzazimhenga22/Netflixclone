@@ -70,55 +70,87 @@ export default function BrowsePage() {
       setLoading(true);
   
       try {
-        const [
-          trending, 
-          top10Shows,
-          popularMovies,
-          popularTv, 
-          favoriteGenreMovies,
-          favoriteGenreTv,
-          comedy, 
-          horror, 
-          romance, 
-          documentaries
-        ] = await Promise.all([
-          getTrending().then(fetchAndHydrate),
-          getTrendingTvShows(profile.country).then(fetchAndHydrate),
-          getPopularMovies().then(fetchAndHydrate),
-          getPopularTvShows().then(fetchAndHydrate),
-          profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
-          profile.favoriteGenreId ? getTvShowsByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
-          getMoviesByGenre(35).then(fetchAndHydrate), // Comedy
-          getMoviesByGenre(27).then(fetchAndHydrate), // Horror
-          getMoviesByGenre(10749).then(fetchAndHydrate), // Romance
-          getMoviesByGenre(99).then(fetchAndHydrate), // Documentary
-        ]);
-        
-        const newCategories: MovieCategory[] = [
-          { title: "Trending Now", movies: trending },
-          { title: "Popular Movies", movies: popularMovies },
-          { title: "Popular TV Shows", movies: popularTv },
-        ];
+        const isKidsProfile = profile.name.toLowerCase() === 'kids';
 
-        setTop10(top10Shows.slice(0, 10));
-  
-        if (profile.favoriteGenreId) {
-          const genreName = genres[profile.favoriteGenreId];
-          const favoriteGenreContent = [...favoriteGenreMovies, ...favoriteGenreTv].sort(() => 0.5 - Math.random());
-          if (genreName) {
-            newCategories.push({ title: `Because you like ${genreName}`, movies: favoriteGenreContent });
+        if (isKidsProfile) {
+          const [
+            familyMovies,
+            animationMovies,
+            kidsTv,
+            animatedTv,
+          ] = await Promise.all([
+            getMoviesByGenre(10751).then(fetchAndHydrate), // Family
+            getMoviesByGenre(16).then(fetchAndHydrate),   // Animation
+            getTvShowsByGenre(10762).then(fetchAndHydrate), // Kids TV
+            getTvShowsByGenre(16).then(fetchAndHydrate), // Animated TV
+          ]);
+          
+          const kidsContent = [...familyMovies, ...animationMovies, ...kidsTv, ...animatedTv].sort(() => 0.5 - Math.random());
+
+          const newCategories: MovieCategory[] = [
+            { title: "Animation", movies: [...animationMovies, ...animatedTv].sort(() => 0.5 - Math.random()) },
+            { title: "Family Fun", movies: familyMovies },
+            { title: "Kids TV", movies: kidsTv },
+          ];
+
+          setCategories(newCategories);
+          setTop10([]); // No top 10 for kids profile for now
+
+          if (kidsContent.length > 0) {
+            setBannerMovie(kidsContent[Math.floor(Math.random() * kidsContent.length)]);
           }
-        }
 
-        newCategories.push({ title: "Comedies", movies: comedy });
-        newCategories.push({ title: "Scary Movies", movies: horror });
-        newCategories.push({ title: "Romance", movies: romance });
-        newCategories.push({ title: "Documentaries", movies: documentaries });
-  
-        setCategories(newCategories);
-  
-        if (trending.length > 0) {
-          setBannerMovie(trending[Math.floor(Math.random() * trending.length)]);
+        } else {
+            const [
+              trending, 
+              top10Shows,
+              popularMovies,
+              popularTv, 
+              favoriteGenreMovies,
+              favoriteGenreTv,
+              comedy, 
+              horror, 
+              romance, 
+              documentaries
+            ] = await Promise.all([
+              getTrending().then(fetchAndHydrate),
+              getTrendingTvShows(profile.country).then(fetchAndHydrate),
+              getPopularMovies().then(fetchAndHydrate),
+              getPopularTvShows().then(fetchAndHydrate),
+              profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
+              profile.favoriteGenreId ? getTvShowsByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
+              getMoviesByGenre(35).then(fetchAndHydrate), // Comedy
+              getMoviesByGenre(27).then(fetchAndHydrate), // Horror
+              getMoviesByGenre(10749).then(fetchAndHydrate), // Romance
+              getMoviesByGenre(99).then(fetchAndHydrate), // Documentary
+            ]);
+            
+            const newCategories: MovieCategory[] = [
+              { title: "Trending Now", movies: trending },
+              { title: "Popular Movies", movies: popularMovies },
+              { title: "Popular TV Shows", movies: popularTv },
+            ];
+
+            setTop10(top10Shows.slice(0, 10));
+      
+            if (profile.favoriteGenreId) {
+              const genreName = genres[profile.favoriteGenreId];
+              const favoriteGenreContent = [...favoriteGenreMovies, ...favoriteGenreTv].sort(() => 0.5 - Math.random());
+              if (genreName) {
+                newCategories.push({ title: `Because you like ${genreName}`, movies: favoriteGenreContent });
+              }
+            }
+
+            newCategories.push({ title: "Comedies", movies: comedy });
+            newCategories.push({ title: "Scary Movies", movies: horror });
+            newCategories.push({ title: "Romance", movies: romance });
+            newCategories.push({ title: "Documentaries", movies: documentaries });
+      
+            setCategories(newCategories);
+      
+            if (trending.length > 0) {
+              setBannerMovie(trending[Math.floor(Math.random() * trending.length)]);
+            }
         }
       } catch (error) {
         console.error("Failed to fetch movies for browse page:", error);
@@ -162,7 +194,7 @@ export default function BrowsePage() {
             {categories.map((category, index) => (
               <React.Fragment key={category.title}>
                 <MovieRow title={category.title} movies={category.movies} />
-                {index === 0 && top10.length > 0 && (
+                {index === 0 && top10.length > 0 && profile.name.toLowerCase() !== 'kids' && (
                    <Top10Row title={`Top 10 TV Shows in ${getCountryName(profile.country)} Today`} movies={top10} />
                 )}
               </React.Fragment>
