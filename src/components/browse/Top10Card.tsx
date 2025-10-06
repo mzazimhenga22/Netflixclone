@@ -12,6 +12,7 @@ import MovieModal from "./MovieModal";
 import { TMDB_IMAGE_BASE_URL } from '@/lib/tmdb';
 import type { Movie } from '@/types';
 import { cn } from "@/lib/utils";
+import StatusBadge from "./StatusBadge";
 
 interface Top10CardProps {
   movie: Movie;
@@ -160,7 +161,7 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
     <>
       <div 
         ref={cardRef} 
-        className="group flex items-end cursor-pointer h-full"
+        className="flex items-end cursor-pointer h-full group"
         onMouseEnter={handleCardEnter}
         onMouseLeave={handleCardLeave}
         onClick={handleOpenModal}
@@ -175,6 +176,7 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
           {rank}
         </div>
         <div className="relative -ml-8 w-[150px] h-[225px] rounded-md overflow-hidden transition-transform duration-300 ease-in-out group-hover:scale-110 shadow-lg">
+          <StatusBadge movie={movie} />
           <Image
             src={posterUrl}
             alt={movie.title || movie.name || 'Movie poster'}
@@ -217,6 +219,7 @@ const Top10Card = ({ movie, rank }: Top10CardProps) => {
                 aria-label={`${movie.title || movie.name} preview`}
               >
                 <div className="relative w-full aspect-video cursor-pointer" onClick={handleOpenModal}>
+                    <StatusBadge movie={movie} />
                     <Image
                       src={backdropUrl}
                       alt={`${movie.title || movie.name} preview`}

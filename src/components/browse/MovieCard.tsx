@@ -12,6 +12,7 @@ import MovieModal from "./MovieModal";
 import type { Movie } from "@/types";
 import { cn } from "@/lib/utils";
 import { TMDB_IMAGE_BASE_URL } from "@/lib/tmdb";
+import StatusBadge from "./StatusBadge";
 
 interface MovieCardProps {
   movie: Movie;
@@ -160,6 +161,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
         onMouseLeave={handleCardLeave}
         onClick={handleOpenModal}
       >
+        <StatusBadge movie={movie} />
         <Image
           src={posterUrl}
           alt={movie.title || movie.name || "Movie poster"}
@@ -202,6 +204,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
                 aria-label={`${movie.title || movie.name} preview`}
               >
                 <div className="relative w-full aspect-video cursor-pointer" onClick={handleOpenModal}>
+                    <StatusBadge movie={movie} />
                     <Image
                       src={posterUrl}
                       alt={`${movie.title || movie.name} preview`}
