@@ -5,8 +5,9 @@ import { useState, useEffect } from 'react';
 import Banner from "@/components/browse/Banner";
 import Navbar from "@/components/browse/Navbar";
 import MovieRow from "@/components/browse/MovieRow";
+import Top10Row from '@/components/browse/Top10Row';
 import Footer from "@/components/shared/Footer";
-import { getTrending, getMoviesByGenre, getPopularMovies, getPopularTvShows, getTvShowsByGenre } from "@/lib/tmdb";
+import { getTrending, getMoviesByGenre, getPopularMovies, getPopularTvShows, getTvShowsByGenre, getTrendingTvShows } from "@/lib/tmdb";
 import type { Movie } from "@/types";
 import { useProfile } from '@/hooks/useProfile';
 import { genres } from '@/lib/genres';
@@ -20,6 +21,7 @@ export default function BrowsePage() {
   const { profile } = useProfile();
   const [bannerMovie, setBannerMovie] = useState<Movie | null>(null);
   const [categories, setCategories] = useState<MovieCategory[]>([]);
+  const [top10, setTop10] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,6 +32,7 @@ export default function BrowsePage() {
       try {
         const [
           trending, 
+          top10Shows,
           popularMovies,
           popularTv, 
           favoriteGenreMovies,
@@ -40,6 +43,7 @@ export default function BrowsePage() {
           documentaries
         ] = await Promise.all([
           getTrending(),
+          getTrendingTvShows(),
           getPopularMovies(),
           getPopularTvShows(),
           profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId) : Promise.resolve([]),
@@ -55,6 +59,8 @@ export default function BrowsePage() {
           { title: "Popular Movies", movies: popularMovies },
           { title: "Popular TV Shows", movies: popularTv },
         ];
+
+        setTop10(top10Shows.slice(0, 10));
   
         if (profile.favoriteGenreId) {
           const genreName = genres[profile.favoriteGenreId];
@@ -102,8 +108,13 @@ export default function BrowsePage() {
         <Banner movie={bannerMovie} />
         <div className="relative -mt-8 md:-mt-20 pb-32">
           <div className="space-y-8 lg:space-y-12">
-            {categories.map((category) => (
-              <MovieRow key={category.title} title={category.title} movies={category.movies} />
+            {categories.map((category, index) => (
+              <React.Fragment key={category.title}>
+                <MovieRow title={category.title} movies={category.movies} />
+                {index === 0 && top10.length > 0 && (
+                   <Top10Row title="Top 10 TV Shows in the U.S. Today" movies={top10} />
+                )}
+              </React.Fragment>
             ))}
           </div>
         </div>
