@@ -45,7 +45,6 @@ export default function MovieCard({ movie }: MovieCardProps) {
     if (left < 20) left = 20;
     else if (left + overlayWidth > window.innerWidth - 20) left = window.innerWidth - overlayWidth - 20;
     
-    // Convert to fixed position coordinates
     const fixedTop = top - window.scrollY;
     const fixedLeft = left - window.scrollX;
 
@@ -62,7 +61,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
         setPosition(p);
         setShowPreview(true);
       }
-    }, 400); // A slight delay before showing the preview
+    }, 400); 
   };
 
   const handleMouseLeave = () => {
@@ -95,7 +94,6 @@ export default function MovieCard({ movie }: MovieCardProps) {
         className="group/item relative aspect-video bg-zinc-900 rounded-md transition-transform duration-300 ease-in-out cursor-pointer"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onClick={openModal}
       >
         <Image
           src={movie.posterUrl}
@@ -104,6 +102,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
           height={225}
           className="object-cover rounded-md w-full h-full"
           data-ai-hint={movie.imageHint}
+          onClick={openModal}
         />
       </div>
 
@@ -123,8 +122,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
               zIndex: 9999,
             }}
             className="bg-zinc-900 rounded-lg overflow-hidden shadow-2xl"
-            onMouseEnter={handleMouseEnter} // Keep it open when mouse enters preview
-            onMouseLeave={handleMouseLeave} // Close it when mouse leaves preview
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
             <div className="relative w-full cursor-pointer aspect-video" onClick={openModal}>
               {movie.previewUrl ? (
