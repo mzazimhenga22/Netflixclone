@@ -32,12 +32,12 @@ const MovieRow = ({ title, movies }: MovieRowProps) => {
       >
         <CarouselContent className="-ml-2">
           {movies.map((movie, index) => (
-            <CarouselItem key={movie.id} className="basis-1/3 sm:basis-1/4 md:basis-1/5 lg:basis-1/6 xl:basis-[14%] pl-2">
+            <CarouselItem key={movie.id} className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6 pl-2">
                 <MovieCard movie={movie} />
             </CarouselItem>
           ))}
-           <CarouselItem className="basis-1/3 sm:basis-1/4 md:basis-1/5 lg:basis-1/6 xl:basis-[14%] pl-2">
-              <div className="aspect-[2/3]"/>
+           <CarouselItem className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6 pl-2">
+              <div className="aspect-video"/>
            </CarouselItem>
         </CarouselContent>
         <div className="hidden md:block">

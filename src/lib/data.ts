@@ -1,9 +1,14 @@
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
+const landscapeImages = PlaceHolderImages.filter(img => !img.id.startsWith('movie-poster'));
+const posterImages = PlaceHolderImages.filter(img => img.id.startsWith('movie-poster'));
+
+const allMovieImages = [...landscapeImages, ...posterImages];
+
 export const movieCategories = [
   {
     title: "Trending Now",
-    movies: PlaceHolderImages.filter(img => img.id.startsWith('movie-poster')).slice(0, 10).map((img, index) => ({
+    movies: allMovieImages.slice(0, 10).map((img, index) => ({
       id: index + 1,
       title: `Trending Movie ${index + 1}`,
       posterUrl: img.imageUrl,
@@ -12,7 +17,7 @@ export const movieCategories = [
   },
   {
     title: "Popular on StreamClone",
-    movies: [...PlaceHolderImages.filter(img => img.id.startsWith('movie-poster'))].reverse().slice(0, 10).map((img, index) => ({
+    movies: [...allMovieImages].reverse().slice(0, 10).map((img, index) => ({
       id: index + 11,
       title: `Popular Movie ${index + 1}`,
       posterUrl: img.imageUrl,
@@ -21,7 +26,7 @@ export const movieCategories = [
   },
   {
     title: "Sci-Fi & Fantasy",
-    movies: PlaceHolderImages.filter(img => img.id.startsWith('movie-poster')).slice(2, 12).map((img, index) => ({
+    movies: allMovieImages.slice(2, 12).map((img, index) => ({
       id: index + 21,
       title: `Sci-Fi Movie ${index + 1}`,
       posterUrl: img.imageUrl,
@@ -30,7 +35,7 @@ export const movieCategories = [
   },
     {
     title: "Action & Adventure",
-    movies: PlaceHolderImages.filter(img => img.id.startsWith('movie-poster')).slice(4, 10).concat(PlaceHolderImages.filter(img => img.id.startsWith('movie-poster')).slice(0,4)).map((img, index) => ({
+    movies: allMovieImages.slice(4, 10).concat(allMovieImages.slice(0,4)).map((img, index) => ({
       id: index + 31,
       title: `Action Movie ${index + 1}`,
       posterUrl: img.imageUrl,

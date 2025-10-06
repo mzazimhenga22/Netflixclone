@@ -16,21 +16,21 @@ interface MovieCardProps {
 
 const MovieCard = ({ movie }: MovieCardProps) => {
   return (
-    <div className="group relative aspect-[2/3] bg-background rounded-md">
+    <div className="group relative aspect-video bg-background rounded-md">
         <Image
           src={movie.posterUrl}
           alt={movie.title}
           width={300}
-          height={450}
+          height={169}
           className="object-cover rounded-md w-full h-full"
           data-ai-hint={movie.imageHint}
         />
       
       {/* Expanded state on hover */}
-      <div className="absolute top-0 left-0 right-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100 group-hover:delay-500 origin-bottom shadow-2xl rounded-md md:group-hover:scale-125 md:group-hover:z-30">
+      <div className="absolute top-0 left-0 right-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100 group-hover:delay-500 origin-bottom shadow-2xl rounded-lg md:group-hover:scale-125 md:group-hover:z-30">
         <div className="relative aspect-video w-full">
              <Image
-              src={movie.posterUrl.replace('/450', '/300')} // Use a wider image if available
+              src={movie.posterUrl}
               alt={`${movie.title} preview`}
               width={300}
               height={169}
