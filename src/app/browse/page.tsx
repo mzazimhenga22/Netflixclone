@@ -108,10 +108,19 @@ export default function BrowsePage() {
               popularTv, 
               favoriteGenreMovies,
               favoriteGenreTv,
-              comedy, 
-              horror, 
-              romance, 
-              documentaries
+              comedyMovies,
+              comedyTv, 
+              horrorMovies, 
+              romanceMovies, 
+              documentaryMovies,
+              actionMovies,
+              actionTv,
+              dramaMovies,
+              dramaTv,
+              scifiMovies,
+              scifiTv,
+              animationMovies,
+              animationTv
             ] = await Promise.all([
               getTrending().then(fetchAndHydrate),
               getTrendingTvShows(profile.country).then(fetchAndHydrate),
@@ -119,10 +128,19 @@ export default function BrowsePage() {
               getPopularTvShows().then(fetchAndHydrate),
               profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
               profile.favoriteGenreId ? getTvShowsByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
-              getMoviesByGenre(35).then(fetchAndHydrate), // Comedy
-              getMoviesByGenre(27).then(fetchAndHydrate), // Horror
-              getMoviesByGenre(10749).then(fetchAndHydrate), // Romance
-              getMoviesByGenre(99).then(fetchAndHydrate), // Documentary
+              getMoviesByGenre(35).then(fetchAndHydrate), // Comedy Movies
+              getTvShowsByGenre(35).then(fetchAndHydrate), // Comedy TV
+              getMoviesByGenre(27).then(fetchAndHydrate), // Horror Movies
+              getMoviesByGenre(10749).then(fetchAndHydrate), // Romance Movies
+              getMoviesByGenre(99).then(fetchAndHydrate), // Documentary Movies
+              getMoviesByGenre(28).then(fetchAndHydrate), // Action Movies
+              getTvShowsByGenre(10759).then(fetchAndHydrate), // Action & Adventure TV
+              getMoviesByGenre(18).then(fetchAndHydrate), // Drama Movies
+              getTvShowsByGenre(18).then(fetchAndHydrate), // Drama TV
+              getMoviesByGenre(878).then(fetchAndHydrate), // Sci-Fi Movies
+              getTvShowsByGenre(10765).then(fetchAndHydrate), // Sci-Fi & Fantasy TV
+              getMoviesByGenre(16).then(fetchAndHydrate), // Animation Movies
+              getTvShowsByGenre(16).then(fetchAndHydrate), // Animation TV
             ]);
             
             const newCategories: MovieCategory[] = [
@@ -141,10 +159,20 @@ export default function BrowsePage() {
               }
             }
 
-            newCategories.push({ title: "Comedies", movies: comedy });
-            newCategories.push({ title: "Scary Movies", movies: horror });
-            newCategories.push({ title: "Romance", movies: romance });
-            newCategories.push({ title: "Documentaries", movies: documentaries });
+            const actionAdventure = [...actionMovies, ...actionTv].sort(() => 0.5 - Math.random());
+            const dramas = [...dramaMovies, ...dramaTv].sort(() => 0.5 - Math.random());
+            const scifiFantasy = [...scifiMovies, ...scifiTv].sort(() => 0.5 - Math.random());
+            const comedies = [...comedyMovies, ...comedyTv].sort(() => 0.5 - Math.random());
+            const animation = [...animationMovies, ...animationTv].sort(() => 0.5 - Math.random());
+
+            newCategories.push({ title: "Action & Adventure", movies: actionAdventure });
+            newCategories.push({ title: "Comedies", movies: comedies });
+            newCategories.push({ title: "Dramas", movies: dramas });
+            newCategories.push({ title: "Scary Movies", movies: horrorMovies });
+            newCategories.push({ title: "Romance", movies: romanceMovies });
+            newCategories.push({ title: "Sci-Fi & Fantasy", movies: scifiFantasy });
+            newCategories.push({ title: "Animation", movies: animation });
+            newCategories.push({ title: "Documentaries", movies: documentaryMovies });
       
             setCategories(newCategories);
       
