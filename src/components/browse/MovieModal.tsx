@@ -4,7 +4,6 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Plus, Play, ThumbsUp, Volume2, X } from 'lucide-react';
-import { DialogClose } from '@/components/ui/dialog';
 import { movieCategories } from '@/lib/data';
 
 interface Movie {
@@ -16,11 +15,12 @@ interface Movie {
 
 interface MovieModalProps {
   movie: Movie;
+  onClose: () => void;
 }
 
 const similarMovies = movieCategories.find(cat => cat.title === "Trending Now")?.movies.slice(0, 3) || [];
 
-const MovieModal = ({ movie }: MovieModalProps) => {
+const MovieModal = ({ movie, onClose }: MovieModalProps) => {
   return (
     <div className="text-white">
       <div className="relative aspect-video">
@@ -33,11 +33,9 @@ const MovieModal = ({ movie }: MovieModalProps) => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
         <div className="absolute top-4 right-4">
-          <DialogClose asChild>
-            <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full bg-black/50 text-white hover:bg-black/70">
+            <Button size="icon" variant="ghost" onClick={onClose} className="h-9 w-9 rounded-full bg-black/50 text-white hover:bg-black/70">
               <X className="h-6 w-6" />
             </Button>
-          </DialogClose>
         </div>
         <div className="absolute bottom-10 left-10">
           <h2 className="text-4xl font-black mb-4">{movie.title}</h2>
