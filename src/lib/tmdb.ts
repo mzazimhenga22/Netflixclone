@@ -22,16 +22,28 @@ async function fetchFromTmdb<T>(endpoint: string, isSingleItem = false): Promise
   }
 }
 
-export async function getTrendingMovies(): Promise<Movie[]> {
+export async function getTrending(): Promise<Movie[]> {
   return fetchFromTmdb<Movie>(`/trending/all/week?api_key=${API_KEY}&language=en-US`) as Promise<Movie[]>;
+}
+
+export async function getTrendingTvShows(): Promise<Movie[]> {
+  return fetchFromTmdb<Movie>(`/trending/tv/week?api_key=${API_KEY}&language=en-US`) as Promise<Movie[]>;
 }
 
 export async function getPopularMovies(): Promise<Movie[]> {
     return fetchFromTmdb<Movie>(`/movie/popular?api_key=${API_KEY}&language=en-US&page=1`) as Promise<Movie[]>;
 }
 
+export async function getPopularTvShows(): Promise<Movie[]> {
+    return fetchFromTmdb<Movie>(`/tv/popular?api_key=${API_KEY}&language=en-US&page=1`) as Promise<Movie[]>;
+}
+
 export async function getMoviesByGenre(genreId: number): Promise<Movie[]> {
     return fetchFromTmdb<Movie>(`/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&language=en-US&page=1`) as Promise<Movie[]>;
+}
+
+export async function getTvShowsByGenre(genreId: number): Promise<Movie[]> {
+    return fetchFromTmdb<Movie>(`/discover/tv?api_key=${API_KEY}&with_genres=${genreId}&language=en-US&page=1`) as Promise<Movie[]>;
 }
 
 export async function getSimilar(id: number, mediaType: 'movie' | 'tv' | undefined): Promise<Movie[]> {

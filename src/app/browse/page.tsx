@@ -6,7 +6,7 @@ import Banner from "@/components/browse/Banner";
 import Navbar from "@/components/browse/Navbar";
 import MovieRow from "@/components/browse/MovieRow";
 import Footer from "@/components/shared/Footer";
-import { getTrendingMovies, getMoviesByGenre, getPopularMovies } from "@/lib/tmdb";
+import { getTrending, getMoviesByGenre, getPopularMovies, getPopularTvShows, getTvShowsByGenre } from "@/lib/tmdb";
 import type { Movie } from "@/types";
 import { useProfile } from '@/hooks/useProfile';
 import { genres } from '@/lib/genres';
@@ -30,16 +30,20 @@ export default function BrowsePage() {
       try {
         const [
           trending, 
-          popular, 
-          favoriteGenreMovies, 
+          popularMovies,
+          popularTv, 
+          favoriteGenreMovies,
+          favoriteGenreTv,
           comedy, 
           horror, 
           romance, 
           documentaries
         ] = await Promise.all([
-          getTrendingMovies(),
+          getTrending(),
           getPopularMovies(),
+          getPopularTvShows(),
           profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId) : Promise.resolve([]),
+          profile.favoriteGenreId ? getTvShowsByGenre(profile.favoriteGenreId) : Promise.resolve([]),
           getMoviesByGenre(35), // Comedy
           getMoviesByGenre(27), // Horror
           getMoviesByGenre(10749), // Romance
@@ -48,13 +52,15 @@ export default function BrowsePage() {
         
         const newCategories: MovieCategory[] = [
           { title: "Trending Now", movies: trending },
-          { title: "Popular on StreamClone", movies: popular },
+          { title: "Popular Movies", movies: popularMovies },
+          { title: "Popular TV Shows", movies: popularTv },
         ];
   
         if (profile.favoriteGenreId) {
           const genreName = genres[profile.favoriteGenreId];
+          const favoriteGenreContent = [...favoriteGenreMovies, ...favoriteGenreTv].sort(() => 0.5 - Math.random());
           if (genreName) {
-            newCategories.push({ title: `Because you like ${genreName}`, movies: favoriteGenreMovies });
+            newCategories.push({ title: `Because you like ${genreName}`, movies: favoriteGenreContent });
           }
         }
 
