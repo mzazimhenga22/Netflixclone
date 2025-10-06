@@ -225,8 +225,10 @@ const Navbar = () => {
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <ScrollText className="mr-2 h-4 w-4" />
-                  <span>Viewing Activity</span>
+                  <Link href="/account/viewing-activity" className='flex items-center w-full'>
+                    <ScrollText className="mr-2 h-4 w-4" />
+                    <span>Viewing Activity</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
