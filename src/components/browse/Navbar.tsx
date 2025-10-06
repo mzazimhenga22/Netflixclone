@@ -98,8 +98,8 @@ const Navbar = () => {
 
   const navItems = [
     { name: 'Home', href: '/browse' },
-    { name: 'TV Shows', href: '#' },
-    { name: 'Movies', href: '#' },
+    { name: 'TV Shows', href: '/tv' },
+    { name: 'Movies', href: '/movies' },
     { name: 'New & Popular', href: '#' },
     { name: 'My List', href: '/my-list' }
  ];
