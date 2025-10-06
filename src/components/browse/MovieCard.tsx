@@ -27,7 +27,7 @@ const MovieCard = ({ movie }: MovieCardProps) => {
         />
       
       {/* Expanded state on hover */}
-      <div className="absolute top-0 left-0 right-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100 group-hover:delay-500 origin-bottom shadow-2xl rounded-lg md:group-hover:scale-125 md:group-hover:z-30">
+      <div className="absolute top-0 left-0 right-0 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-500 transform scale-75 group-hover:scale-125 group-hover:delay-500 origin-bottom shadow-2xl rounded-lg md:group-hover:z-50">
         <div className="relative aspect-video w-full">
              <Image
               src={movie.posterUrl}
