@@ -1,7 +1,9 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import MovieModal from './MovieModal';
@@ -65,8 +67,10 @@ const Banner = () => {
             </p>
           </div>
           <div className="flex items-center space-x-3 mt-4 md:mt-6">
-            <Button size="lg" className="bg-white text-black hover:bg-white/80 font-bold">
-              <Play className="mr-2 h-6 w-6" /> Play
+            <Button asChild size="lg" className="bg-white text-black hover:bg-white/80 font-bold">
+              <Link href={`/watch/${bannerMovie.id}`}>
+                <Play className="mr-2 h-6 w-6" /> Play
+              </Link>
             </Button>
             <Button onClick={openModal} size="lg" className="bg-gray-500/70 text-white hover:bg-gray-500/50 backdrop-blur-sm font-bold">
               <Info className="mr-2 h-6 w-6" /> More Info

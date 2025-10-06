@@ -2,6 +2,7 @@
 "use client";
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Plus, Play, ThumbsUp, Volume2, X } from 'lucide-react';
 import type { Movie } from '@/types';
@@ -55,8 +56,10 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
         <div className="absolute bottom-10 left-10">
           <h2 className="text-4xl font-black mb-4">{movie.title || movie.name}</h2>
           <div className="flex items-center gap-2">
-            <Button size="lg" className="bg-white text-black hover:bg-white/80 font-bold text-lg">
-              <Play className="mr-2 h-7 w-7" /> Play
+            <Button asChild size="lg" className="bg-white text-black hover:bg-white/80 font-bold text-lg">
+              <Link href={`/watch/${movie.id}`}>
+                <Play className="mr-2 h-7 w-7" /> Play
+              </Link>
             </Button>
             <Button size="icon" variant="outline" className="h-11 w-11 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70">
               <Plus className="h-7 w-7" />
