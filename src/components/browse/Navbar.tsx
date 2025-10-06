@@ -144,7 +144,7 @@ const Navbar = () => {
                 <Bell className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="mr-4 w-80 md:w-96 bg-black/90 border-white/20 text-white" align="end">
+            <DropdownMenuContent className="mr-4 w-80 bg-black/90 border-white/20 text-white" align="end">
               <DropdownMenuLabel className="py-3">Notifications</DropdownMenuLabel>
               {loadingNotifications ? (
                 <div className="p-2 space-y-2">
@@ -246,4 +246,5 @@ const Navbar = () => {
 
 export default Navbar;
 
+    
     
