@@ -39,7 +39,7 @@ const fetchAndHydrate = async (movieList: Movie[]): Promise<Movie[]> => {
 };
 
 export default function MoviesPage() {
-  const { profile } = useProfile();
+  const { activeProfile } = useProfile();
   const { history, removeWatchHistory } = useWatchHistory();
   const [bannerMovie, setBannerMovie] = useState<Movie | null>(null);
   const [categories, setCategories] = useState<MovieCategory[]>([]);
@@ -76,11 +76,11 @@ export default function MoviesPage() {
 
   useEffect(() => {
     const fetchMovies = async () => {
-      if (!profile) return;
+      if (!activeProfile) return;
       setLoading(true);
 
       try {
-        const isKidsProfile = profile.name.toLowerCase() === 'kids';
+        const isKidsProfile = activeProfile.name.toLowerCase() === 'kids';
 
         if (isKidsProfile) {
           const [
@@ -119,7 +119,7 @@ export default function MoviesPage() {
               fantasy
             ] = await Promise.all([
               getPopularMovies().then(fetchAndHydrate),
-              profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
+              activeProfile.favoriteGenreId ? getMoviesByGenre(activeProfile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
               getMoviesByGenre(28).then(fetchAndHydrate), // Action
               getMoviesByGenre(35).then(fetchAndHydrate), // Comedy
               getMoviesByGenre(27).then(fetchAndHydrate), // Horror
@@ -135,8 +135,8 @@ export default function MoviesPage() {
               { title: "Popular Movies", movies: popularMovies },
             ];
 
-            if (profile.favoriteGenreId) {
-              const favoriteGenre = movieGenres.find(g => g.id === profile.favoriteGenreId);
+            if (activeProfile.favoriteGenreId) {
+              const favoriteGenre = movieGenres.find(g => g.id === activeProfile.favoriteGenreId);
               if (favoriteGenre) {
                 newCategories.push({ title: `Because you like ${favoriteGenre.name}`, movies: favoriteGenreMovies });
               }
@@ -168,7 +168,7 @@ export default function MoviesPage() {
     if (!selectedGenre) {
         fetchMovies();
     }
-  }, [profile, selectedGenre]);
+  }, [activeProfile, selectedGenre]);
   
   useEffect(() => {
     const fetchGenreMovies = async () => {
@@ -183,7 +183,7 @@ export default function MoviesPage() {
     fetchGenreMovies();
   }, [selectedGenre]);
 
-  if (loading || !profile) {
+  if (loading || !activeProfile) {
       return (
         <div className="flex items-center justify-center h-screen bg-black">
           <LoadingSpinner />

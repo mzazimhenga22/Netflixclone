@@ -85,10 +85,12 @@ export const useProfile = () => {
       router.push('/login');
   }
 
+  const memoizedProfiles = useMemo(() => profiles || [], [profiles]);
+
   return { 
     user,
     isUserLoading,
-    profiles: profiles || [], 
+    profiles: memoizedProfiles, 
     areProfilesLoading,
     activeProfile, 
     setActiveProfile: setActive,

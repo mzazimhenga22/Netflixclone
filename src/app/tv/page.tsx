@@ -43,7 +43,7 @@ const fetchAndHydrate = async (movieList: Movie[]): Promise<Movie[]> => {
 
 
 export default function TvPage() {
-  const { profile } = useProfile();
+  const { activeProfile } = useProfile();
   const { history, removeWatchHistory } = useWatchHistory();
   const [bannerMovie, setBannerMovie] = useState<Movie | null>(null);
   const [categories, setCategories] = useState<MovieCategory[]>([]);
@@ -81,11 +81,11 @@ export default function TvPage() {
 
   useEffect(() => {
     const fetchMovies = async () => {
-      if (!profile) return;
+      if (!activeProfile) return;
       setLoading(true);
   
       try {
-        const isKidsProfile = profile.name.toLowerCase() === 'kids';
+        const isKidsProfile = activeProfile.name.toLowerCase() === 'kids';
 
         if (isKidsProfile) {
           const [
@@ -125,9 +125,9 @@ export default function TvPage() {
               scifi,
               reality
             ] = await Promise.all([
-              getTrendingTvShows(profile.country).then(fetchAndHydrate),
+              getTrendingTvShows(activeProfile.country).then(fetchAndHydrate),
               getPopularTvShows().then(fetchAndHydrate),
-              profile.favoriteGenreId ? getTvShowsByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
+              activeProfile.favoriteGenreId ? getTvShowsByGenre(activeProfile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
               getTvShowsByGenre(10759).then(fetchAndHydrate), // Action & Adventure
               getTvShowsByGenre(16).then(fetchAndHydrate),    // Animation
               getTvShowsByGenre(35).then(fetchAndHydrate),   // Comedy
@@ -145,8 +145,8 @@ export default function TvPage() {
 
             setTop10(top10Shows.slice(0, 10));
       
-            if (profile.favoriteGenreId) {
-              const genre = tvGenres.find(g => g.id === profile.favoriteGenreId);
+            if (activeProfile.favoriteGenreId) {
+              const genre = tvGenres.find(g => g.id === activeProfile.favoriteGenreId);
               if (genre && favoriteGenreTv.length > 0) {
                 newCategories.push({ title: `TV Shows Because you like ${genre.name}`, movies: favoriteGenreTv });
               }
@@ -178,7 +178,7 @@ export default function TvPage() {
     if (!selectedGenre) {
         fetchMovies();
     }
-  }, [profile, selectedGenre]);
+  }, [activeProfile, selectedGenre]);
   
   useEffect(() => {
     const fetchGenreShows = async () => {
@@ -209,7 +209,7 @@ export default function TvPage() {
   const selectedGenreName = selectedGenre ? tvGenres.find(g => g.id.toString() === selectedGenre)?.name : 'All Genres';
 
 
-  if (loading || !profile) {
+  if (loading || !activeProfile) {
       return (
          <div className="flex items-center justify-center h-screen bg-black">
           <LoadingSpinner />
@@ -278,8 +278,8 @@ export default function TvPage() {
                             onRemove={handleRemoveFromHistory}
                         />
                     )}
-                    {top10.length > 0 && profile.name.toLowerCase() !== 'kids' && (
-                        <Top10Row title={`Top 10 TV Shows in ${getCountryName(profile.country)} Today`} movies={top10} />
+                    {top10.length > 0 && activeProfile.name.toLowerCase() !== 'kids' && (
+                        <Top10Row title={`Top 10 TV Shows in ${getCountryName(activeProfile.country)} Today`} movies={top10} />
                     )}
                     {categories.map((category) => (
                     <React.Fragment key={category.title}>
