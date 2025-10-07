@@ -1,5 +1,4 @@
 
-
 'use server';
 
 import { makeProviders, makeStandardFetcher, makeSimpleProxyFetcher, targets, type ScrapeMedia, type Stream } from '../../providers/src/index';
@@ -61,9 +60,11 @@ export async function getStream(
     const output = await providers.runAll({
       media: scrapeMedia,
       events: {
-        onError(err: Error) {
-          lastError = err;
-          console.error(`[STREAM] Provider error for ${title}:`, err.message);
+        update(evt) {
+          if (evt.status === 'failure' && evt.error) {
+            lastError = evt.error as Error;
+            console.error(`[STREAM] Provider error for ${title}:`, (evt.error as Error).message);
+          }
         },
       }
     });
@@ -81,7 +82,7 @@ export async function getStream(
 
     return { stream: output.stream as Stream, error: null };
     
-  } catch (err: unknown) {
+  } catch (err: any) {
     let message = 'An unknown error occurred during scraping.';
     if (err instanceof Error) {
       message = err.message;
