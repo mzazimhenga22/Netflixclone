@@ -1,6 +1,4 @@
 
-'use server';
-
 import { makeStandardFetcher } from "./fetchers";
 import { NotFoundError } from "./errors";
 import type { Embed, Source, ScrapeMedia } from "./types";
