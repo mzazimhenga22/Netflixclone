@@ -1,16 +1,16 @@
 
 import { load } from 'cheerio';
 
-import { flags } from '../../../targets';
-import { Caption, labelToLanguageCode } from '../../../captions';
-import { Stream } from '../../../streams';
-import { compareMedia } from '../../../utils/compare';
-import { MovieScrapeContext, ShowScrapeContext } from '../../../utils/context';
-import { NotFoundError } from '../../../utils/errors';
-import { convertPlaylistsToDataUrls } from '../../../utils/playlist';
+import { flags } from '../../entrypoint/utils/targets';
+import { Caption, labelToLanguageCode } from '../captions';
+import { Stream } from '../streams';
+import { compareMedia } from '../../utils/compare';
+import { MovieScrapeContext, ShowScrapeContext } from '../../utils/context';
+import { NotFoundError } from '../../utils/errors';
+import { convertPlaylistsToDataUrls } from '../../utils/playlist';
 
 import { InfoResponse } from './types';
-import { SourcererOutput, makeSourcerer } from '../../base';
+import { SourcererOutput, makeSourcerer } from '../base';
 
 const baseUrl = 'https://soaper.cc';
 

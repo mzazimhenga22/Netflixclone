@@ -1,3 +1,4 @@
+
 import { ScrapeContext } from '../../../utils/context';
 
 export const warezcdnBase = 'https://embed.warezcdn.link';

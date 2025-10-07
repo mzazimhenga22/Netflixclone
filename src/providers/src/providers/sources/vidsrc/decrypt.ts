@@ -1,3 +1,4 @@
+
 const abc = String.fromCharCode(
   65,
   66,
@@ -159,7 +160,7 @@ const salt = {
       } else {
         c2 = input.charCodeAt(n + 1);
         c3 = input.charCodeAt(n + 2);
-        t += dechar(((r & 15) << 12) | ((c2 & 63) << 6) | (63 & c3));
+        t += dechar(((r & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
         n += 3;
       }
     }
