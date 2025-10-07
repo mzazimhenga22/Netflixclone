@@ -10,7 +10,7 @@ import { PlusCircle, Pencil, Lock } from 'lucide-react';
 import ProfileForm from '@/components/profiles/ProfileForm';
 import { useProfile, type Profile } from '@/hooks/useProfile';
 import { useFirestore } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { doc, collection } from 'firebase/firestore';
 import { setDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
@@ -37,7 +37,7 @@ export default function ProfileSetupPage() {
 
   const getProfilesCollectionRef = () => {
     if (!user || !firestore) return null;
-    return doc(firestore, `users/${user.uid}`).collection('profiles');
+    return collection(firestore, 'users', user.uid, 'profiles');
   }
 
   const handleSaveProfile = (profileData: Omit<Profile, 'id'> & { id?: string }) => {
