@@ -15,7 +15,7 @@ export default function Home() {
 
   return (
     <div className="bg-black text-white">
-      <LandingHeader />
+      <LandingHeader signInUrl="/login" />
       <main>
         <section className="relative h-[65vh] md:h-[85vh] flex items-center justify-center text-center">
           {heroImage && (

@@ -1,12 +1,13 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { movieGenres } from '@/lib/movieGenres';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
 
-type Profile = {
-  id: number;
+export type Profile = {
+  id: string;
   name: string;
   avatar: string;
   pin?: string;
@@ -15,41 +16,79 @@ type Profile = {
   country: string; // ISO 3166-1 code
 };
 
+const ACTIVE_PROFILE_KEY = 'streamclone_active_profile';
+
 export const useProfile = () => {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
   const router = useRouter();
   const pathname = usePathname();
+  
+  const [activeProfile, setActiveProfile] = useState<Profile | null>(null);
 
+  const profilesCollectionRef = useMemoFirebase(() => {
+    if (!user || !firestore) return null;
+    return collection(firestore, `users/${user.uid}/profiles`);
+  }, [user, firestore]);
+
+  const { data: profiles, isLoading: areProfilesLoading } = useCollection<Omit<Profile, 'id'>>(profilesCollectionRef);
+
+  // Effect to load active profile from localStorage
   useEffect(() => {
-    // This code runs only on the client
-    let storedProfile: string | null = null;
+    if (isUserLoading || areProfilesLoading) return;
     try {
-      storedProfile = localStorage.getItem('activeProfile');
-      if (storedProfile) {
-        const parsedProfile = JSON.parse(storedProfile);
-        // Add a random favorite genre if one doesn't exist
-        if (parsedProfile && typeof parsedProfile.favoriteGenreId === 'undefined') {
-            const randomGenre = movieGenres[Math.floor(Math.random() * movieGenres.length)];
-            parsedProfile.favoriteGenreId = randomGenre.id;
-            localStorage.setItem('activeProfile', JSON.stringify(parsedProfile));
-        }
-        setProfile(parsedProfile);
+      const storedProfileId = localStorage.getItem(ACTIVE_PROFILE_KEY);
+      if (storedProfileId && profiles) {
+        const foundProfile = profiles.find(p => p.id === storedProfileId);
+        setActiveProfile(foundProfile || null);
       } else {
-        // If there's no profile and we are not on a public page, redirect to setup
-        if (pathname !== '/' && !pathname.startsWith('/signup') && pathname !== '/profiles/setup') {
-          router.push('/profiles/setup');
-        }
+        setActiveProfile(null);
       }
     } catch (error) {
-      console.error("Failed to parse profile from localStorage", error);
-      localStorage.removeItem('activeProfile');
-       if (pathname !== '/' && !pathname.startsWith('/signup') && pathname !== '/profiles/setup') {
-          router.push('/profiles/setup');
-        }
+      console.error("Failed to parse active profile from localStorage", error);
+      localStorage.removeItem(ACTIVE_PROFILE_KEY);
+      setActiveProfile(null);
     }
-  }, [pathname, router]);
+  }, [profiles, isUserLoading, areProfilesLoading]);
 
-  return { profile };
+  // Effect for redirecting if no user or no active profile
+  useEffect(() => {
+    const isPublicPage = pathname === '/' || pathname.startsWith('/signup') || pathname === '/login' || pathname.startsWith('/only-on-streamclone');
+    const isProfileSetupPage = pathname === '/profiles/setup';
+
+    if (isUserLoading || areProfilesLoading) return;
+
+    if (!user && !isPublicPage) {
+      router.push('/login');
+    } else if (user && !activeProfile && !isProfileSetupPage) {
+      router.push('/profiles/setup');
+    }
+  }, [user, activeProfile, isUserLoading, areProfilesLoading, pathname, router]);
+
+
+  const setActive = (profile: Profile | null) => {
+    if (profile) {
+      localStorage.setItem(ACTIVE_PROFILE_KEY, profile.id);
+      setActiveProfile(profile);
+    } else {
+      localStorage.removeItem(ACTIVE_PROFILE_KEY);
+      setActiveProfile(null);
+    }
+  };
+
+  const logout = () => {
+      // Note: This needs to also sign out from Firebase
+      setActive(null);
+      router.push('/login');
+  }
+
+  return { 
+    user,
+    isUserLoading,
+    profiles: profiles || [], 
+    areProfilesLoading,
+    activeProfile, 
+    setActiveProfile: setActive,
+    logout
+  };
 };
-
-    

@@ -50,10 +50,10 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
       const currentTime = videoRef.current.currentTime;
       const duration = videoRef.current.duration;
       if (duration > 0) { // Only update if duration is valid
-        updateWatchHistory(media.id, currentTime, duration, media.media_type);
+        updateWatchHistory(media, currentTime, duration);
       }
     }
-  }, [media.id, media.media_type, updateWatchHistory]);
+  }, [media, updateWatchHistory]);
   
   useEffect(() => {
     const handleFullscreenChange = () => {

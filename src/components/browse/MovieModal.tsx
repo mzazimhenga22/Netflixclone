@@ -26,7 +26,7 @@ interface MovieModalProps {
 const MovieModal = ({ movie, onClose }: MovieModalProps) => {
   const [similarMovies, setSimilarMovies] = useState<Movie[]>([]);
   const isTvShow = movie.media_type === 'tv' || !movie.release_date;
-  const { myList, addToMyList, removeFromMyList } = useMyList();
+  const { myList, toggleMyList } = useMyList();
   const isInList = myList.includes(movie.id);
 
   useEffect(() => {
@@ -58,20 +58,12 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
 
   const handleToggleList = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isInList) {
-      removeFromMyList(movie.id);
-    } else {
-      addToMyList(movie.id);
-    }
+    toggleMyList(movie);
   };
 
-  const handleSimilarToggleList = (e: React.MouseEvent, similarMovieId: number) => {
+  const handleSimilarToggleList = (e: React.MouseEvent, similarMovie: Movie) => {
     e.stopPropagation();
-    if (myList.includes(similarMovieId)) {
-        removeFromMyList(similarMovieId);
-    } else {
-        addToMyList(similarMovieId);
-    }
+    toggleMyList(similarMovie);
   };
 
   return (
@@ -177,7 +169,7 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
                         <div className="relative aspect-video">
                             <Image src={`${TMDB_IMAGE_BASE_URL}${similarMovie.backdrop_path}`} alt={similarMovie.title || similarMovie.name || ""} fill className="object-cover" />
                              <div className="absolute top-2 right-2 z-10">
-                                 <Button onClick={(e) => handleSimilarToggleList(e, similarMovie.id)} size="icon" variant="outline" className="h-8 w-8 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70">
+                                 <Button onClick={(e) => handleSimilarToggleList(e, similarMovie)} size="icon" variant="outline" className="h-8 w-8 rounded-full border-white/50 text-white bg-black/50 hover:border-white hover:bg-black/70">
                                     {myList.includes(similarMovie.id) ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
                                 </Button>
                             </div>

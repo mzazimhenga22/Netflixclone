@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { TMDB_IMAGE_BASE_URL } from "@/lib/tmdb";
 import StatusBadge from "./StatusBadge";
 import { useMyList } from "@/hooks/useMyList";
+import { genres } from "@/lib/genres";
 
 interface MovieCardProps {
   movie: Movie;
@@ -26,7 +27,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
   const showTimeoutRef = useRef<number | null>(null);
   const hideTimeoutRef = useRef<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { myList, addToMyList, removeFromMyList } = useMyList();
+  const { myList, toggleMyList } = useMyList();
   const isInList = myList.includes(movie.id);
 
   const posterUrl = movie.backdrop_path 
@@ -157,12 +158,13 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
   const handleToggleList = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isInList) {
-      removeFromMyList(movie.id);
-    } else {
-      addToMyList(movie.id);
-    }
+    toggleMyList(movie);
   };
+
+  const getGenreNames = (ids?: number[]) => {
+    if (!ids) return [];
+    return ids.map(id => genres[id]).filter(Boolean);
+  }
 
 
   return (
@@ -256,11 +258,11 @@ export default function MovieCard({ movie }: MovieCardProps) {
                       <span>{movie.release_date?.substring(0,4)}</span>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 text-xs text-white/70">
-                       {movie.genre_ids?.slice(0,3).map((genre, index) => (
-                          <React.Fragment key={genre}>
-                            <span>Genre {genre}</span>
-                            {index < 2 && <span className="text-white/40">•</span>}
+                    <div className="flex flex-wrap items-center gap-1.5 text-xs text-white/70">
+                       {getGenreNames(movie.genre_ids).slice(0,3).map((genreName, index, arr) => (
+                          <React.Fragment key={genreName}>
+                            <span>{genreName}</span>
+                            {index < arr.length - 1 && <span className="text-white/40 text-[8px]">&#9679;</span>}
                           </React.Fragment>
                        ))}
                     </div>

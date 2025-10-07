@@ -66,7 +66,7 @@ export default function ContinueWatchingCard({ movie, historyItem, onRemove }: C
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-card">
-                <DropdownMenuItem onClick={() => onRemove(movie.id)} className="cursor-pointer">
+                <DropdownMenuItem onClick={() => onRemove(movie.mediaId)} className="cursor-pointer">
                     <XCircle className="mr-2 h-4 w-4" />
                     <span>Remove from row</span>
                 </DropdownMenuItem>

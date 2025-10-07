@@ -1,53 +1,61 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useMemo } from 'react';
+import { useProfile } from './useProfile';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import type { Movie } from '@/types';
 
-const MY_LIST_KEY = 'streamclone_my_list';
+
+type MyListItem = {
+    id: string; // Firestore document ID
+    mediaId: number;
+    media_type: 'movie' | 'tv';
+    addedAt: any; // serverTimestamp
+};
 
 export const useMyList = () => {
-  const [myList, setMyList] = useState<number[]>([]);
+  const { user } = useUser();
+  const { activeProfile } = useProfile();
+  const firestore = useFirestore();
 
-  useEffect(() => {
-    // This code runs only on the client
-    try {
-      const storedList = localStorage.getItem(MY_LIST_KEY);
-      if (storedList) {
-        setMyList(JSON.parse(storedList));
-      }
-    } catch (error) {
-      console.error("Failed to parse My List from localStorage", error);
-      localStorage.removeItem(MY_LIST_KEY);
-    }
-  }, []);
+  const myListCollectionRef = useMemoFirebase(() => {
+    if (!user || !activeProfile || !firestore) return null;
+    return collection(firestore, `users/${user.uid}/profiles/${activeProfile.id}/myList`);
+  }, [user, activeProfile, firestore]);
+  
+  const { data: myListItems, isLoading } = useCollection<MyListItem>(myListCollectionRef);
 
-  const saveList = (newList: number[]) => {
-    try {
-      localStorage.setItem(MY_LIST_KEY, JSON.stringify(newList));
-      setMyList(newList);
-    } catch (error) {
-      console.error("Failed to save My List to localStorage", error);
-    }
+  const myList = useMemo(() => myListItems?.map(item => item.mediaId) || [], [myListItems]);
+
+  const addToMyList = (media: Movie) => {
+    if (!myListCollectionRef || !media.media_type) return;
+    const newItem = {
+        mediaId: media.id,
+        media_type: media.media_type,
+        addedAt: serverTimestamp()
+    };
+    addDocumentNonBlocking(myListCollectionRef, newItem);
   };
 
-  const addToMyList = useCallback((id: number) => {
-    setMyList(prevList => {
-      if (prevList.includes(id)) {
-        return prevList; // Already in the list
-      }
-      const newList = [id, ...prevList];
-      saveList(newList);
-      return newList;
-    });
-  }, []);
+  const removeFromMyList = (mediaId: number) => {
+    if (!myListCollectionRef || !myListItems) return;
+    const itemToRemove = myListItems.find(item => item.mediaId === mediaId);
+    if (itemToRemove) {
+        const docRef = doc(myListCollectionRef, itemToRemove.id);
+        deleteDocumentNonBlocking(docRef);
+    }
+  };
+  
+  const toggleMyList = (media: Movie) => {
+    if(myList.includes(media.id)) {
+        removeFromMyList(media.id);
+    } else {
+        addToMyList(media);
+    }
+  }
 
-  const removeFromMyList = useCallback((id: number) => {
-    setMyList(prevList => {
-      const newList = prevList.filter(itemId => itemId !== id);
-      saveList(newList);
-      return newList;
-    });
-  }, []);
-
-  return { myList, addToMyList, removeFromMyList };
+  return { myList, isLoading, toggleMyList, addToMyList, removeFromMyList };
 };

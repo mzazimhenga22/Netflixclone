@@ -8,28 +8,19 @@ import { Input } from '@/components/ui/input';
 import Logo from '@/components/Logo';
 import { PlusCircle, Pencil, Lock } from 'lucide-react';
 import ProfileForm from '@/components/profiles/ProfileForm';
+import { useProfile, type Profile } from '@/hooks/useProfile';
+import { useFirestore } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { setDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
-type Profile = {
-  id: number;
-  name: string;
-  avatar: string;
-  pin?: string;
-  isLocked: boolean;
-  favoriteGenreId?: number;
-  country: string; // ISO 3166-1 code
-};
-
-const initialProfiles: Profile[] = [
-  { id: 1, name: 'John', avatar: 'https://picsum.photos/seed/avatar1/200/200', pin: '1234', isLocked: true, favoriteGenreId: 28, country: 'US' }, // Action
-  { id: 2, name: 'Jane', avatar: 'https://picsum.photos/seed/avatar2/200/200', isLocked: false, favoriteGenreId: 878, country: 'GB' }, // Sci-Fi
-  { id: 3, name: 'Kids', avatar: 'https://picsum.photos/seed/avatar3/200/200', isLocked: false, favoriteGenreId: 16, country: 'US' }, // Animation
-];
 
 export default function ProfileSetupPage() {
-  const [profiles, setProfiles] = useState<Profile[]>(initialProfiles);
+  const { user, profiles, areProfilesLoading, setActiveProfile, isUserLoading } = useProfile();
+  const firestore = useFirestore();
   const [isEditing, setIsEditing] = useState(false);
-  const [editingProfile, setEditingProfile] = useState<Profile | null | 'new'>(null);
-  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [editingProfile, setEditingProfile] = useState<Profile | 'new' | null>(null);
+  const [selectedProfileForPin, setSelectedProfileForPin] = useState<Profile | null>(null);
   const [pin, setPin] = useState('');
   const [pinError, setPinError] = useState(false);
 
@@ -37,39 +28,50 @@ export default function ProfileSetupPage() {
     if (isEditing) {
       setEditingProfile(profile);
     } else if (profile.isLocked) {
-      setSelectedProfile(profile);
+      setSelectedProfileForPin(profile);
     } else {
-      localStorage.setItem('activeProfile', JSON.stringify(profile));
+      setActiveProfile(profile);
       window.location.href = '/browse';
     }
   };
 
-  const handleSaveProfile = (profileData: Omit<Profile, 'id'> & { id?: number }) => {
-    if (profileData.id) {
+  const getProfilesCollectionRef = () => {
+    if (!user || !firestore) return null;
+    return doc(firestore, `users/${user.uid}`).collection('profiles');
+  }
+
+  const handleSaveProfile = (profileData: Omit<Profile, 'id'> & { id?: string }) => {
+    if (!user || !firestore) return;
+    const profilesCollection = getProfilesCollectionRef();
+    if (!profilesCollection) return;
+
+    const { id, ...dataToSave } = profileData;
+
+    if (id) {
       // Edit existing profile
-      setProfiles(profiles.map(p => p.id === profileData.id ? { ...p, ...profileData } as Profile : p));
+      const docRef = doc(profilesCollection, id);
+      setDocumentNonBlocking(docRef, dataToSave, { merge: true });
     } else {
       // Add new profile
-      const newProfile: Profile = { 
-        ...profileData, 
-        id: Date.now(), 
-        favoriteGenreId: [28, 878, 35, 18, 53][Math.floor(Math.random() * 5)], // Assign a random genre
-        country: profileData.country || 'US',
-      };
-      setProfiles([...profiles, newProfile]);
+      const docRef = doc(profilesCollection); // Auto-generates ID
+      setDocumentNonBlocking(docRef, dataToSave, {});
     }
     setEditingProfile(null);
   };
   
-  const handleDeleteProfile = (profileId: number) => {
-    setProfiles(profiles.filter(p => p.id !== profileId));
+  const handleDeleteProfile = (profileId: string) => {
+    const profilesCollection = getProfilesCollectionRef();
+    if (!profilesCollection) return;
+
+    const docRef = doc(profilesCollection, profileId);
+    deleteDocumentNonBlocking(docRef);
     setEditingProfile(null);
   }
 
   const handlePinSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedProfile && selectedProfile.pin === pin) {
-        localStorage.setItem('activeProfile', JSON.stringify(selectedProfile));
+    if (selectedProfileForPin && selectedProfileForPin.pin === pin) {
+        setActiveProfile(selectedProfileForPin);
         window.location.href = '/browse';
     } else {
       setPinError(true);
@@ -77,7 +79,15 @@ export default function ProfileSetupPage() {
     }
   };
 
-  if (selectedProfile) {
+  if (isUserLoading || areProfilesLoading) {
+      return (
+          <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
+              <LoadingSpinner />
+          </div>
+      )
+  }
+
+  if (selectedProfileForPin) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
         <Logo className="absolute top-8 left-8 h-8 w-auto" />
@@ -85,9 +95,9 @@ export default function ProfileSetupPage() {
           <h2 className="text-3xl font-semibold mb-2">Profile Locked</h2>
           <p className="text-muted-foreground mb-6">Enter your PIN to unlock this profile.</p>
           <div className="flex items-center gap-4 mb-4">
-            <Image src={selectedProfile.avatar} alt={selectedProfile.name} width={80} height={80} className="rounded-md"/>
+            <Image src={selectedProfileForPin.avatar} alt={selectedProfileForPin.name} width={80} height={80} className="rounded-md"/>
             <div>
-              <p className="text-lg">{selectedProfile.name}</p>
+              <p className="text-lg">{selectedProfileForPin.name}</p>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Lock className="h-4 w-4" />
                 <span>This profile is locked.</span>
@@ -112,7 +122,7 @@ export default function ProfileSetupPage() {
              {pinError && <p className="text-primary text-sm">Incorrect PIN. Please try again.</p>}
              <div className="flex gap-4 mt-6">
                 <Button type="submit" size="lg" className="px-8">Enter</Button>
-                <Button variant="outline" size="lg" className="px-8" onClick={() => { setSelectedProfile(null); setPin(''); setPinError(false); }}>Cancel</Button>
+                <Button variant="outline" size="lg" className="px-8" onClick={() => { setSelectedProfileForPin(null); setPin(''); setPinError(false); }}>Cancel</Button>
              </div>
           </form>
             <Button variant="link" className="mt-4 text-muted-foreground">Forgot PIN?</Button>

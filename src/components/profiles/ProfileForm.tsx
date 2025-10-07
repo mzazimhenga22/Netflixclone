@@ -28,21 +28,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { countries } from '@/lib/countries';
+import type { Profile } from '@/hooks/useProfile';
 
-type Profile = {
-  id: number;
-  name: string;
-  avatar: string;
-  pin?: string;
-  isLocked: boolean;
-  country: string;
-};
 
 interface ProfileFormProps {
   profile?: Profile;
-  onSave: (profileData: Omit<Profile, 'id' | 'favoriteGenreId'> & { id?: number }) => void;
+  onSave: (profileData: Omit<Profile, 'id' | 'favoriteGenreId'> & { id?: string }) => void;
   onCancel: () => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 const avatars = [

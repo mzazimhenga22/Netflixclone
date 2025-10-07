@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Banner from "@/components/browse/Banner";
 import Navbar from "@/components/browse/Navbar";
 import MovieRow from "@/components/browse/MovieRow";
@@ -34,8 +34,8 @@ const fetchAndHydrate = async (movieList: Movie[]): Promise<Movie[]> => {
 
 
 export default function BrowsePage() {
-  const { profile } = useProfile();
-  const { history, removeWatchHistory, setHistory } = useWatchHistory();
+  const { activeProfile, isUserLoading } = useProfile();
+  const { history, removeWatchHistory, isLoading: isHistoryLoading } = useWatchHistory();
   const [bannerMovie, setBannerMovie] = useState<Movie | null>(null);
   const [categories, setCategories] = useState<MovieCategory[]>([]);
   const [continueWatching, setContinueWatching] = useState<ContinueWatchingMovie[]>([]);
@@ -44,34 +44,35 @@ export default function BrowsePage() {
 
   const handleRemoveFromHistory = (id: number) => {
     removeWatchHistory(id);
-    setContinueWatching(prev => prev.filter(m => m.id !== id));
   };
   
   useEffect(() => {
     const fetchContinueWatching = async () => {
-      if (history.length > 0) {
-        const moviesWithHistory = await Promise.all(
-          history.map(async (item) => {
-            const movieDetails = await getMovieOrTvDetails(item.id, item.media_type);
-            if (movieDetails) {
-              return { ...movieDetails, history: item };
-            }
-            return null;
-          })
-        );
-        setContinueWatching(moviesWithHistory.filter((m): m is ContinueWatchingMovie => m !== null));
+      if (isHistoryLoading || history.length === 0) {
+        setContinueWatching([]);
+        return;
       }
+      const moviesWithHistory = await Promise.all(
+        history.map(async (item) => {
+          const movieDetails = await getMovieOrTvDetails(item.mediaId, item.media_type);
+          if (movieDetails) {
+            return { ...movieDetails, history: item };
+          }
+          return null;
+        })
+      );
+      setContinueWatching(moviesWithHistory.filter((m): m is ContinueWatchingMovie => m !== null));
     };
     fetchContinueWatching();
-  }, [history]);
+  }, [history, isHistoryLoading]);
 
   useEffect(() => {
     const fetchMovies = async () => {
-      if (!profile) return;
+      if (!activeProfile) return;
       setLoading(true);
   
       try {
-        const isKidsProfile = profile.name.toLowerCase() === 'kids';
+        const isKidsProfile = activeProfile.name.toLowerCase() === 'kids';
 
         if (isKidsProfile) {
           const [
@@ -124,11 +125,11 @@ export default function BrowsePage() {
               animationTv
             ] = await Promise.all([
               getTrending().then(fetchAndHydrate),
-              getTrendingTvShows(profile.country).then(fetchAndHydrate),
+              getTrendingTvShows(activeProfile.country).then(fetchAndHydrate),
               getPopularMovies().then(fetchAndHydrate),
               getPopularTvShows().then(fetchAndHydrate),
-              profile.favoriteGenreId ? getMoviesByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
-              profile.favoriteGenreId ? getTvShowsByGenre(profile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
+              activeProfile.favoriteGenreId ? getMoviesByGenre(activeProfile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
+              activeProfile.favoriteGenreId ? getTvShowsByGenre(activeProfile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
               getMoviesByGenre(35).then(fetchAndHydrate), // Comedy Movies
               getTvShowsByGenre(35).then(fetchAndHydrate), // Comedy TV
               getMoviesByGenre(27).then(fetchAndHydrate), // Horror Movies
@@ -152,8 +153,8 @@ export default function BrowsePage() {
 
             setTop10(top10Shows.slice(0, 10));
       
-            if (profile.favoriteGenreId) {
-              const genreName = genres[profile.favoriteGenreId];
+            if (activeProfile.favoriteGenreId) {
+              const genreName = genres[activeProfile.favoriteGenreId];
               const favoriteGenreContent = [...favoriteGenreMovies, ...favoriteGenreTv].sort(() => 0.5 - Math.random());
               if (genreName) {
                 newCategories.push({ title: `Because you like ${genreName}`, movies: favoriteGenreContent });
@@ -189,13 +190,13 @@ export default function BrowsePage() {
     };
   
     fetchMovies();
-  }, [profile]);
+  }, [activeProfile]);
   
   const getCountryName = (code: string) => {
     return countries.find(c => c.iso_3166_1 === code)?.english_name || 'the U.S.';
   }
 
-  if (loading || !profile) {
+  if (loading || isUserLoading || !activeProfile) {
       return (
         <div className="flex items-center justify-center h-screen bg-black">
           <LoadingSpinner />
@@ -220,8 +221,8 @@ export default function BrowsePage() {
             {categories.map((category, index) => (
               <React.Fragment key={category.title}>
                 <MovieRow title={category.title} movies={category.movies} />
-                {index === 0 && top10.length > 0 && profile.name.toLowerCase() !== 'kids' && (
-                   <Top10Row title={`Top 10 TV Shows in ${getCountryName(profile.country)} Today`} movies={top10} />
+                {index === 0 && top10.length > 0 && activeProfile.name.toLowerCase() !== 'kids' && (
+                   <Top10Row title={`Top 10 TV Shows in ${getCountryName(activeProfile.country)} Today`} movies={top10} />
                 )}
               </React.Fragment>
             ))}

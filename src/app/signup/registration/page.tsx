@@ -1,18 +1,39 @@
 "use client";
 
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import SignupHeader from '@/components/shared/SignupHeader';
 import Footer from '@/components/shared/Footer';
+import { useAuth, initiateEmailSignUp } from '@/firebase';
+import { useToast } from '@/hooks/use-toast';
+
 
 function RegistrationForm() {
   const searchParams = useSearchParams();
-  const email = searchParams.get('email') || '';
+  const router = useRouter();
+  const auth = useAuth();
+  const { toast } = useToast();
+  
+  const [email, setEmail] = useState(searchParams.get('email') || '');
+  const [password, setPassword] = useState('');
+
+
+  const handleSignUp = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!auth) {
+        toast({ title: "Authentication service not available.", variant: "destructive" });
+        return;
+    }
+    initiateEmailSignUp(auth, email, password);
+    // The onAuthStateChanged listener in the provider will handle the redirect.
+    // For now, we manually redirect to the next step.
+    router.push('/signup/planform');
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
@@ -30,14 +51,15 @@ function RegistrationForm() {
               We hate paperwork, too.
             </p>
           </div>
-          <form className="mt-6 space-y-4">
+          <form onSubmit={handleSignUp} className="mt-6 space-y-4">
             <div>
               <Label htmlFor="email" className="sr-only">Email</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="Email"
-                defaultValue={email}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="h-14 text-lg bg-gray-800 border-gray-600"
               />
             </div>
@@ -47,6 +69,8 @@ function RegistrationForm() {
                 id="password"
                 type="password"
                 placeholder="Add a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="h-14 text-lg bg-gray-800 border-gray-600"
               />
             </div>
@@ -56,8 +80,8 @@ function RegistrationForm() {
                 Please do not email me StreamClone special offers.
               </Label>
             </div>
-            <Button asChild size="lg" className="w-full h-14 text-2xl mt-6">
-              <Link href="/signup/planform">Next</Link>
+            <Button type="submit" size="lg" className="w-full h-14 text-2xl mt-6">
+              Next
             </Button>
           </form>
         </div>

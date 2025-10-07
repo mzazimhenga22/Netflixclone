@@ -11,7 +11,7 @@ import {
 import { Globe } from 'lucide-react';
 
 
-const LandingHeader = () => {
+const LandingHeader = ({ signInUrl = "/signup/registration" }: { signInUrl?: string }) => {
   return (
     <header className="absolute top-0 left-0 right-0 z-20 p-4 sm:p-8">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -28,7 +28,7 @@ const LandingHeader = () => {
             </SelectContent>
           </Select>
           <Button asChild>
-            <Link href="/signup/registration">Sign In</Link>
+            <Link href={signInUrl}>Sign In</Link>
           </Button>
         </div>
       </div>
