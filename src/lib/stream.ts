@@ -17,15 +17,17 @@ const providers = makeProviders({
   embeds: allEmbeds,
 });
 
-export async function getStream(media: Movie, season?: number, episode?: number): Promise<Stream | null> {
+export async function getStream(media: Movie, season?: number, episode?: number): Promise<{ stream: Stream | null; error: string | null; }> {
+  let lastError: Error | null = null;
   try {
     const tmdbId = media.id.toString();
     const releaseYear = new Date(media.release_date || media.first_air_date || '').getFullYear();
     const title = media.title || media.name || '';
 
     if (!media.media_type || !title || !releaseYear || !tmdbId) {
-        console.error('[STREAM] Invalid media object for stream lookup:', media);
-        throw new Error('Invalid media for stream lookup');
+        const errorMsg = 'Invalid media object for stream lookup';
+        console.error(`[STREAM] ${errorMsg}:`, media);
+        return { stream: null, error: errorMsg };
     }
 
     let scrapeMedia: ScrapeMedia;
@@ -60,28 +62,31 @@ export async function getStream(media: Movie, season?: number, episode?: number)
       media: scrapeMedia,
       events: {
         onError(err: Error) {
-          console.error(`[STREAM] Error during runAll for ${title}:`, err.message);
+          lastError = err;
+          console.error(`[STREAM] Provider error for ${title}:`, err.message);
         },
       }
     });
 
     if (!output) {
-      console.log(`[STREAM] No stream found from any provider for: ${title}`);
-      return null;
+      const errorMsg = `No stream found from any provider for: ${title}. ${lastError ? `Last error: ${lastError.message}`: ''}`;
+      console.log(`[STREAM] ${errorMsg}`);
+      return { stream: null, error: errorMsg };
     }
     
     console.log(`[STREAM] Stream found via source '${output.sourceId}' and embed '${output.embedId}' for: ${title}`);
 
-    return output.stream;
+    return { stream: output.stream, error: null };
 
   } catch (err) {
+    const error = err as Error;
     if (err instanceof NotFoundError) {
-      console.warn(`[STREAM] Stream not found for ${media.title || media.name}:`, err.message);
+      console.warn(`[STREAM] Stream not found for ${media.title || media.name}:`, error.message);
     } else if (err instanceof Error) {
-      console.error(`[STREAM] An unexpected error occurred while fetching the stream for ${media.title || media.name}:`, err);
+      console.error(`[STREAM] An unexpected error occurred while fetching the stream for ${media.title || media.name}:`, error);
     } else {
       console.error(`[STREAM] An unknown error occurred for ${media.title || media.name}:`, err);
     }
-    return null;
+    return { stream: null, error: error.message || 'An unknown error occurred during scraping.' };
   }
 }

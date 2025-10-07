@@ -50,7 +50,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     if (videoRef.current) {
       const currentTime = videoRef.current.currentTime;
       const duration = videoRef.current.duration;
-      if (duration > 0) { // Only update if duration is valid
+      if (duration > 0 && currentTime > 0) { // Only update if duration is valid and video has started
         updateWatchHistory(media, currentTime, duration);
       }
     }
@@ -76,7 +76,9 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
 
         video.volume = volume;
         video.muted = isMuted;
-        video.addEventListener('timeupdate', handleProgress);
+        
+        // Use an interval to save progress to avoid too many writes
+        const progressInterval = setInterval(handleProgress, 5000); // Save every 5 seconds
         
         const updatePlayingState = () => setIsPlaying(!video.paused);
         video.addEventListener('play', updatePlayingState);
@@ -86,16 +88,15 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
         setIsPlaying(!video.paused);
         setIsMuted(video.muted);
         setVolume(video.volume);
+    
+        return () => {
+            clearInterval(progressInterval);
+            video.removeEventListener('play', updatePlayingState);
+            video.removeEventListener('pause', updatePlayingState);
+        };
     }
-    return () => {
-      if (video) {
-        video.removeEventListener('timeupdate', handleProgress);
-        const updatePlayingState = () => setIsPlaying(!video.paused);
-        video.removeEventListener('play', updatePlayingState);
-        video.removeEventListener('pause', updatePlayingState);
-      }
-    };
   }, [handleProgress, isMuted, volume]);
+
 
   const resetControlsTimeout = useCallback(() => {
     if (controlsTimeoutRef.current) {
