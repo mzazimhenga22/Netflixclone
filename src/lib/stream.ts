@@ -14,7 +14,7 @@ const providers = makeProviders({
   target: targets.NATIVE,
   // Add error event listeners for more detailed logging
   events: {
-    onError(err) {
+    onError(err: Error) {
       console.error('[STREAM] Provider internal error:', err.message);
     },
   },
@@ -62,7 +62,7 @@ export async function getStream(media: Movie, season?: number, episode?: number)
     const output = await providers.runAll({
       media: scrapeMedia,
       events: {
-        onError(err) {
+        onError(err: Error) {
           console.error(`[STREAM] Error during runAll for ${title}:`, err.message);
         },
       }
