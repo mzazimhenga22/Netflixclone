@@ -63,7 +63,7 @@ const getRecommendationsFlow = ai.defineFlow(
     },
     async (input) => {
         const { output } = await recommendationPrompt(input);
-        return output || { categories: [] };
+        return output || [];
     }
 );
 

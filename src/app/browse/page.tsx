@@ -149,7 +149,7 @@ export default function BrowsePage() {
                 favoriteGenre: activeProfile.favoriteGenreId ? genres[activeProfile.favoriteGenreId] : undefined,
             });
 
-            const categoryPromises = recommendations.categories.map(async (rec) => {
+            const categoryPromises = recommendations.map(async (rec) => {
                 const movies = await fetchCategoryMovies(rec.category).then(fetchAndHydrate);
                 return { title: rec.title, movies };
             });
