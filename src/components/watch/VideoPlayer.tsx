@@ -4,7 +4,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, RotateCcw, RotateCw, Captions, Layers, Volume2, VolumeX, Maximize, Minimize, Play, Pause } from 'lucide-react';
+import { ArrowLeft, RotateCcw, RotateCw, Captions, Layers, Volume2, VolumeX, Maximize, Minimize } from 'lucide-react';
 import Image from 'next/image';
 import type { Movie } from '@/types';
 import { useWatchHistory } from '@/hooks/useWatchHistory';
@@ -12,8 +12,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import NetflixProgress from './NetflixProgress';
-import { Slider } from '../ui/slider';
-
 
 // Custom Netflix-style SVG Icons
 const PlayIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -50,10 +48,12 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     if (videoRef.current) {
       const currentTime = videoRef.current.currentTime;
       const duration = videoRef.current.duration;
-      updateWatchHistory(media.id, currentTime, duration, media.media_type);
+      if (duration > 0) { // Only update if duration is valid
+        updateWatchHistory(media.id, currentTime, duration, media.media_type);
+      }
     }
   }, [media.id, media.media_type, updateWatchHistory]);
-
+  
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -66,21 +66,32 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
 	}
   }, []);
 
-
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
+        // Attempt to play on mount, will be muted
+        video.play().catch(error => console.error("Autoplay was prevented:", error));
+
         video.volume = volume;
         video.muted = isMuted;
         video.addEventListener('timeupdate', handleProgress);
         
+        const updatePlayingState = () => setIsPlaying(!video.paused);
+        video.addEventListener('play', updatePlayingState);
+        video.addEventListener('pause', updatePlayingState);
+
         // Set initial state
         setIsPlaying(!video.paused);
         setIsMuted(video.muted);
         setVolume(video.volume);
     }
     return () => {
-      video?.removeEventListener('timeupdate', handleProgress);
+      if (video) {
+        video.removeEventListener('timeupdate', handleProgress);
+        const updatePlayingState = () => setIsPlaying(!video.paused);
+        video.removeEventListener('play', updatePlayingState);
+        video.removeEventListener('pause', updatePlayingState);
+      }
     };
   }, [handleProgress, isMuted, volume]);
 
@@ -133,8 +144,9 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
       videoRef.current.muted = newMuted;
       setIsMuted(newMuted);
       if (!newMuted && videoRef.current.volume === 0) {
-        videoRef.current.volume = 0.5;
-        setVolume(0.5);
+        const newVolume = 0.5;
+        videoRef.current.volume = newVolume;
+        setVolume(newVolume);
       }
     }
   };
@@ -158,7 +170,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
         elem.requestFullscreen().catch(err => {
           console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
         });
-      } else {
+      } else if (document.fullscreenElement) {
         document.exitFullscreen();
       }
     }
@@ -179,19 +191,18 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
 
         {/* Center Controls */}
         <div className={cn("absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-12 transition-opacity duration-300", !showControls && "opacity-0 pointer-events-none")}>
-            <button onClick={() => skip(-10)} className="text-white h-12 w-12 relative flex items-center justify-center">
-                <RotateCcw className="h-full w-full" />
-                <span className="absolute text-xs font-bold">10</span>
+            <button onClick={() => skip(-10)} className="text-white h-16 w-16 relative flex items-center justify-center">
+                <RotateCcw className="h-10 w-10" />
+                <span className="absolute text-xs font-bold mt-0.5">10</span>
             </button>
             <button onClick={togglePlay} className="text-white h-20 w-20">
-                {isPlaying ? <Pause /> : <Play />}
+                {isPlaying ? <PauseIcon className="w-full h-full" /> : <PlayIcon className="w-full h-full" />}
             </button>
-            <button onClick={() => skip(10)} className="text-white h-12 w-12 relative flex items-center justify-center">
-                <RotateCw className="h-full w-full" />
-                <span className="absolute text-xs font-bold">10</span>
+            <button onClick={() => skip(10)} className="text-white h-16 w-16 relative flex items-center justify-center">
+                <RotateCw className="h-10 w-10" />
+                <span className="absolute text-xs font-bold mt-0.5">10</span>
             </button>
         </div>
-
 
         {/* Top Controls */}
         <div className={cn("absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/70 to-transparent transition-transform duration-300", !showControls && "-translate-y-full")}>
@@ -206,19 +217,17 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
         
         {/* Bottom Controls */}
         <div className={cn("absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent transition-transform duration-300", !showControls && "translate-y-full")}>
-            {/* Progress Bar */}
              <NetflixProgress videoRef={videoRef} />
 
             {/* Main Controls */}
             <div className="flex items-center justify-between mt-3">
-                <div className="flex items-center gap-2 group">
+                <div className="flex items-center gap-4 group">
                     <button onClick={toggleMute} className="text-white h-7 w-7">
                         {isMuted || volume === 0 ? <VolumeX /> : <Volume2 />}
                     </button>
                     <div className="w-24 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Slider 
-                            defaultValue={[volume]} 
-                            value={[volume]}
+                            value={[isMuted ? 0 : volume]}
                             max={1}
                             step={0.1}
                             onValueChange={handleVolumeChange} 
@@ -287,3 +296,5 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     </Sheet>
   );
 }
+
+    
