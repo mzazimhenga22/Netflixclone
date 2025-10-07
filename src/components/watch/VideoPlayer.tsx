@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, X, RotateCcw, RotateCw, Captions, Layers } from 'lucide-react';
+import { ArrowLeft, RotateCcw, RotateCw, Captions, Layers, Volume2, VolumeX, Maximize, Minimize, Play, Pause } from 'lucide-react';
 import Image from 'next/image';
 import type { Movie } from '@/types';
 import { useWatchHistory } from '@/hooks/useWatchHistory';
@@ -21,18 +21,7 @@ const PlayIcon = (props: React.SVGProps<SVGSVGElement>) => (
 const PauseIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M6 4h4v16H6zM14 4h4v16h-4z"></path></svg>
 );
-const VolumeHighIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M25.33 2.022H22.7a.7.7 0 0 0-.7.7v28.556a.7.7 0 0 0 .7.7h2.63a.7.7 0 0 0 .7-.7V2.722a.7.7 0 0 0-.7-.7ZM13.3 2.022H10.67a.7.7 0 0 0-.7.7v28.556a.7.7 0 0 0 .7.7H13.3a.7.7 0 0 0 .7-.7V2.722a.7.7 0 0 0-.7-.7Z"></path></svg>
-);
-const VolumeMutedIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="m21.43 31.83-8.62-6.53H8.22V10.7h4.59l8.62-6.53Zm-1.8-21.14-5.4 4.08H9.92v6.8h4.31l5.4 4.09Zm10.45 6.13a.9.9 0 0 0-1.28 1.28 5.78 5.78 0 0 1 0 9.2 1 1 0 0 0 .64 1.76.94.94 0 0 0 .64-.24 8.13 8.13 0 0 0 0-12Zm3.48-3.48a.9.9 0 0 0-1.28 1.28 9.51 9.51 0 0 1 0 16.36 1 1 0 0 0 .64 1.76.93.93 0 0 0 .64-.24 11.42 11.42 0 0 0 0-19.16Z"></path></svg>
-);
-const FullscreenEnterIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M31.5 8H28V4.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v4H19a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5Zm-2 7h-3V9h3v6Zm-15.5-3H11V8.5a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0-.5.5V12h3.5a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5H5V9h5v5H8.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5ZM13 23.5a.5.5 0 0 0-.5.5V28H8.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5H12v-3.5a.5.5 0 0 0-.5-.5h-3v-5h3.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5H4.5a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5H8v-3.5a.5.5 0 0 0-.5-.5h-3V21h10v3.5a.5.5 0 0 0 .5.5ZM27.5 20h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5H27v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5V24h-3.5a.5.5 0 0 0-.5.5v3h-5v-5h1.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5H20v-3.5a.5.5 0 0 0-.5-.5h-3V21h10v6h-3v-3.5a.5.5 0 0 0-.5-.5Z"></path></svg>
-);
-const FullscreenExitIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M4.5 12.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5H4a.5.5 0 0 0-.5.5v4.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm26 0h3v3h-3v-3ZM28 8h.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4ZM4.5 28.5h4a.5.5 0 0 0 .5-.5v-3.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v3.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm25-1v3h-3v-3h3Zm-4-1h4.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5Z"></path></svg>
-);
+
 
 interface VideoPlayerProps {
   src: string;
@@ -257,7 +246,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
             <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center gap-2 group">
                     <button onClick={toggleMute} className="text-white h-7 w-7">
-                        {isMuted || volume === 0 ? <VolumeMutedIcon /> : <VolumeHighIcon />}
+                        {isMuted || volume === 0 ? <VolumeX /> : <Volume2 />}
                     </button>
                     <div className="w-24 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Slider 
@@ -275,12 +264,12 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
                 <div className="flex items-center gap-4">
                     {isTvShow && (
                          <SheetTrigger asChild>
-                            <button className="text-white h-7 w-7"><Layers className="h-7 w-7" /></button>
+                            <button className="text-white h-7 w-7"><Layers /></button>
                         </SheetTrigger>
                     )}
                     <Popover>
                         <PopoverTrigger asChild>
-                            <button className="text-white h-7 w-7"><Captions className="h-7 w-7" /></button>
+                            <button className="text-white h-7 w-7"><Captions /></button>
                         </PopoverTrigger>
                          <PopoverContent className="w-64 bg-black/80 border-white/20 text-white p-2" align="end">
                             <div className="text-center p-2 border-b border-white/20">Audio & Subtitles</div>
@@ -298,7 +287,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
                         </PopoverContent>
                     </Popover>
                     <button onClick={toggleFullscreen} className="text-white h-7 w-7">
-                        {isFullscreen ? <FullscreenExitIcon /> : <FullscreenEnterIcon />}
+                        {isFullscreen ? <Minimize /> : <Maximize />}
                     </button>
                 </div>
             </div>
@@ -331,5 +320,3 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     </Sheet>
   );
 }
-
-    
