@@ -2,8 +2,8 @@
 import { load } from 'cheerio';
 
 import { flags } from '../../../entrypoint/utils/targets';
-import { Caption, labelToLanguageCode } from '../../captions';
-import { Stream } from '../../streams';
+import { Caption, labelToLanguageCode } from '../../../captions';
+import { Stream } from '../../../streams';
 import { compareMedia } from '../../../utils/compare';
 import { MovieScrapeContext, ShowScrapeContext } from '../../../utils/context';
 import { NotFoundError } from '../../../utils/errors';
