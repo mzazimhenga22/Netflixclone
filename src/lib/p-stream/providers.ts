@@ -29,8 +29,7 @@ const vidsrcScraper: Source = {
             }
         });
         
-        // More robust way to find the stream URL, looking for a sources array in a script tag
-        const streamSrcMatch = mainPage.body.match(/sources:\s*\[[\s\S]*?\{[\s\S]*?file:\s*["']([^"']+)["']/i);
+        const streamSrcMatch = mainPage.body.match(/'(https?:\/\/[^']*\.m3u8[^']*)'/);
         const streamUrl = streamSrcMatch ? streamSrcMatch[1] : null;
 
         if (!streamUrl) {
