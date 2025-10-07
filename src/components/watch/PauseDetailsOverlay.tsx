@@ -3,6 +3,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import type { Movie } from "@/types";
+import Image from 'next/image';
 
 const API_KEY = '1ba41bda48d0f1c90954f4811637b6d6';
 
@@ -20,7 +21,7 @@ interface TmdbConfig {
 
 interface TmdbDetails extends Movie {
     credits?: {
-        cast: { cast_id: number; credit_id: string; name: string; character: string }[];
+        cast: { cast_id: number; credit_id: string; name: string; character: string, profile_path: string | null }[];
     };
 }
 
@@ -110,7 +111,6 @@ export default function PauseDetailsOverlay({
     return () => { cancelled = true };
   }, [showOverlay, media.id, media.media_type]);
 
-  const topCast = (details?.credits?.cast || []).slice(0, 4);
 
   const onClose = () => {
     setShowOverlay(false);
@@ -121,7 +121,7 @@ export default function PauseDetailsOverlay({
   if (!details) {
     return (
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[60]">
-        <div className="bg-black bg-opacity-60 text-white p-6 rounded-md">Loading details…</div>
+        {/* Minimal loading indicator that doesn't obscure the screen */}
       </div>
     );
   }
@@ -129,74 +129,77 @@ export default function PauseDetailsOverlay({
   const backdropUrl = buildImageUrl(config, details.backdrop_path, "w1280") ||
                       buildImageUrl(config, details.poster_path, "w780");
 
+  const topCast = (details?.credits?.cast || []).slice(0, 4);
+
   return (
     <div
-      className="absolute inset-0 flex items-end md:items-center justify-center pointer-events-auto"
+      className="absolute inset-0 grid grid-cols-1 md:grid-cols-2 pointer-events-auto animate-in fade-in-0 duration-700"
       style={{ zIndex: 60 }}
+      onClick={onClose}
     >
-      <div
-        className="absolute inset-0 bg-black bg-opacity-60"
-        onClick={onClose}
-      />
-      <div className="relative max-w-4xl w-full m-6 rounded-md overflow-hidden animate-in fade-in-0 slide-in-from-bottom-10 duration-500">
-        <div className="flex flex-col md:flex-row items-start md:items-stretch bg-gradient-to-t from-black via-black/90 to-black/80 p-6">
-          <div className="flex-shrink-0">
-            {backdropUrl ? (
-              <img src={backdropUrl} alt={details.title || details.name} className="w-48 md:w-64 rounded-md shadow-lg" />
-            ) : (
-              <div className="w-48 md:w-64 h-32 md:h-40 bg-gray-800 rounded-md" />
-            )}
-          </div>
-
-          <div className="ml-4 md:ml-6 flex-1">
-            <div className="flex items-center justify-between">
-              <h3 className="text-white text-lg md:text-2xl font-semibold">
-                {details.title || details.name}
-                <span className="text-gray-400 text-sm ml-2">
-                  {details.release_date ? `(${details.release_date.slice(0,4)})` : details.first_air_date ? `(${details.first_air_date.slice(0,4)})` : ""}
-                </span>
-              </h3>
-              <button onClick={onClose} className="text-gray-300 hover:text-white">Close ✕</button>
+      <div className="relative h-full w-full">
+        {backdropUrl && (
+            <Image src={backdropUrl} alt={details.title || details.name || 'Backdrop'} fill className="object-cover" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-l from-black via-black/80 to-transparent"></div>
+      </div>
+      
+      <div className="relative h-full w-full bg-black/80 backdrop-blur-sm p-8 md:p-12 lg:p-16 flex flex-col justify-center">
+        <div className="max-w-xl text-white">
+            <h2 className="text-3xl lg:text-5xl font-black">{details.title || details.name}</h2>
+            <div className="flex items-center gap-4 text-muted-foreground mt-2 text-lg">
+                <span>{details.release_date?.slice(0,4) || details.first_air_date?.slice(0,4)}</span>
+                <span className="border px-2 rounded-sm text-base">{details.certification || '16+'}</span>
+                 <span className="text-green-400 font-semibold">{(details.vote_average * 10).toFixed(0)}% Match</span>
             </div>
 
-            <p className="text-gray-300 mt-2 line-clamp-4">{details.overview}</p>
+            <p className="mt-4 text-base lg:text-lg line-clamp-4">{details.overview}</p>
 
-            <div className="mt-4">
-              <div className="text-gray-400 text-xs uppercase tracking-wide mb-2">Top cast</div>
-              <div className="flex gap-3">
-                {topCast.map((c) => (
-                  <div key={c.cast_id || c.credit_id} className="text-xs text-gray-200">
-                    <div className="font-medium">{c.name}</div>
-                    <div className="text-gray-400">{c.character}</div>
-                  </div>
+            <div className="mt-8">
+              <h4 className="text-sm uppercase font-semibold text-muted-foreground mb-3">Cast</h4>
+              <div className="flex flex-wrap gap-x-6 gap-y-3">
+                {topCast.map(c => (
+                    <div key={c.cast_id || c.credit_id} className="flex items-center gap-3">
+                         <div className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden flex-shrink-0">
+                            {c.profile_path && config && (
+                                <Image src={`${config.images.secure_base_url}w185${c.profile_path}`} alt={c.name} width={40} height={40} className="object-cover" />
+                            )}
+                        </div>
+                        <div>
+                            <p className="font-semibold text-sm">{c.name}</p>
+                            <p className="text-xs text-muted-foreground">{c.character}</p>
+                        </div>
+                    </div>
                 ))}
               </div>
             </div>
 
-            <div className="mt-6 flex gap-3">
+            <div className="mt-10 flex gap-3">
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   const v = videoRef?.current;
                   if (v) v.play();
                   setShowOverlay(false);
                 }}
-                className="bg-white text-black px-4 py-2 rounded-md font-semibold"
+                className="bg-white text-black px-6 py-2 rounded-md font-bold text-lg hover:bg-white/80 transition-colors"
               >
                 Resume
               </button>
 
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   window.open(`https://www.themoviedb.org/${media.media_type}/${media.id}`, "_blank");
                 }}
-                className="border border-gray-600 text-white px-4 py-2 rounded-md"
+                className="border border-white/50 text-white px-6 py-2 rounded-md font-bold text-lg bg-black/40 hover:bg-white/10 transition-colors"
               >
-                More info
+                More Info
               </button>
             </div>
-          </div>
         </div>
       </div>
     </div>
   );
 }
+
