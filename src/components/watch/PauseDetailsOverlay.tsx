@@ -141,7 +141,7 @@ export default function PauseDetailsOverlay({
         {backdropUrl && (
             <Image src={backdropUrl} alt={details.title || details.name || 'Backdrop'} fill className="object-cover" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-l from-black via-black/80 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/80 to-black"></div>
       </div>
       
       <div className="relative h-full w-full bg-black/80 backdrop-blur-sm p-8 md:p-12 lg:p-16 flex flex-col justify-center">
@@ -202,4 +202,3 @@ export default function PauseDetailsOverlay({
     </div>
   );
 }
-
