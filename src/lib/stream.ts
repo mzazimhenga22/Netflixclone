@@ -1,5 +1,4 @@
 
-
 'use server';
 
 import { makeProviders, makeStandardFetcher, targets, NotFoundError, type ScrapeMedia } from '@/lib/p-stream';
@@ -12,9 +11,14 @@ const myFetcher = makeStandardFetcher(fetch);
 // make an instance of the providers library
 const providers = makeProviders({
   fetcher: myFetcher,
-  // will be played on a native video player
-  target: targets.NATIVE
-});
+  target: targets.NATIVE,
+  // Add error event listeners for more detailed logging
+  events: {
+    onError(err) {
+      console.error('[STREAM] Provider internal error:', err.message);
+    },
+  },
+} as any);
 
 export async function getStream(media: Movie, season?: number, episode?: number): Promise<Stream | null> {
   try {
@@ -23,6 +27,7 @@ export async function getStream(media: Movie, season?: number, episode?: number)
     const title = media.title || media.name || '';
 
     if (!media.media_type || !title || !releaseYear || !tmdbId) {
+        console.error('[STREAM] Invalid media object for stream lookup:', media);
         throw new Error('Invalid media for stream lookup');
     }
 
@@ -52,26 +57,32 @@ export async function getStream(media: Movie, season?: number, episode?: number)
         };
     }
     
-    console.log(`Searching for stream for: ${title} (${releaseYear})`, scrapeMedia.type === 'tv' ? `S${scrapeMedia.season.number}E${scrapeMedia.episode.number}`: '');
+    console.log(`[STREAM] Searching for stream for: ${title} (${releaseYear})`, scrapeMedia.type === 'tv' ? `S${scrapeMedia.season.number}E${scrapeMedia.episode.number}`: '');
 
     const output = await providers.runAll({
       media: scrapeMedia,
+      events: {
+        onError(err) {
+          console.error(`[STREAM] Error during runAll for ${title}:`, err.message);
+        },
+      }
     });
 
     if (!output) {
-      console.log('No stream found from any provider.');
+      console.log(`[STREAM] No stream found from any provider for: ${title}`);
       return null;
     }
     
-    console.log(`Stream found via ${output.sourceId}:`, output.stream);
+    console.log(`[STREAM] Stream found via source '${output.sourceId}' and embed '${output.embedId}' for: ${title}`);
+    console.log('[STREAM] Stream Details:', output.stream);
 
     return output.stream;
 
   } catch (err) {
     if (err instanceof NotFoundError) {
-      console.warn(`Stream not found for ${media.title || media.name}:`, err.message);
+      console.warn(`[STREAM] Stream not found for ${media.title || media.name}:`, err.message);
     } else {
-      console.error(`An unexpected error occurred while fetching the stream for ${media.title || media.name}:`, err);
+      console.error(`[STREAM] An unexpected error occurred while fetching the stream for ${media.title || media.name}:`, err);
     }
     return null;
   }
