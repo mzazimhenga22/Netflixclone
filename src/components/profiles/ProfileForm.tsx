@@ -39,14 +39,14 @@ interface ProfileFormProps {
 }
 
 const avatars = [
-    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar1.png?alt=media&token=e827b5f6-3914-4395-8292-39324135502c",
-    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar2.png?alt=media&token=255776c4-7389-4809-810a-2004278a9947",
-    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar3.png?alt=media&token=86641A58-348A-42A6-A2A5-364F3539079A",
-    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar4.png?alt=media&token=C3F4A8B3-3B3B-4F6A-915A-69A6B2A8A3F6",
-    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar5.png?alt=media&token=E9A4B3C5-5A3E-4B3A-9E2A-1A2B3C4D5E6F",
-    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar6.png?alt=media&token=A9B8C7D6-5E4F-3A2B-1C0D-9E8F7A6B5C4D",
-    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar7.png?alt=media&token=B8C9D0E7-6F5A-4B3C-2D1E-0F9E8D7C6B5A",
-    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar8.png?alt=media&token=D7E8F9A0-1B2C-3D4E-5F6A-7B8C9D0E1F2A"
+    "https://picsum.photos/seed/1/200/200",
+    "https://picsum.photos/seed/2/200/200",
+    "https://picsum.photos/seed/3/200/200",
+    "https://picsum.photos/seed/4/200/200",
+    "https://picsum.photos/seed/5/200/200",
+    "https://picsum.photos/seed/6/200/200",
+    "https://picsum.photos/seed/7/200/200",
+    "https://picsum.photos/seed/8/200/200"
 ];
 
 export default function ProfileForm({ profile, onSave, onCancel, onDelete }: ProfileFormProps) {
