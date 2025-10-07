@@ -2,6 +2,7 @@
 import { makeStandardFetcher } from "./fetchers";
 import { NotFoundError } from "./errors";
 import type { Embed, Source, ScrapeMedia } from "./types";
+import * as cheerio from 'cheerio';
 
 const vidsrcBase = 'https://vidsrc.to';
 
@@ -11,8 +12,6 @@ const vidsrcScraper: Source = {
     rank: 100,
     disabled: false,
     async fn(ops) {
-        const fetcher = makeStandardFetcher(fetch);
-        
         const media: ScrapeMedia = ops.media;
 
         let url: string;
@@ -22,40 +21,42 @@ const vidsrcScraper: Source = {
             url = `${vidsrcBase}/embed/tv/${media.tmdbId}/${media.season.number}/${media.episode.number}`;
         }
 
-        const mainPage = await fetcher(url, {
+        const mainPage = await ops.fetcher(url, {
             method: 'GET',
             headers: {
                 Referer: vidsrcBase + '/',
             }
         });
         
-        const streamSrcMatch = mainPage.body.match(/'(https?:\/\/[^']*\.m3u8[^']*)'/);
-        const streamUrl = streamSrcMatch ? streamSrcMatch[1] : null;
+        const $ = cheerio.load(mainPage.body);
 
+        let streamUrl: string | null = null;
+        
+        $('script').each((_, el) => {
+            const scriptContent = $(el).html();
+            if (scriptContent && scriptContent.includes('sources:')) {
+                const sourcesMatch = scriptContent.match(/sources: (\[.*?\])/);
+                if (sourcesMatch && sourcesMatch[1]) {
+                    try {
+                        const sources = JSON.parse(sourcesMatch[1]);
+                        const hlsSource = sources.find((s: any) => s.file && s.file.includes('.m3u8'));
+                        if (hlsSource) {
+                            streamUrl = hlsSource.file;
+                            return false; // exit the loop
+                        }
+                    } catch (e) {
+                        // ignore parsing errors
+                    }
+                }
+            }
+        });
+        
         if (!streamUrl) {
             throw new NotFoundError('Could not find stream URL in VidSrc page');
         }
 
         return {
-            embeds: [{
-                embedId: 'vidsrc-embed',
-                url: streamUrl,
-            }],
-        }
-    }
-};
-
-const vidsrcEmbed: Embed = {
-    id: 'vidsrc-embed',
-    name: 'VidSrc Embed',
-    disabled: false,
-    async fn(ops) {
-        const streamUrl = ops.url;
-        if (!streamUrl) {
-            throw new NotFoundError('No stream URL found in VidSrc embed operations');
-        }
-
-        return {
+            embeds: [],
             stream: {
                 qualities: {
                     auto: {
@@ -73,6 +74,4 @@ export const allSources: Source[] = [
     vidsrcScraper,
 ];
 
-export const allEmbeds: Embed[] = [
-    vidsrcEmbed,
-];
+export const allEmbeds: Embed[] = [];
