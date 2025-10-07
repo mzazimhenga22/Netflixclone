@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, X } from 'lucide-react';
+import { ArrowLeft, X, RotateCcw, RotateCw } from 'lucide-react';
 import Image from 'next/image';
 import type { Movie } from '@/types';
 import { useWatchHistory } from '@/hooks/useWatchHistory';
@@ -31,19 +31,7 @@ const FullscreenEnterIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M31.5 8H28V4.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v4H19a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5Zm-2 7h-3V9h3v6Zm-15.5-3H11V8.5a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0-.5.5V12h3.5a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5H5V9h5v5H8.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5ZM13 23.5a.5.5 0 0 0-.5.5V28H8.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5H12v-3.5a.5.5 0 0 0-.5-.5h-3v-5h3.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5H4.5a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5H8v-3.5a.5.5 0 0 0-.5-.5h-3V21h10v3.5a.5.5 0 0 0 .5.5ZM27.5 20h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5H27v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5V24h-3.5a.5.5 0 0 0-.5.5v3h-5v-5h1.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5H20v-3.5a.5.5 0 0 0-.5-.5h-3V21h10v6h-3v-3.5a.5.5 0 0 0-.5-.5Z"></path></svg>
 );
 const FullscreenExitIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M4.5 12.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5H4a.5.5 0 0 0-.5.5v4.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm26 0h3v3h-3v-3ZM28 8h.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4ZM4.5 28.5h4a.5.5 0 0 0 .5-.5v-3.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v3.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm25-1v3h-3v-3h3Zm-4-1h4.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5Z"></path></svg>
-);
-const Rewind10Icon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-        <path d="M12.5 3C7.8 3 3.5 6.3 3.5 11c0 2.8 1.7 5.3 4.2 6.5l-1.5 1.5c-3-1.5-5.2-4.5-5.2-8C1 5.2 5.9 1 12.5 1c5.2 0 9.6 3.3 11.2 7.8l-1.5 1.5C20.8 6.3 17 3 12.5 3z" />
-        <text x="6" y="14" fontSize="8px" fill="white" style={{transform: 'scale(1, -1) translate(0, -24px)'}}>10</text>
-    </svg>
-);
-const Forward10Icon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-        <path d="M11.5 3C16.2 3 20.5 6.3 20.5 11c0 2.8-1.7 5.3-4.2 6.5l1.5 1.5c3-1.5 5.2-4.5 5.2-8C23 5.2 18.1 1 11.5 1c-5.2 0-9.6 3.3-11.2 7.8l1.5 1.5C3.2 6.3 7 3 11.5 3z" />
-        <text x="10" y="14" fontSize="8px" fill="white" style={{transform: 'scale(1, -1) translate(0, -24px)'}}>10</text>
-    </svg>
+  <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M4.5 12.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5H4a.5.5 0 0 0-.5.5v4.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm26 0h3v3h-3v-3ZM28 8h.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4ZM4.5 28.5h4a.5.5 0 0 0 .5-.5v-3.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v3.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm25-1v3h-3v-3h3Zm-4-1h4.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5Z"></path></svg>
 );
 const CaptionsIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M29.13 22.13H6.87a.88.88 0 0 0-.87.88v5.12a.88.88 0 0 0 .87.88h22.26a.88.88 0 0 0 .87-.88v-5.12a.88.88 0 0 0-.87-.88Zm-1 4.25h-6.19v-2.5h6.19Zm-8.7-2.5h6.2v2.5h-6.2Zm-8.67 0h6.19v2.5H10.76Z"></path></svg>
@@ -258,32 +246,33 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
 
             {/* Main Controls */}
             <div className="flex items-center justify-between mt-3">
+                <div className="flex items-center gap-2 group">
+                    <button onClick={toggleMute} className="text-white h-7 w-7">
+                        {isMuted || volume === 0 ? <VolumeMutedIcon /> : <VolumeHighIcon />}
+                    </button>
+                    <div className="w-24 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Slider 
+                            defaultValue={[volume]} 
+                            value={[volume]}
+                            max={1}
+                            step={0.1}
+                            onValueChange={handleVolumeChange} 
+                        />
+                    </div>
+                </div>
+
                 <div className="flex items-center gap-6">
-                    <button onClick={togglePlay} className="text-white h-7 w-7">
+                    <button onClick={() => skip(-10)} className="text-white h-7 w-7 relative">
+                        <RotateCcw className="h-full w-full" />
+                        <span className="absolute text-xs font-bold top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">10</span>
+                    </button>
+                    <button onClick={togglePlay} className="text-white h-10 w-10">
                         {isPlaying ? <PauseIcon /> : <PlayIcon />}
                     </button>
-                     <div className="flex items-center gap-4">
-                        <button onClick={() => skip(-10)} className="text-white h-7 w-7">
-                            <Rewind10Icon />
-                        </button>
-                        <button onClick={() => skip(10)} className="text-white h-7 w-7">
-                            <Forward10Icon />
-                        </button>
-                    </div>
-                     <div className="flex items-center gap-2 group">
-                        <button onClick={toggleMute} className="text-white h-7 w-7">
-                            {isMuted || volume === 0 ? <VolumeMutedIcon /> : <VolumeHighIcon />}
-                        </button>
-                        <div className="w-24 opacity-0 group-hover:opacity-100 transition-opacity">
-                           <Slider 
-                                defaultValue={[volume]} 
-                                value={[volume]}
-                                max={1}
-                                step={0.1}
-                                onValueChange={handleVolumeChange} 
-                           />
-                        </div>
-                    </div>
+                    <button onClick={() => skip(10)} className="text-white h-7 w-7 relative">
+                        <RotateCw className="h-full w-full" />
+                        <span className="absolute text-xs font-bold top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">10</span>
+                    </button>
                 </div>
                 
                 <div className="flex items-center gap-4">
@@ -345,5 +334,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     </Sheet>
   );
 }
+
+    
 
     
