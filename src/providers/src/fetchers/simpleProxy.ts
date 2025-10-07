@@ -1,4 +1,3 @@
-
 import { makeFullUrl } from './common';
 import { FetchLike } from './fetch';
 import { makeStandardFetcher } from './standardFetch';

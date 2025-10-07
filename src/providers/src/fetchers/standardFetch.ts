@@ -1,7 +1,3 @@
-
-
-
-
 import { serializeBody } from './body';
 import { makeFullUrl } from './common';
 import { FetchLike, FetchReply } from './fetch';
