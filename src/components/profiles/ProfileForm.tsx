@@ -29,24 +29,25 @@ import {
 } from "@/components/ui/alert-dialog";
 import { countries } from '@/lib/countries';
 import type { Profile } from '@/hooks/useProfile';
+import { movieGenres } from '@/lib/movieGenres';
 
 
 interface ProfileFormProps {
   profile?: Profile;
-  onSave: (profileData: Omit<Profile, 'id' | 'favoriteGenreId'> & { id?: string }) => void;
+  onSave: (profileData: Omit<Profile, 'id'> & { id?: string }) => void;
   onCancel: () => void;
   onDelete: (id: string) => void;
 }
 
 const avatars = [
-    "https://picsum.photos/seed/1/200/200",
-    "https://picsum.photos/seed/2/200/200",
-    "https://picsum.photos/seed/3/200/200",
-    "https://picsum.photos/seed/4/200/200",
-    "https://picsum.photos/seed/5/200/200",
-    "https://picsum.photos/seed/6/200/200",
-    "https://picsum.photos/seed/7/200/200",
-    "https://picsum.photos/seed/8/200/200"
+    "https://picsum.photos/seed/avatar1/200/200",
+    "https://picsum.photos/seed/avatar2/200/200",
+    "https://picsum.photos/seed/avatar3/200/200",
+    "https://picsum.photos/seed_avatar4/200/200",
+    "https://picsum.photos/seed/avatar5/200/200",
+    "https://picsum.photos/seed/avatar6/200/200",
+    "https://picsum.photos/seed/avatar7/200/200",
+    "https://picsum.photos/seed/avatar8/200/200"
 ];
 
 export default function ProfileForm({ profile, onSave, onCancel, onDelete }: ProfileFormProps) {
@@ -55,6 +56,7 @@ export default function ProfileForm({ profile, onSave, onCancel, onDelete }: Pro
   const [isLocked, setIsLocked] = useState(profile?.isLocked || false);
   const [pin, setPin] = useState(profile?.pin || '');
   const [country, setCountry] = useState(profile?.country || 'US');
+  const [favoriteGenreId, setFavoriteGenreId] = useState(profile?.favoriteGenreId?.toString() || '');
 
   const handleSave = () => {
     onSave({
@@ -64,6 +66,7 @@ export default function ProfileForm({ profile, onSave, onCancel, onDelete }: Pro
       isLocked,
       pin: isLocked ? pin : undefined,
       country,
+      favoriteGenreId: favoriteGenreId ? parseInt(favoriteGenreId) : undefined,
     });
   };
 
@@ -89,6 +92,21 @@ export default function ProfileForm({ profile, onSave, onCancel, onDelete }: Pro
                     placeholder="Name"
                     className="bg-gray-700 border-none h-12 text-lg"
                 />
+              </div>
+
+               <div className="space-y-2">
+                 <Label htmlFor="favoriteGenre" className="text-gray-400">Favorite Genre</Label>
+                 <Select value={favoriteGenreId} onValueChange={setFavoriteGenreId}>
+                    <SelectTrigger className="w-full bg-gray-700 border-none h-12 text-lg">
+                        <SelectValue placeholder="Select a favorite genre" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-64">
+                         <SelectItem value="">None</SelectItem>
+                        {movieGenres.map(g => (
+                            <SelectItem key={g.id} value={g.id.toString()}>{g.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">

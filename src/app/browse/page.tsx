@@ -1,21 +1,23 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Banner from "@/components/browse/Banner";
 import Navbar from "@/components/browse/Navbar";
 import MovieRow from "@/components/browse/MovieRow";
 import Top10Row from '@/components/browse/Top10Row';
 import ContinueWatchingRow from '@/components/browse/ContinueWatchingRow';
 import Footer from "@/components/shared/Footer";
-import { getTrending, getMoviesByGenre, getPopularMovies, getPopularTvShows, getTvShowsByGenre, getTrendingTvShows, getMovieOrTvDetails } from "@/lib/tmdb";
+import { getTrending, getMoviesByGenre, getPopularMovies, getPopularTvShows, getTvShowsByGenre, getTrendingTvShows, getMovieOrTvDetails, searchMulti } from "@/lib/tmdb";
 import type { Movie } from "@/types";
 import { useProfile } from '@/hooks/useProfile';
 import { useWatchHistory, type WatchHistoryItem } from '@/hooks/useWatchHistory';
-import { genres } from '@/lib/genres';
+import { useMyList } from '@/hooks/useMyList';
 import React from 'react';
 import { countries } from '@/lib/countries';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { getRecommendations } from '@/ai/flows/recommendations-flow';
+import { genres } from '@/lib/genres';
 
 
 type MovieCategory = {
@@ -26,6 +28,7 @@ type MovieCategory = {
 type ContinueWatchingMovie = Movie & { history: WatchHistoryItem };
 
 const fetchAndHydrate = async (movieList: Movie[]): Promise<Movie[]> => {
+    if (!movieList) return [];
   const detailedMovies = await Promise.all(
     movieList.map(movie => getMovieOrTvDetails(movie.id, movie.media_type))
   );
@@ -36,6 +39,7 @@ const fetchAndHydrate = async (movieList: Movie[]): Promise<Movie[]> => {
 export default function BrowsePage() {
   const { activeProfile, isUserLoading } = useProfile();
   const { history, removeWatchHistory, isLoading: isHistoryLoading } = useWatchHistory();
+  const { myList, isLoading: isMyListLoading } = useMyList();
   const [bannerMovie, setBannerMovie] = useState<Movie | null>(null);
   const [categories, setCategories] = useState<MovieCategory[]>([]);
   const [continueWatching, setContinueWatching] = useState<ContinueWatchingMovie[]>([]);
@@ -66,9 +70,32 @@ export default function BrowsePage() {
     fetchContinueWatching();
   }, [history, isHistoryLoading]);
 
+  const fetchCategoryMovies = useCallback(async (category: { type: string; value: string; }): Promise<Movie[]> => {
+    switch (category.type) {
+        case 'genre':
+            const genreId = Object.keys(genres).find(key => genres[parseInt(key)] === category.value);
+            if (genreId) {
+                const movies = await getMoviesByGenre(parseInt(genreId));
+                const tv = await getTvShowsByGenre(parseInt(genreId));
+                return [...movies, ...tv].sort(() => 0.5 - Math.random());
+            }
+            return [];
+        case 'trending':
+            return getTrending();
+        case 'popular_movies':
+            return getPopularMovies();
+        case 'popular_tv':
+            return getPopularTvShows();
+        case 'search':
+            return searchMulti(category.value);
+        default:
+            return [];
+    }
+  }, []);
+
   useEffect(() => {
     const fetchMovies = async () => {
-      if (!activeProfile) return;
+      if (!activeProfile || isMyListLoading) return;
       setLoading(true);
   
       try {
@@ -103,84 +130,32 @@ export default function BrowsePage() {
           }
 
         } else {
-            const [
-              trending, 
-              top10Shows,
-              popularMovies,
-              popularTv, 
-              favoriteGenreMovies,
-              favoriteGenreTv,
-              comedyMovies,
-              comedyTv, 
-              horrorMovies, 
-              romanceMovies, 
-              documentaryMovies,
-              actionMovies,
-              actionTv,
-              dramaMovies,
-              dramaTv,
-              scifiMovies,
-              scifiTv,
-              animationMovies,
-              animationTv
-            ] = await Promise.all([
-              getTrending().then(fetchAndHydrate),
-              getTrendingTvShows(activeProfile.country).then(fetchAndHydrate),
-              getPopularMovies().then(fetchAndHydrate),
-              getPopularTvShows().then(fetchAndHydrate),
-              activeProfile.favoriteGenreId ? getMoviesByGenre(activeProfile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
-              activeProfile.favoriteGenreId ? getTvShowsByGenre(activeProfile.favoriteGenreId).then(fetchAndHydrate) : Promise.resolve([]),
-              getMoviesByGenre(35).then(fetchAndHydrate), // Comedy Movies
-              getTvShowsByGenre(35).then(fetchAndHydrate), // Comedy TV
-              getMoviesByGenre(27).then(fetchAndHydrate), // Horror Movies
-              getMoviesByGenre(10749).then(fetchAndHydrate), // Romance Movies
-              getMoviesByGenre(99).then(fetchAndHydrate), // Documentary Movies
-              getMoviesByGenre(28).then(fetchAndHydrate), // Action Movies
-              getTvShowsByGenre(10759).then(fetchAndHydrate), // Action & Adventure TV
-              getMoviesByGenre(18).then(fetchAndHydrate), // Drama Movies
-              getTvShowsByGenre(18).then(fetchAndHydrate), // Drama TV
-              getMoviesByGenre(878).then(fetchAndHydrate), // Sci-Fi Movies
-              getTvShowsByGenre(10765).then(fetchAndHydrate), // Sci-Fi & Fantasy TV
-              getMoviesByGenre(16).then(fetchAndHydrate), // Animation Movies
-              getTvShowsByGenre(16).then(fetchAndHydrate), // Animation TV
+            const [trending, top10Shows] = await Promise.all([
+                getTrending().then(fetchAndHydrate),
+                getTrendingTvShows(activeProfile.country).then(fetchAndHydrate)
             ]);
-            
-            const newCategories: MovieCategory[] = [
-              { title: "Trending Now", movies: trending },
-              { title: "Popular Movies", movies: popularMovies },
-              { title: "Popular TV Shows", movies: popularTv },
-            ];
-
             setTop10(top10Shows.slice(0, 10));
-      
-            if (activeProfile.favoriteGenreId) {
-              const genreName = genres[activeProfile.favoriteGenreId];
-              const favoriteGenreContent = [...favoriteGenreMovies, ...favoriteGenreTv].sort(() => 0.5 - Math.random());
-              if (genreName) {
-                newCategories.push({ title: `Because you like ${genreName}`, movies: favoriteGenreContent });
-              }
-            }
-
-            const actionAdventure = [...actionMovies, ...actionTv].sort(() => 0.5 - Math.random());
-            const dramas = [...dramaMovies, ...dramaTv].sort(() => 0.5 - Math.random());
-            const scifiFantasy = [...scifiMovies, ...scifiTv].sort(() => 0.5 - Math.random());
-            const comedies = [...comedyMovies, ...comedyTv].sort(() => 0.5 - Math.random());
-            const animation = [...animationMovies, ...animationTv].sort(() => 0.5 - Math.random());
-
-            newCategories.push({ title: "Action & Adventure", movies: actionAdventure });
-            newCategories.push({ title: "Comedies", movies: comedies });
-            newCategories.push({ title: "Dramas", movies: dramas });
-            newCategories.push({ title: "Scary Movies", movies: horrorMovies });
-            newCategories.push({ title: "Romance", movies: romanceMovies });
-            newCategories.push({ title: "Sci-Fi & Fantasy", movies: scifiFantasy });
-            newCategories.push({ title: "Animation", movies: animation });
-            newCategories.push({ title: "Documentaries", movies: documentaryMovies });
-      
-            setCategories(newCategories);
-      
             if (trending.length > 0) {
-              setBannerMovie(trending[Math.floor(Math.random() * trending.length)]);
+                setBannerMovie(trending[Math.floor(Math.random() * trending.length)]);
             }
+
+            // Fetch detailed items for history and mylist
+            const historyDetails = await Promise.all(history.map(item => getMovieOrTvDetails(item.mediaId, item.media_type)));
+            const myListDetails = await Promise.all(myList.map(id => getMovieOrTvDetails(id)));
+
+            const recommendations = await getRecommendations({
+                myList: myListDetails.filter(Boolean).map(m => m?.title || m?.name || ''),
+                watchHistory: historyDetails.filter(Boolean).map(m => m?.title || m?.name || ''),
+                favoriteGenre: activeProfile.favoriteGenreId ? genres[activeProfile.favoriteGenreId] : undefined,
+            });
+
+            const categoryPromises = recommendations.map(async (rec) => {
+                const movies = await fetchCategoryMovies(rec.category).then(fetchAndHydrate);
+                return { title: rec.title, movies };
+            });
+
+            const newCategories = await Promise.all(categoryPromises);
+            setCategories(newCategories.filter(c => c.movies.length > 0));
         }
       } catch (error) {
         console.error("Failed to fetch movies for browse page:", error);
@@ -190,7 +165,7 @@ export default function BrowsePage() {
     };
   
     fetchMovies();
-  }, [activeProfile]);
+  }, [activeProfile, history, myList, isMyListLoading, fetchCategoryMovies]);
   
   const getCountryName = (code: string) => {
     return countries.find(c => c.iso_3166_1 === code)?.english_name || 'the U.S.';
@@ -226,6 +201,11 @@ export default function BrowsePage() {
                 )}
               </React.Fragment>
             ))}
+             {categories.length === 0 && !loading && (
+                 <div className="pl-4 md:pl-16">
+                    <MovieRow title="Trending Now" movies={top10} />
+                 </div>
+             )}
           </div>
         </div>
       </main>
