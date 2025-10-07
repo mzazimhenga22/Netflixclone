@@ -1,6 +1,7 @@
+
 "use client";
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
@@ -9,18 +10,71 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import SignupHeader from '@/components/shared/SignupHeader';
 import Footer from '@/components/shared/Footer';
-import { useAuth, initiateEmailSignUp } from '@/firebase';
+import { useAuth, initiateEmailSignUp, setDocumentNonBlocking, addDocumentNonBlocking } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
+import { PROFILE_TRANSFER_KEY } from '@/app/profiles/transfer/page';
+import { collection, serverTimestamp } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
 
 
 function RegistrationForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const auth = useAuth();
+  const firestore = useFirestore();
   const { toast } = useToast();
   
   const [email, setEmail] = useState(searchParams.get('email') || '');
   const [password, setPassword] = useState('');
+
+  // This effect will run on the client after the auth state has been updated.
+  useEffect(() => {
+    if (auth?.currentUser && firestore) {
+      const transferDataRaw = localStorage.getItem(PROFILE_TRANSFER_KEY);
+      if (transferDataRaw) {
+        try {
+          const transferData = JSON.parse(transferDataRaw);
+          const { profile, myList, history } = transferData;
+          
+          const newProfileRef = collection(firestore, `users/${auth.currentUser.uid}/profiles`);
+          
+          // Add the transferred profile
+          addDocumentNonBlocking(newProfileRef, {
+            name: profile.name,
+            avatar: profile.avatar,
+            isLocked: profile.isLocked,
+            pin: profile.pin,
+            country: profile.country,
+            favoriteGenreId: profile.favoriteGenreId,
+          }).then((docRef) => {
+            if (!docRef) return;
+             // Add My List items
+            const myListRef = collection(newProfileRef, docRef.id, 'myList');
+            myList.forEach((item: any) => addDocumentNonBlocking(myListRef, {
+                ...item,
+                addedAt: serverTimestamp()
+            }));
+
+            // Add History items
+            const historyRef = collection(newProfileRef, docRef.id, 'history');
+            history.forEach((item: any) => addDocumentNonBlocking(historyRef, {
+                ...item,
+                watchedAt: new Date(item.watchedAt) // Convert back to Date
+            }));
+
+            localStorage.removeItem(PROFILE_TRANSFER_KEY);
+          });
+          
+        } catch (error) {
+          console.error("Failed to process profile transfer data:", error);
+          localStorage.removeItem(PROFILE_TRANSFER_KEY);
+        }
+      }
+      
+      // Redirect to the next step
+      router.push('/signup/planform');
+    }
+  }, [auth?.currentUser, firestore, router]);
 
 
   const handleSignUp = (e: React.FormEvent) => {
@@ -29,10 +83,8 @@ function RegistrationForm() {
         toast({ title: "Authentication service not available.", variant: "destructive" });
         return;
     }
+    // This will trigger the onAuthStateChanged listener, and the useEffect above will handle the logic
     initiateEmailSignUp(auth, email, password);
-    // The onAuthStateChanged listener in the provider will handle the redirect.
-    // For now, we manually redirect to the next step.
-    router.push('/signup/planform');
   }
 
   return (
