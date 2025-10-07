@@ -1,257 +1,188 @@
-
 // src/providers.ts
 import { makeStandardFetcher } from "./fetchers";
 import { NotFoundError } from "./errors";
 import type { Embed, Source, ScrapeMedia } from "./types";
 import * as cheerio from "cheerio";
 
+// ========== makeSimpleProxyFetcher ==========
+function makeSimpleProxyFetcher(proxyUrl: string, fetchApi: typeof fetch): any {
+    if (!proxyUrl) throw new Error("proxyUrl required");
+    const base = proxyUrl.replace(/\/$/, "");
+    return async (input: RequestInfo | URL, init?: RequestInit): Promise<any> => {
+        let targetUrl: string;
+        if (typeof input === 'string') targetUrl = input;
+        else if (input instanceof URL) targetUrl = input.toString();
+        else if ((input as any).url) targetUrl = (input as any).url;
+        else targetUrl = String(input);
+
+        // Use a simpler proxy URL format
+        const proxiedUrl = `${base}/${targetUrl}`;
+
+        const upstreamInit: RequestInit = {
+            method: init?.method || "GET",
+            headers: init?.headers ? init.headers : undefined,
+            redirect: (init as any)?.redirect || "follow",
+            body: init && (init as any).body ? (init as any).body : undefined,
+        };
+
+        return fetchApi(proxiedUrl, upstreamInit);
+    };
+}
+
+
+/* ===== local constants & scrapers (unchanged logic) ===== */
 const vidsrcBase = "https://vidsrc.to";
+const vidsrcproBase = "https://vidsrc.pro";
 const twoembedBase = "https://www.2embed.cc";
-const superembedBase = "https://superembed.stream";
-
-const vidsrcScraper: Source = {
-  id: 'vidsrc',
-  name: 'VidSrc',
-  rank: 100,
-  disabled: true, // Disabled due to consistent failures
-  async fn(ops) {
-    const media: ScrapeMedia = ops.media;
-
-    let url: string;
-    if (media.type === 'movie') {
-      url = `${vidsrcBase}/embed/movie/${media.tmdbId}`;
-    } else {
-      url = `${vidsrcBase}/embed/tv/${media.tmdbId}/${media.seasonNumber}/${media.episodeNumber}`;
-    }
-
-    const mainPage = await ops.fetcher(url, {
-      method: 'GET',
-      headers: {
-        Referer: vidsrcBase + '/',
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36',
-        'Accept-Language': 'en-US,en;q=0.9',
-      },
-    });
-
-    const html = mainPage.body;
-    const $ = cheerio.load(html);
-
-    let streamUrl: string | null = null;
-
-    const anyM3u8 = html.match(/https?:\/\/[^'"\s>]+\.m3u8(?:\?[^'"\s>]*)?/i);
-    if (anyM3u8) {
-      streamUrl = anyM3u8[0];
-    }
-
-    const tryParseJsArray = (text: string) => {
-      try {
-        return new Function(`return ${text}`)();
-      } catch (e) {
-        return null;
-      }
-    };
-
-    if (!streamUrl) {
-      $('script').each((_, el) => {
-        if (streamUrl) return false;
-
-        const scriptContent = $(el).html() || '';
-        const sourcesMatch = scriptContent.match(/sources\s*[:=]\s*(\[[\s\S]*?\])/i);
-        if (sourcesMatch && sourcesMatch[1]) {
-          const parsed = tryParseJsArray(sourcesMatch[1]);
-          if (parsed && Array.isArray(parsed)) {
-            const hls = parsed.find((s: any) => s.file && /(\.m3u8|\.m3u8\?)/i.test(s.file));
-            if (hls && hls.file) {
-              streamUrl = hls.file;
-              return false;
-            }
-          }
-        }
-      });
-    }
-
-    if (!streamUrl) {
-      throw new NotFoundError(`Could not find stream URL in VidSrc page`);
-    }
-
-    return {
-      embeds: [],
-      stream: {
-        qualities: {
-          auto: {
-            type: 'hls',
-            url: streamUrl,
-          },
-        },
-        captions: [],
-      },
-    };
-  },
-};
 
 
+/* --------- Local scrapers (defensive) ---------- */
 const twoembedScraper: Source = {
-  id: 'twoembed',
-  name: '2Embed',
-  rank: 100,
+  id: "twoembed",
+  name: "2Embed",
+  rank: 110,
   disabled: false,
   async fn(ops: any) {
     const media: ScrapeMedia = ops.media;
-    
-    const embedUrl = media.type === 'movie'
-      ? `${twoembedBase}/embed/movie?tmdb=${media.tmdbId}`
-      : `${twoembedBase}/embed/tv?tmdb=${media.tmdbId}&s=${media.seasonNumber}&e=${media.episodeNumber}`;
+    const referer = media.type === 'movie'
+        ? `${twoembedBase}/embed/movie?tmdb=${media.tmdbId}`
+        : `${twoembedBase}/embed/tv?tmdb=${media.tmdbId}&s=${media.season.number}&e=${media.episode.number}`;
 
-    const embedPage = await ops.fetcher(embedUrl, {
-      headers: {
-        "Referer": embedUrl,
-      }
+    const embedPage = await ops.fetcher(referer, {
+      method: "GET",
+      headers: { Referer: twoembedBase, "User-Agent": "Mozilla/5.0" },
     });
+    const embedHtml = embedPage.body as string;
+    const $ = cheerio.load(embedHtml);
+    const playerId = $(".play-btn[data-id]").attr("data-id");
 
-    const $ = cheerio.load(embedPage.body);
-    const serverId = $('.server-item[data-id]').attr('data-id');
-
-    if (!serverId) {
-      throw new NotFoundError('Could not find player data-id on 2embed');
+    if (!playerId) {
+      throw new Error("Could not find player ID on 2embed");
     }
-    
-    const ajaxUrl = `${twoembedBase}/ajax/embed/play?id=${serverId}&_token=2embed`; // token is static for now
 
-    const { body: ajaxBody } = await ops.fetcher(ajaxUrl, {
-        method: 'GET',
+    const playerUrl = await ops.fetcher(`${twoembedBase}/ajax/embed/play`, {
+        method: 'POST',
+        body: { id: playerId },
+        bodyType: 'form',
         headers: {
-          "Referer": embedUrl,
-          "X-Requested-With": "XMLHttpRequest",
-        },
-        responseType: 'json'
+            'X-Requested-With': 'XMLHttpRequest',
+            Referer: referer,
+        }
     });
-
-    if (!ajaxBody?.url) {
-        throw new NotFoundError('Failed to get player URL from 2embed API');
-    }
-
+    
+    const url = (playerUrl.body as { link: string }).link;
+    
     return {
-        embeds: [{
-            embedId: 'twoembed-player',
-            url: ajaxBody.url
-        }],
-        stream: undefined
+      embeds: [{ embedId: "twoembed-player", url: url }],
+      stream: undefined,
     };
   },
 };
 
-const vidsrcProScraper: Source = {
-  id: 'vidsrcpro',
-  name: 'VidSrc.pro',
-  rank: 190,
-  disabled: true, 
-  async fn() { throw new Error('vidsrc.pro scraper is disabled'); }
-};
-
-const superembedScraper: Source = {
-  id: 'superembed',
-  name: 'SuperEmbed',
-  rank: 90,
-  disabled: false,
-  async fn(ops: any) {
-    const media = ops.media;
-    const url = media.type === 'movie'
-      ? `${superembedBase}/embed/movie?tmdb_id=${media.tmdbId}`
-      : `${superembedBase}/embed/tv?tmdb_id=${media.tmdbId}&s=${media.seasonNumber}&e=${media.episodeNumber}`;
-      
-    return {
-        embeds: [{
-            embedId: 'superembed-player',
-            url: url
-        }],
-        stream: undefined
-    };
-  }
-};
-
-
-// Embed Handlers
+/* ===================== local embed players ===================== */
 const twoembedPlayer: Embed = {
   id: "twoembed-player",
   name: "2Embed Player",
   async fn(ops: any) {
-    const playerPage = await ops.fetcher(ops.url, {
-        headers: {
-            "Referer": twoembedBase
-        }
-    });
-
-    const body = playerPage.body as string;
-    const streamUrlMatch = body.match(/file:\s*"(https?:\/\/[^"]+\.m3u8[^"]*)"/);
-
-    if (!streamUrlMatch || !streamUrlMatch[1]) {
-        throw new NotFoundError("Could not extract m3u8 file from 2embed player");
+    let playerUrl = String(ops.url);
+    try { playerUrl = new URL(String(ops.url), twoembedBase).href; } catch {}
+    const iframePage = await ops.fetcher(playerUrl, { method: "GET", headers: { Referer: twoembedBase } });
+    const body = iframePage.body as string;
+    const m3u8 = body.match(/file:\s*"(https?:\/\/[^"]+\.m3u8[^"]*)/) || body.match(/"(https?:\/\/[^"]+\.m3u8[^"]*)"/);
+    if (!m3u8 || !m3u8[1]) {
+      throw new NotFoundError("Could not find m3u8 file in 2Embed player");
     }
-
-    return {
-        stream: {
-            qualities: {
-                auto: {
-                    type: 'hls',
-                    url: streamUrlMatch[1],
-                },
-            },
-            captions: [],
-        },
-    };
+    return { stream: { qualities: { auto: { type: "hls", url: m3u8[1] } }, captions: [] } };
   },
 };
 
-const superembedPlayer: Embed = {
-    id: "superembed-player",
-    name: "SuperEmbed Player",
-    async fn(ops: any) {
-        const playerPage = await ops.fetcher(ops.url, {
-            headers: {
-                "Referer": superembedBase
-            }
+/* ===== merge external + local lists ===== */
+const localSources: Source[] = [twoembedScraper];
+const localEmbeds: Embed[] = [twoembedPlayer];
+
+const mergedSources: Source[] = [...localSources].filter(Boolean);
+mergedSources.sort((a, b) => (a.rank ?? 100) - (b.rank ?? 100));
+
+const mergedEmbeds: Embed[] = [...localEmbeds].filter(Boolean);
+
+/* ===== targets enum-like ===== */
+export const targets = {
+  ANY: "any",
+  HLS: "hls",
+  FILE: "file",
+};
+
+
+/* ===== main factory: makeProviders ===== */
+export function makeProviders(opts: { fetcher: any; proxiedFetcher?: any; target?: string } = { fetcher: (globalThis as any).fetch }) {
+  const defaultFetcher = opts.fetcher ?? (globalThis as any).fetch;
+  const proxied = opts.proxiedFetcher;
+
+  function _preferredFetcher() {
+    return proxied || defaultFetcher;
+  }
+
+  async function runAll({ media, events }: { media: ScrapeMedia, events: any }) {
+    for (const source of mergedSources) {
+      if (source.disabled) continue;
+      try {
+        const output = await source.fn({
+          fetcher: _preferredFetcher(),
+          proxiedFetcher: proxied,
+          media,
+          target: opts.target || targets.ANY,
+          consistentIpForRequests: !!proxied,
+          events,
         });
 
-        const $ = cheerio.load(playerPage.body);
-        const scriptWithData = $('script').filter((_, el) => {
-            return $(el).html()?.includes('window.files') || false;
-        });
+        if (output.stream) return { sourceId: source.id, embedId: null, stream: output.stream };
 
-        const scriptContent = scriptWithData.html();
-        if (!scriptContent) {
-            throw new NotFoundError("Could not find script with stream data in SuperEmbed player");
+        for (const embed of output.embeds) {
+          const embedRunner = mergedEmbeds.find(e => e.id === embed.embedId);
+          if (!embedRunner || embedRunner.disabled) continue;
+
+          const embedOutput = await embedRunner.fn({
+            fetcher: _preferredFetcher(),
+            proxiedFetcher: proxied,
+            media,
+            target: opts.target || targets.ANY,
+            url: embed.url,
+            consistentIpForRequests: !!proxied,
+            events,
+          });
+
+          if (embedOutput.stream) return { sourceId: source.id, embedId: embedRunner.id, stream: embedOutput.stream };
         }
-
-        const urlMatch = scriptContent.match(/file:\s*'"(https?:\/\/[^"']+)"'/);
-        if (!urlMatch || !urlMatch[1]) {
-            throw new NotFoundError("Could not extract m3u8 file from SuperEmbed player");
-        }
-
-        return {
-            stream: {
-                qualities: {
-                    auto: {
-                        type: 'hls',
-                        url: urlMatch[1],
-                    },
-                },
-                captions: [],
-            },
-        };
+      } catch (err: any) {
+        events?.onError?.(err);
+      }
     }
+    return null;
+  }
+
+  return {
+    runAll,
+    listSources: () => mergedSources,
+    runSourceScraper: async ({ id, media }: { id: string; media: ScrapeMedia }) => {
+      const source = mergedSources.find(s => s.id === id);
+      if (!source) throw new Error(`Unknown source: ${id}`);
+      return source.fn({ fetcher: _preferredFetcher(), proxiedFetcher: proxied, media } as any);
+    },
+    runEmbedScraper: async ({ id, url }: { id: string; url: string }) => {
+      const embed = mergedEmbeds.find(e => e.id === id);
+      if (!embed) throw new Error(`Unknown embed: ${id}`);
+      return embed.fn({ fetcher: _preferredFetcher(), proxiedFetcher: proxied, url } as any);
+    },
+    allSources: mergedSources,
+    allEmbeds: mergedEmbeds,
+  };
 }
 
 
-export const allSources: Source[] = [
-    twoembedScraper,
-    superembedScraper,
-    vidsrcScraper,
-    vidsrcProScraper,
-].filter(s => !s.disabled);
+/* re-export makeStandardFetcher from local fetchers module (server expects this) */
+export { makeStandardFetcher, makeSimpleProxyFetcher };
 
-
-export const allEmbeds: Embed[] = [
-    twoembedPlayer,
-    superembedPlayer
-];
+/* optional exports for direct use */
+export const allSources = mergedSources;
+export const allEmbeds = mergedEmbeds;
+export default { makeProviders, makeStandardFetcher, targets };
