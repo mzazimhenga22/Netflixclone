@@ -1,0 +1,12 @@
+diff --git a/package.json b/package.json
+index 45b8e90e7225139c878b27387f34c26a57007542..405a1e757d5498801d01768f03767e7c8511676c 100644
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,5 @@
+ {
+   "name": "@p-stream/providers",
+-  "preinstall": "npx -y only-allow pnpm",
+   "version": "3.1.0",
+   "description": "A meta-package to scrape providers for movies and tv shows",
+   "main": "dist/index.js",
+
