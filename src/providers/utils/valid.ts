@@ -1,5 +1,6 @@
 // import { alphaScraper, deltaScraper } from '../providers/embeds/nsbx';
 // import { astraScraper, novaScraper, orionScraper } from '../providers/embeds/whvx';
+import { bombtheirishScraper } from '../providers/archive/sources/bombtheirish';
 import { warezcdnembedMp4Scraper } from '../providers/embeds/warezcdn/mp4';
 import { Stream } from '../streams';
 import { IndividualEmbedRunnerOptions } from '../runners/individualRunner';
@@ -14,8 +15,9 @@ const SKIP_VALIDATION_CHECK_IDS = [
   // orionScraper.id,
 ];
 
-const UNPROXIED_VALIDATION_CHECK_IDS: string[] = [
+const UNPROXIED_VALIDATION_CHECK_IDS = [
   // sources here are always proxied, so we dont need to validate with a proxy
+  bombtheirishScraper.id, // this one is dead, but i'll keep it here for now
 ];
 
 export function isValidStream(stream: Stream | undefined): boolean {

@@ -47,7 +47,7 @@ export async function scrape(ctx: ScrapeContext, media: MovieMedia | ShowMedia, 
     });
 
     const episode = data.episodes?.find((v: episodeObj) => {
-      return Number(v.season) === Number(media.season.number) && Number(v.episode) === Number(media.episode.number);
+      return Number(v.season) === Number((media as ShowMedia).season.number) && Number(v.episode) === Number((media as ShowMedia).episode.number);
     });
 
     if (episode) id = episode.id;
