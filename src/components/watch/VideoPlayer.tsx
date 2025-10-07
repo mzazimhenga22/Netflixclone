@@ -177,7 +177,10 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   }, []);
 
   const handleSeek = (value: number[]) => {
-    if (videoRef.current) videoRef.current.currentTime = value[0];
+    if (videoRef.current) {
+      videoRef.current.currentTime = value[0];
+      setProgress(value[0]);
+    }
   };
 
   const handleSeekRelative = useCallback((offset: number, e?: React.MouseEvent) => {
@@ -200,8 +203,11 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     e?.stopPropagation();
     const player = playerRef.current;
     if (!player) return;
-    if (!document.fullscreenElement) player.requestFullscreen().catch(err => console.error(err));
-    else document.exitFullscreen();
+    if (!document.fullscreenElement) {
+        player.requestFullscreen().catch(err => console.error(err));
+    } else {
+        document.exitFullscreen();
+    }
   }, []);
 
   useEffect(() => {
@@ -287,7 +293,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
                 <Slider 
                     value={[progress]} 
                     max={duration} 
-                    step={0.1} 
+                    step={1} 
                     onValueChange={handleSeek} 
                     className="w-full cursor-pointer h-1.5 group/slider"
                 />
@@ -339,5 +345,3 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     </div>
   );
 }
-
-    
