@@ -25,8 +25,7 @@ export default function LoadingSpinner({ size = 120, strokeWidth = 6, label, cla
       >
         {/* Rounded square (inverted square look) */}
         <div
-          className="absolute inset-0 rounded-2xl bg-[#141414] shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
-          style={{ boxShadow: 'inset 0 2px 8px rgba(255,255,255,0.02), 0 10px 30px rgba(0,0,0,0.6)' }}
+          className="absolute inset-0 rounded-2xl"
         />
 
         {/* Spinning red circle (SVG) */}
