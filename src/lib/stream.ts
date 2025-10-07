@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import { makeProviders, makeStandardFetcher, makeSimpleProxyFetcher, targets, type ScrapeMedia, type Stream } from '../../providers/src/index';
@@ -47,7 +48,7 @@ export async function getStream(
             releaseYear,
             tmdbId,
             imdbId: media.imdb_id,
-            season: { number: season || 1, tmdbId: '' }, // The scraper library doesn't need season/episode tmdbId
+            season: { number: season || 1, tmdbId: '', title: `Season ${season || 1}` }, // The scraper library doesn't need season/episode tmdbId
             episode: { number: episode || 1, tmdbId: '' },
           };
 
