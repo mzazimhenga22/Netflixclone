@@ -38,11 +38,16 @@ const NextEpisodeIcon = (props: React.SVGProps<SVGSVGElement>) => (
 const CaptionsIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M18 4H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM6 12h2v2H6v-2zm8 6H6v-2h8v2zm0-4H6v-2h8v2z"></path></svg>
 );
-const Rewind10Icon = () => (
-    <svg width="52" height="52" viewBox="0 0 52 52" fill="currentColor"><path d="M26,52 C11.663,52 0,40.337 0,26 C0,11.663 11.663,0 26,0 C40.337,0 52,11.663 52,26 C52,40.337 40.337,52 26,52 Z M29,19.333 L20.333,26 L29,32.667 L29,19.333 Z"></path></svg>
+const Rewind10Icon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+        <path d="M12.5,3C7.26,3,3,7.26,3,12.5S7.26,22,12.5,22S22,17.74,22,12.5C22,12.2,22,11.9,21.96,11.61L19.92,13.65C19.97,14.1,20,14.55,20,15c0,4.14-3.36,7.5-7.5,7.5S5,19.14,5,15c0-3.35,2.2-6.18,5.18-7.11L9,9.24V7.11C8.3,7.26,7.66,7.5,7.07,7.81L6.04,6.78C7.38,5.7,8.94,5,10.68,4.56L11,2.5C11.5,2.53,12,2.54,12.5,2.54M10,14H8V12h2.5L10,12.5V10.5h-2V9h4v6h-2V14M16.5,14H13V9h4.5v1.5H14.5v2h1.5V14z" />
+    </svg>
 );
-const Forward10Icon = () => (
-    <svg width="52" height="52" viewBox="0 0 52 52" fill="currentColor"><path d="M26,0 C40.337,0 52,11.663 52,26 C52,40.337 40.337,52 26,52 C11.663,52 0,40.337 0,26 C0,11.663 11.663,0 26,0 Z M23,32.667 L31.667,26 L23,19.333 L23,32.667 Z"></path></svg>
+
+const Forward10Icon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+        <path d="M12.5,3C17.74,3,22,7.26,22,12.5S17.74,22,12.5,22S3,17.74,3,12.5c0-0.34,0.03-0.67,0.07-1l2.1,2.1C5.07,13.75,5,14.12,5,14.5c0,4.14,3.36,7.5,7.5,7.5s7.5-3.36,7.5-7.5c0-3.35-2.2-6.18-5.18-7.11L14,9.24V7.11c0.7,0.15,1.34,0.39,1.93,0.71l1.03-1.03C15.62,5.7,14.06,5,12.32,4.56L12,2.5C12.17,2.5,12.33,2.5,12.5,2.5M11,14h2V9h-4.5v1.5H11v2H9V14h2m5.5,0h2V9h-4.5v1.5H16.5v2H15V14h1.5Z" />
+    </svg>
 );
 
 
@@ -273,16 +278,14 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
         
         {/* Center Controls */}
         <div className="absolute inset-0 flex items-center justify-center gap-12" onClick={togglePlay}>
-            <button onClick={(e) => handleSeekRelative(-10, e)} className="text-white/80 hover:text-white transition-transform hover:scale-110 relative w-16 h-16 flex items-center justify-center">
-                <Rewind10Icon />
-                <span className="absolute text-sm font-bold">10</span>
+            <button onClick={(e) => handleSeekRelative(-10, e)} className="text-white/80 hover:text-white transition-transform hover:scale-110 flex items-center justify-center w-16 h-16 rounded-full bg-black/30 backdrop-blur-sm">
+                <Rewind10Icon className="w-8 h-8" />
             </button>
             <button className="h-20 w-20 rounded-full flex items-center justify-center transition-transform hover:scale-110 bg-black/30 backdrop-blur-sm ring-2 ring-white/50">
                 {isPlaying ? <PauseIcon className="h-10 w-10 text-white" /> : <PlayIcon className="h-10 w-10 text-white" />}
             </button>
-            <button onClick={(e) => handleSeekRelative(10, e)} className="text-white/80 hover:text-white transition-transform hover:scale-110 relative w-16 h-16 flex items-center justify-center">
-                <Forward10Icon />
-                 <span className="absolute text-sm font-bold">10</span>
+            <button onClick={(e) => handleSeekRelative(10, e)} className="text-white/80 hover:text-white transition-transform hover:scale-110 flex items-center justify-center w-16 h-16 rounded-full bg-black/30 backdrop-blur-sm">
+                <Forward10Icon className="w-8 h-8" />
             </button>
         </div>
 
@@ -345,3 +348,5 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     </div>
   );
 }
+
+    
