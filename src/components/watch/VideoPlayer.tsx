@@ -31,13 +31,19 @@ const FullscreenEnterIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M31.5 8H28V4.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v4H19a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5Zm-2 7h-3V9h3v6Zm-15.5-3H11V8.5a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0-.5.5V12h3.5a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5H5V9h5v5H8.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5ZM13 23.5a.5.5 0 0 0-.5.5V28H8.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5H12v-3.5a.5.5 0 0 0-.5-.5h-3v-5h3.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5H4.5a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5H8v-3.5a.5.5 0 0 0-.5-.5h-3V21h10v3.5a.5.5 0 0 0 .5.5ZM27.5 20h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5H27v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5V24h-3.5a.5.5 0 0 0-.5.5v3h-5v-5h1.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5H20v-3.5a.5.5 0 0 0-.5-.5h-3V21h10v6h-3v-3.5a.5.5 0 0 0-.5-.5Z"></path></svg>
 );
 const FullscreenExitIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M4.5 12.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5H4a.5.5 0 0 0-.5.5v4.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm26 0h3v3h-3v-3ZM28 8h.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4ZM4.5 28.5h4a.5.5 0 0 0 .5-.5v-3.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v3.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm25-1v3h-3v-3h3Zm-4-1h4.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5Z"></path></svg>
+    <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M4.5 12.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5H4a.5.5 0 0 0-.5.5v4.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm26 0h3v3h-3v-3ZM28 8h.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4ZM4.5 28.5h4a.5.5 0 0 0 .5-.5v-3.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v3.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm25-1v3h-3v-3h3Zm-4-1h4.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5Z"></path></svg>
 );
 const Rewind10Icon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M12.5 3C7.8 3 3.5 6.3 3.5 11c0 2.8 1.7 5.3 4.2 6.5l-1.5 1.5c-3-1.5-5.2-4.5-5.2-8C1 5.2 5.9 1 12.5 1c5.2 0 9.6 3.3 11.2 7.8l-1.5 1.5C20.8 6.3 17 3 12.5 3z M10.5 10V7h-2v3.5L12 12V10h-1.5z M16.5 10h-3V7h-2v5h5V10z"></path></svg>
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+        <path d="M12.5 3C7.8 3 3.5 6.3 3.5 11c0 2.8 1.7 5.3 4.2 6.5l-1.5 1.5c-3-1.5-5.2-4.5-5.2-8C1 5.2 5.9 1 12.5 1c5.2 0 9.6 3.3 11.2 7.8l-1.5 1.5C20.8 6.3 17 3 12.5 3z" />
+        <text x="6" y="14" fontSize="8px" fill="white" style={{transform: 'scale(1, -1) translate(0, -24px)'}}>10</text>
+    </svg>
 );
 const Forward10Icon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M12.5 3C7.8 3 3.5 6.3 3.5 11c0 2.8 1.7 5.3 4.2 6.5l-1.5 1.5c-3-1.5-5.2-4.5-5.2-8C1 5.2 5.9 1 12.5 1c5.2 0 9.6 3.3 11.2 7.8l-1.5 1.5C20.8 6.3 17 3 12.5 3z M10.5 10V7h-2v3.5L12 12V10h-1.5z M16.5 10h-3V7h-2v5h5V10z" transform="scale(-1, 1) translate(-24, 0)"></path></svg>
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+        <path d="M11.5 3C16.2 3 20.5 6.3 20.5 11c0 2.8-1.7 5.3-4.2 6.5l1.5 1.5c3-1.5 5.2-4.5 5.2-8C23 5.2 18.1 1 11.5 1c-5.2 0-9.6 3.3-11.2 7.8l1.5 1.5C3.2 6.3 7 3 11.5 3z" />
+        <text x="10" y="14" fontSize="8px" fill="white" style={{transform: 'scale(1, -1) translate(0, -24px)'}}>10</text>
+    </svg>
 );
 const CaptionsIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M29.13 22.13H6.87a.88.88 0 0 0-.87.88v5.12a.88.88 0 0 0 .87.88h22.26a.88.88 0 0 0 .87-.88v-5.12a.88.88 0 0 0-.87-.88Zm-1 4.25h-6.19v-2.5h6.19Zm-8.7-2.5h6.2v2.5h-6.2Zm-8.67 0h6.19v2.5H10.76Z"></path></svg>
@@ -64,6 +70,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   const [showControls, setShowControls] = useState(true);
   const [showInfo, setShowInfo] = useState(false);
   const [isEpisodesPanelOpen, setIsEpisodesPanelOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const controlsTimeoutRef = useRef<number | null>(null);
   const infoTimeoutRef = useRef<number | null>(null);
   const { updateWatchHistory } = useWatchHistory();
@@ -87,6 +94,18 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
       updateWatchHistory(media.id, currentTime, duration, media.media_type);
     }
   }, [media.id, media.media_type, updateWatchHistory]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+	if (typeof document !== 'undefined') {
+		document.addEventListener('fullscreenchange', handleFullscreenChange);
+		return () => {
+		document.removeEventListener('fullscreenchange', handleFullscreenChange);
+		};
+	}
+  }, []);
 
 
   useEffect(() => {
@@ -187,11 +206,11 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   const toggleFullscreen = () => {
     const elem = playerRef.current;
     if (elem) {
-      if (!document.fullscreenElement) {
+      if (typeof document !== 'undefined' && !document.fullscreenElement) {
         elem.requestFullscreen().catch(err => {
           console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
         });
-      } else {
+      } else if (typeof document !== 'undefined') {
         document.exitFullscreen();
       }
     }
@@ -293,7 +312,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
                         </PopoverContent>
                     </Popover>
                     <button onClick={toggleFullscreen} className="text-white h-7 w-7">
-                        {document.fullscreenElement ? <FullscreenExitIcon /> : <FullscreenEnterIcon />}
+                        {isFullscreen ? <FullscreenExitIcon /> : <FullscreenEnterIcon />}
                     </button>
                 </div>
             </div>
@@ -326,3 +345,5 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     </Sheet>
   );
 }
+
+    
