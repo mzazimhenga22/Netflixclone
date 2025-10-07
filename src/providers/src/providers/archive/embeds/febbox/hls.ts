@@ -1,9 +1,9 @@
-// import { MediaTypes } from '@/entrypoint/utils/media';
-// import { makeEmbed } from '@/providers/base';
-// import { parseInputUrl } from '@/providers/embeds/febbox/common';
-// import { getStreams } from '@/providers/embeds/febbox/fileList';
-// import { getSubtitles } from '@/providers/embeds/febbox/subtitles';
-// import { showboxBase } from '@/providers/sources/showbox/common';
+// import { MediaTypes } from '../../../../entrypoint/utils/media';
+// import { makeEmbed } from '../../../base';
+// import { parseInputUrl } from './common';
+// import { getStreams } from './fileList';
+// import { getSubtitles } from './subtitles';
+// import { showboxBase } from '../../sources/showbox/common';
 
 // // structure: https://www.febbox.com/share/<random_key>
 // export function extractShareKey(url: string): string {

@@ -1,8 +1,8 @@
-// import { flags } from '@/entrypoint/utils/targets';
-// import { makeEmbed } from '@/providers/base';
-// import { parseInputUrl } from '@/providers/embeds/febbox/common';
-// import { getStreamQualities } from '@/providers/embeds/febbox/qualities';
-// import { getSubtitles } from '@/providers/embeds/febbox/subtitles';
+// import { flags } from '../../../../entrypoint/utils/targets';
+// import { makeEmbed } from '../../../base';
+// import { parseInputUrl } from './common';
+// import { getStreamQualities } from './qualities';
+// import { getSubtitles } from './subtitles';
 
 // export const febboxMp4Scraper = makeEmbed({
 //   id: 'febbox-mp4',
