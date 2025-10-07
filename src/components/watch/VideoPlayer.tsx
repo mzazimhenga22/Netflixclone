@@ -3,7 +3,6 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import { ArrowLeft, RotateCcw, RotateCw, Captions, Layers, Volume2, VolumeX, Maximize, Minimize, Play, Pause } from 'lucide-react';
 import Image from 'next/image';
@@ -12,6 +11,8 @@ import { useWatchHistory } from '@/hooks/useWatchHistory';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
+import NetflixProgress from './NetflixProgress';
+import { Slider } from '../ui/slider';
 
 
 // Custom Netflix-style SVG Icons
@@ -35,8 +36,6 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [volume, setVolume] = useState(0.5);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [showControls, setShowControls] = useState(true);
   const [showInfo, setShowInfo] = useState(false);
   const [isEpisodesPanelOpen, setIsEpisodesPanelOpen] = useState(false);
@@ -47,20 +46,10 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
 
   const isTvShow = media.media_type === 'tv';
 
-  const formatTime = (timeInSeconds: number) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
-
   const handleProgress = useCallback(() => {
     if (videoRef.current) {
       const currentTime = videoRef.current.currentTime;
       const duration = videoRef.current.duration;
-      setProgress(currentTime);
-      if (!isNaN(duration)) {
-        setDuration(duration);
-      }
       updateWatchHistory(media.id, currentTime, duration, media.media_type);
     }
   }, [media.id, media.media_type, updateWatchHistory]);
@@ -84,10 +73,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
         video.volume = volume;
         video.muted = isMuted;
         video.addEventListener('timeupdate', handleProgress);
-        video.addEventListener('loadedmetadata', () => {
-            if (videoRef.current) setDuration(videoRef.current.duration);
-        });
-
+        
         // Set initial state
         setIsPlaying(!video.paused);
         setIsMuted(video.muted);
@@ -135,14 +121,6 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     }
   };
   
-  const handleSeek = (value: number[]) => {
-    if (videoRef.current) {
-        const newTime = value[0];
-        videoRef.current.currentTime = newTime;
-        setProgress(newTime);
-    }
-  };
-
   const skip = (amount: number) => {
     if (videoRef.current) {
       videoRef.current.currentTime += amount;
@@ -176,11 +154,11 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   const toggleFullscreen = () => {
     const elem = playerRef.current;
     if (elem) {
-      if (typeof document !== 'undefined' && !document.fullscreenElement) {
+      if (!isFullscreen) {
         elem.requestFullscreen().catch(err => {
           console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
         });
-      } else if (typeof document !== 'undefined') {
+      } else {
         document.exitFullscreen();
       }
     }
@@ -201,16 +179,16 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
 
         {/* Center Controls */}
         <div className={cn("absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-12 transition-opacity duration-300", !showControls && "opacity-0 pointer-events-none")}>
-            <button onClick={() => skip(-10)} className="text-white h-12 w-12 relative">
+            <button onClick={() => skip(-10)} className="text-white h-12 w-12 relative flex items-center justify-center">
                 <RotateCcw className="h-full w-full" />
-                <span className="absolute text-sm font-bold top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">10</span>
+                <span className="absolute text-xs font-bold">10</span>
             </button>
             <button onClick={togglePlay} className="text-white h-20 w-20">
-                {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                {isPlaying ? <Pause /> : <Play />}
             </button>
-            <button onClick={() => skip(10)} className="text-white h-12 w-12 relative">
+            <button onClick={() => skip(10)} className="text-white h-12 w-12 relative flex items-center justify-center">
                 <RotateCw className="h-full w-full" />
-                <span className="absolute text-sm font-bold top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">10</span>
+                <span className="absolute text-xs font-bold">10</span>
             </button>
         </div>
 
@@ -229,18 +207,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
         {/* Bottom Controls */}
         <div className={cn("absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent transition-transform duration-300", !showControls && "translate-y-full")}>
             {/* Progress Bar */}
-            <div className="flex items-center gap-4 text-sm font-semibold">
-                <span className="w-14 text-right">{formatTime(progress)}</span>
-                 <Slider
-                    defaultValue={[0]}
-                    value={[progress]}
-                    max={duration || 1}
-                    step={1}
-                    onValueChange={handleSeek}
-                    className="w-full"
-                />
-                <span className="w-14">{formatTime(duration)}</span>
-            </div>
+             <NetflixProgress videoRef={videoRef} />
 
             {/* Main Controls */}
             <div className="flex items-center justify-between mt-3">
