@@ -1,7 +1,7 @@
 
 'use server';
 
-import { makeProviders, makeStandardFetcher, makeSimpleProxyFetcher, targets, type ScrapeMedia, type Stream } from '../../providers/src';
+import { makeProviders, makeStandardFetcher, makeSimpleProxyFetcher, targets, type ScrapeMedia, type Stream } from '../../providers/src/index';
 import type { Movie } from '@/types';
 
 // The proxy is used as a fallback for scrapers that might need it.
@@ -39,7 +39,7 @@ export async function getStream(
     
     // Construct the media object for the scraper
     const scrapeMedia: ScrapeMedia =
-      media.type === 'movie'
+      media.media_type === 'movie'
         ? { type: 'movie', title, releaseYear, tmdbId, imdbId: media.imdb_id }
         : {
             type: 'show',
