@@ -3,7 +3,7 @@ import { getMoviesByGenre, getTvShowsByGenre, getMovieOrTvDetails } from '@/lib/
 import type { Movie } from '@/types';
 import LandingHeader from '@/components/landing/LandingHeader';
 import Footer from '@/components/shared/Footer';
-import MovieRow from '@/components/browse/MovieRow';
+import StaticMovieRow from '@/components/landing/StaticMovieRow';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -64,7 +64,7 @@ export default async function OnlyOnNetflixPage() {
 
             <div className="space-y-12">
                 {categories.map((category) => (
-                    <MovieRow key={category.title} title={category.title} movies={category.movies} />
+                    <StaticMovieRow key={category.title} title={category.title} movies={category.movies} />
                 ))}
             </div>
 
