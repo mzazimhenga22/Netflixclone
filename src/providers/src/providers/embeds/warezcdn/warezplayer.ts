@@ -1,3 +1,4 @@
+
 import { makeEmbed } from '../../base';
 
 export const warezPlayerScraper = makeEmbed({
