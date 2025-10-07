@@ -13,6 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import NetflixProgress from './NetflixProgress';
 import { Slider } from '@/components/ui/slider';
+import PauseDetailsOverlay from './PauseDetailsOverlay';
 
 
 // Custom Netflix-style SVG Icons
@@ -37,11 +38,9 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   const [isMuted, setIsMuted] = useState(true);
   const [volume, setVolume] = useState(0.5);
   const [showControls, setShowControls] = useState(true);
-  const [showInfo, setShowInfo] = useState(false);
   const [isEpisodesPanelOpen, setIsEpisodesPanelOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const controlsTimeoutRef = useRef<number | null>(null);
-  const infoTimeoutRef = useRef<number | null>(null);
   const { updateWatchHistory } = useWatchHistory();
 
   const isTvShow = media.media_type === 'tv';
@@ -115,7 +114,6 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     return () => {
       player?.removeEventListener('mousemove', handleMouseMove);
       if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-      if (infoTimeoutRef.current) clearTimeout(infoTimeoutRef.current);
     };
   }, [resetControlsTimeout]);
 
@@ -123,13 +121,8 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     if (videoRef.current) {
       if (videoRef.current.paused) {
         videoRef.current.play();
-        setIsPlaying(true);
-        if (infoTimeoutRef.current) clearTimeout(infoTimeoutRef.current);
-        setShowInfo(false);
       } else {
         videoRef.current.pause();
-        setIsPlaying(false);
-        infoTimeoutRef.current = window.setTimeout(() => setShowInfo(true), 2000);
       }
     }
   };
@@ -183,25 +176,19 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
       <div ref={playerRef} className={cn("w-full h-screen bg-black flex justify-center items-center relative select-none overflow-hidden", showControls ? "cursor-auto" : "cursor-none")} onDoubleClick={toggleFullscreen}>
         <video ref={videoRef} src={src} className="w-full h-full object-contain" autoPlay muted onClick={togglePlay}/>
         
-        {/* Dimmer & Info Overlay */}
-        <div className={cn("absolute inset-0 bg-black/40 transition-opacity duration-500", isPlaying || !showInfo ? 'opacity-0' : 'opacity-100', showControls && 'opacity-0', 'pointer-events-none')}>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                <h1 className="text-4xl font-bold">{media.title || media.name}</h1>
-                <p className="text-lg text-muted-foreground mt-2 max-w-2xl line-clamp-3">{media.overview}</p>
-            </div>
-        </div>
+        <PauseDetailsOverlay videoRef={videoRef} media={media} />
 
         {/* Center Controls */}
         <div className={cn("absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-12 transition-opacity duration-300", !showControls && "opacity-0 pointer-events-none")}>
-            <button onClick={() => skip(-10)} className="text-white h-16 w-16 relative flex items-center justify-center">
-                <RotateCcw className="h-10 w-10" />
+            <button onClick={() => skip(-10)} className="text-white h-20 w-20 relative flex items-center justify-center">
+                <RotateCcw className="h-12 w-12" />
                 <span className="absolute text-xs font-bold mt-0.5">10</span>
             </button>
             <button onClick={togglePlay} className="text-white h-20 w-20">
                 {isPlaying ? <PauseIcon className="w-full h-full" /> : <PlayIcon className="w-full h-full" />}
             </button>
-            <button onClick={() => skip(10)} className="text-white h-16 w-16 relative flex items-center justify-center">
-                <RotateCw className="h-10 w-10" />
+            <button onClick={() => skip(10)} className="text-white h-20 w-20 relative flex items-center justify-center">
+                <RotateCw className="h-12 w-12" />
                 <span className="absolute text-xs font-bold mt-0.5">10</span>
             </button>
         </div>
