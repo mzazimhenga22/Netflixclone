@@ -1,3 +1,4 @@
+
 import { Embed, Sourcerer } from './base';
 import { doodScraper } from './embeds/dood';
 import { mixdropScraper } from './embeds/mixdrop';
@@ -47,12 +48,12 @@ import {
   vidnestOfficialEmbed,
 } from './embeds/vidnest';
 import {
-  VidsrcsuServer1Scraper,
   VidsrcsuServer10Scraper,
   VidsrcsuServer11Scraper,
   VidsrcsuServer12Scraper,
-  VidsrcsuServer2Scraper,
+  VidsrcsuServer1Scraper,
   VidsrcsuServer20Scraper,
+  VidsrcsuServer2Scraper,
   VidsrcsuServer3Scraper,
   VidsrcsuServer4Scraper,
   VidsrcsuServer5Scraper,
@@ -177,9 +178,6 @@ export function gatherAllEmbeds(): Array<Embed> {
     streamtapeLatinoScraper,
     ...cinemaosEmbeds,
     ...cinemaosHexaEmbeds,
-    // vidsrcNovaEmbed,
-    // vidsrcCometEmbed,
-    // vidsrcPulsarEmbed,
     madplayBaseEmbed,
     madplayNsapiEmbed,
     madplayRoperEmbed,

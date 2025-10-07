@@ -58,7 +58,6 @@ export function makeVidifyEmbed(id: string, rank: number = 100) {
     id: `vidify-${id}`,
     name: `${id.charAt(0).toUpperCase() + id.slice(1)}`,
     rank,
-    disabled: true,
     async scrape(ctx): Promise<EmbedOutput> {
       const query = JSON.parse(ctx.url);
       const { type, tmdbId, season, episode } = query;
@@ -90,7 +89,7 @@ export function makeVidifyEmbed(id: string, rank: number = 100) {
       if (Array.isArray(res.result) && res.result.length > 0) {
         const qualities: Record<string, { type: 'mp4'; url: string }> = {};
         res.result.forEach((r: { url: string | string[]; resolution: any }) => {
-          if (r.url.includes('.mp4')) {
+          if ((r.url as string).includes('.mp4')) {
             qualities[`${r.resolution}p`] = { type: 'mp4', url: decodeURIComponent(r.url as string) };
           }
         });

@@ -152,7 +152,6 @@ export const soaperTvScraper = makeSourcerer({
   id: 'soapertv',
   name: 'SoaperTV',
   rank: 130,
-  disabled: true,
   flags: [flags.CORS_ALLOWED],
   scrapeMovie: universalScraper,
   scrapeShow: universalScraper,
