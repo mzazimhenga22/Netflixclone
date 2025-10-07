@@ -33,5 +33,7 @@ const RecommendationCategorySchema = z.object({
 });
 
 
-export const RecommendationsOutputSchema = z.array(RecommendationCategorySchema);
-export type RecommendationsOutput = z.infer<typeof RecommendationsOutputSchema>;
+export const RecommendationsOutputSchema = z.object({
+    recommendations: z.array(RecommendationCategorySchema)
+});
+export type RecommendationsOutput = z.infer<typeof RecommendationsOutputSchema>['recommendations'];

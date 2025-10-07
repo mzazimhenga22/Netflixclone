@@ -63,10 +63,11 @@ const getRecommendationsFlow = ai.defineFlow(
     },
     async (input) => {
         const { output } = await recommendationPrompt(input);
-        return output || [];
+        return output || { recommendations: [] };
     }
 );
 
 export async function getRecommendations(input: RecommendationsInput): Promise<RecommendationsOutput> {
-    return getRecommendationsFlow(input);
+    const output = await getRecommendationsFlow(input);
+    return output.recommendations;
 }

@@ -149,13 +149,15 @@ export default function BrowsePage() {
                 favoriteGenre: activeProfile.favoriteGenreId ? genres[activeProfile.favoriteGenreId] : undefined,
             });
 
-            const categoryPromises = recommendations.map(async (rec) => {
-                const movies = await fetchCategoryMovies(rec.category).then(fetchAndHydrate);
-                return { title: rec.title, movies };
-            });
+            if (recommendations) {
+                const categoryPromises = recommendations.map(async (rec) => {
+                    const movies = await fetchCategoryMovies(rec.category).then(fetchAndHydrate);
+                    return { title: rec.title, movies };
+                });
 
-            const newCategories = await Promise.all(categoryPromises);
-            setCategories(newCategories.filter(c => c.movies.length > 0));
+                const newCategories = await Promise.all(categoryPromises);
+                setCategories(newCategories.filter(c => c.movies.length > 0));
+            }
         }
       } catch (error) {
         console.error("Failed to fetch movies for browse page:", error);
