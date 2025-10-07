@@ -1,4 +1,3 @@
-
 export const flags = {
   // CORS are set to allow any origin
   CORS_ALLOWED: 'cors-allowed',

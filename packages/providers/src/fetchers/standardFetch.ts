@@ -1,5 +1,7 @@
+
+
 import { serializeBody } from './body';
-import { makeFullUrl } from '../utils/common';
+import { makeFullUrl } from './common';
 import { FetchLike, FetchReply } from './fetch';
 import { Fetcher } from './types';
 
@@ -8,7 +10,7 @@ function getHeaders(list: string[], res: FetchReply): Headers {
   list.forEach((header) => {
     const realHeader = header.toLowerCase();
     const realValue = res.headers.get(realHeader);
-    const extraValue = res.extraHeaders?.get(realHeader);
+    const extraValue = (res as any).extraHeaders?.get(realHeader);
     const value = extraValue ?? realValue;
     if (!value) return;
     output.set(realHeader, value);

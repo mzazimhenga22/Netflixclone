@@ -1,4 +1,3 @@
-
 import { load } from 'cheerio';
 
 import { flags } from '../../../entrypoint/utils/targets';

@@ -1,8 +1,7 @@
-
-import { MovieMedia, ShowMedia } from '@/entrypoint/utils/media';
-import { compareMedia } from '@/utils/compare';
-import { ScrapeContext } from '@/utils/context';
-import { NotFoundError } from '@/utils/errors';
+import { MovieMedia, ShowMedia } from '../../../entrypoint/utils/media';
+import { compareMedia } from '../../../utils/compare';
+import { ScrapeContext } from '../../../utils/context';
+import { NotFoundError } from '../../../utils/errors';
 
 import { Result, ResultItem, ShowDataResult, episodeObj } from './type';
 import { getVideo } from './video';
@@ -48,7 +47,7 @@ export async function scrape(ctx: ScrapeContext, media: MovieMedia | ShowMedia, 
     });
 
     const episode = data.episodes?.find((v: episodeObj) => {
-      return Number(v.season) === Number(media.season.number) && Number(v.episode) === Number(media.episode.number);
+      return Number(v.season) === Number((media as ShowMedia).season.number) && Number(v.episode) === Number((media as ShowMedia).episode.number);
     });
 
     if (episode) id = episode.id;

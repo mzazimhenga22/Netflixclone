@@ -1,11 +1,10 @@
-
 import { load } from 'cheerio';
 
-import { SourcererEmbed, makeSourcerer } from '@/providers/base';
-import { closeLoadScraper } from '@/providers/embeds/closeload';
-import { ridooScraper } from '@/providers/embeds/ridoo';
-import { MovieScrapeContext, ShowScrapeContext } from '@/utils/context';
-import { NotFoundError } from '@/utils/errors';
+import { SourcererEmbed, makeSourcerer } from '../../base';
+import { closeLoadScraper } from '../../embeds/closeload';
+import { ridooScraper } from '../../embeds/ridoo';
+import { MovieScrapeContext, ShowScrapeContext } from '../../../utils/context';
+import { NotFoundError } from '../../../utils/errors';
 
 import { IframeSourceResult, SearchResult } from './types';
 

@@ -1,19 +1,19 @@
-import { Embed, Sourcerer } from '@/providers/base';
-import { doodScraper } from '@/providers/embeds/dood';
-import { mixdropScraper } from '@/providers/embeds/mixdrop';
-import { turbovidScraper } from '@/providers/embeds/turbovid';
-import { upcloudScraper } from '@/providers/embeds/upcloud';
-import { autoembedScraper } from '@/providers/sources/autoembed';
-import { ee3Scraper } from '@/providers/sources/ee3';
-import { fsharetvScraper } from '@/providers/sources/fsharetv';
-import { insertunitScraper } from '@/providers/sources/insertunit';
-import { mp4hydraScraper } from '@/providers/sources/mp4hydra';
-import { nepuScraper } from '@/providers/sources/nepu';
-import { pirxcyScraper } from '@/providers/sources/pirxcy';
-import { tugaflixScraper } from '@/providers/sources/tugaflix';
-import { vidsrcScraper } from '@/providers/sources/vidsrc';
-import { vidsrcvipScraper } from '@/providers/sources/vidsrcvip';
-import { zoechipScraper } from '@/providers/sources/zoechip';
+import { Embed, Sourcerer } from './base';
+import { doodScraper } from './embeds/dood';
+import { mixdropScraper } from './embeds/mixdrop';
+import { turbovidScraper } from './embeds/turbovid';
+import { upcloudScraper } from './embeds/upcloud';
+import { autoembedScraper } from './sources/autoembed';
+import { ee3Scraper } from './sources/ee3';
+import { fsharetvScraper } from './sources/fsharetv';
+import { insertunitScraper } from './sources/insertunit';
+import { mp4hydraScraper } from './sources/mp4hydra';
+import { nepuScraper } from './sources/nepu';
+import { pirxcyScraper } from './sources/pirxcy';
+import { tugaflixScraper } from './sources/tugaflix';
+import { vidsrcScraper } from './sources/vidsrc';
+import { vidsrcvipScraper } from './sources/vidsrcvip';
+import { zoechipScraper } from './sources/zoechip';
 
 import { AnimetsuEmbeds } from './embeds/animetsu';
 import {

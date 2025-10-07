@@ -1,4 +1,3 @@
-
 import { gatherAllEmbeds, gatherAllSources } from './all';
 import { Embed, Sourcerer } from './base';
 

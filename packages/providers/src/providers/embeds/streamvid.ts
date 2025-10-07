@@ -1,8 +1,7 @@
-
 import * as unpacker from 'unpacker';
 
-import { flags } from '@/entrypoint/utils/targets';
-import { makeEmbed } from '@/providers/base';
+import { flags } from '../../entrypoint/utils/targets';
+import { makeEmbed } from '../base';
 
 const packedRegex = /(eval\(function\(p,a,c,k,e,d\).*\)\)\))/;
 const linkRegex = /src:"(https:\/\/[^"]+)"/;

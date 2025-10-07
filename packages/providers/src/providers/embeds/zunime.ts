@@ -1,5 +1,4 @@
-
-import { NotFoundError } from '@/utils/errors';
+import { NotFoundError } from '../../utils/errors';
 
 import { EmbedOutput, makeEmbed } from '../base';
 
