@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import NetflixProgress from './NetflixProgress';
 import { Slider } from '@/components/ui/slider';
 import PauseDetailsOverlay from './PauseDetailsOverlay';
+import Link from 'next/link';
 
 
 // Custom Netflix-style SVG Icons
@@ -267,23 +268,30 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
           <SheetTitle>Episodes: {media.name}</SheetTitle>
         </SheetHeader>
         <div className="p-4 space-y-3">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="flex items-center p-2 rounded-md hover:bg-white/10 cursor-pointer gap-4">
-              <span className="text-xl text-muted-foreground font-bold w-8 text-center">{index + 1}</span>
-              <div className="relative w-40 h-20 rounded-md overflow-hidden flex-shrink-0">
-                <Image src={`https://picsum.photos/seed/ep${index + (media.id || 0)}/320/180`} alt={`Episode ${index+1}`} fill className="object-cover" />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                  <PlayIcon className="h-8 w-8 text-white" />
+          {Array.from({ length: 8 }).map((_, index) => {
+            const episodeNumber = index + 1;
+            return (
+              <Link
+                key={episodeNumber}
+                href={`/watch/${media.id}?season=1&episode=${episodeNumber}`}
+                className="flex items-center p-2 rounded-md hover:bg-white/10 cursor-pointer gap-4"
+              >
+                <span className="text-xl text-muted-foreground font-bold w-8 text-center">{episodeNumber}</span>
+                <div className="relative w-40 h-20 rounded-md overflow-hidden flex-shrink-0">
+                  <Image src={`https://picsum.photos/seed/ep${episodeNumber + (media.id || 0)}/320/180`} alt={`Episode ${episodeNumber}`} fill className="object-cover" />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <PlayIcon className="h-8 w-8 text-white" />
+                  </div>
                 </div>
-              </div>
-              <div className="flex-grow">
-                <h4 className="font-bold">Episode {index + 1}</h4>
-                <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                  As a crisis looms, the group must make a difficult choice. A surprising ally emerges.
-                </p>
-              </div>
-            </div>
-          ))}
+                <div className="flex-grow">
+                  <h4 className="font-bold">Episode {episodeNumber}</h4>
+                  <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                    As a crisis looms, the group must make a difficult choice. A surprising ally emerges.
+                  </p>
+                </div>
+              </Link>
+            )
+          })}
         </div>
       </SheetContent>
     </Sheet>
