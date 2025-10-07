@@ -1,3 +1,4 @@
+
 export type ScrapeMedia =
   | {
       type: 'movie';
@@ -92,5 +93,5 @@ export type Embed = {
   id: string;
   name: string;
   disabled?: boolean;
-  fn: (ops: Runner-Options) => Promise<EmbedOutput>;
+  fn: (ops: RunnerOptions) => Promise<EmbedOutput>;
 };
