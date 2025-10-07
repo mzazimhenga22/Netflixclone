@@ -217,6 +217,22 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
             </div>
         </div>
 
+        {/* Center Controls */}
+        <div className={cn("absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-12 transition-opacity duration-300", !showControls && "opacity-0 pointer-events-none")}>
+            <button onClick={() => skip(-10)} className="text-white h-12 w-12 relative">
+                <RotateCcw className="h-full w-full" />
+                <span className="absolute text-sm font-bold top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">10</span>
+            </button>
+            <button onClick={togglePlay} className="text-white h-20 w-20">
+                {isPlaying ? <PauseIcon /> : <PlayIcon />}
+            </button>
+            <button onClick={() => skip(10)} className="text-white h-12 w-12 relative">
+                <RotateCw className="h-full w-full" />
+                <span className="absolute text-sm font-bold top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">10</span>
+            </button>
+        </div>
+
+
         {/* Top Controls */}
         <div className={cn("absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/70 to-transparent transition-transform duration-300", !showControls && "-translate-y-full")}>
           <div className="flex items-center justify-between">
@@ -260,20 +276,8 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
                         />
                     </div>
                 </div>
-
-                <div className="flex items-center gap-6">
-                    <button onClick={() => skip(-10)} className="text-white h-7 w-7 relative">
-                        <RotateCcw className="h-full w-full" />
-                        <span className="absolute text-xs font-bold top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">10</span>
-                    </button>
-                    <button onClick={togglePlay} className="text-white h-10 w-10">
-                        {isPlaying ? <PauseIcon /> : <PlayIcon />}
-                    </button>
-                    <button onClick={() => skip(10)} className="text-white h-7 w-7 relative">
-                        <RotateCw className="h-full w-full" />
-                        <span className="absolute text-xs font-bold top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">10</span>
-                    </button>
-                </div>
+                
+                <div className="flex-1"></div>
                 
                 <div className="flex items-center gap-4">
                     {isTvShow && (
@@ -334,7 +338,3 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     </Sheet>
   );
 }
-
-    
-
-    
