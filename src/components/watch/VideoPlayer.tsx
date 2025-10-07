@@ -39,10 +39,10 @@ const CaptionsIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M18 4H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM6 12h2v2H6v-2zm8 6H6v-2h8v2zm0-4H6v-2h8v2z"></path></svg>
 );
 const Rewind10Icon = () => (
-    <svg viewBox="0 0 52 52" fill="currentColor"><path d="M26,52 C11.663,52 0,40.337 0,26 C0,11.663 11.663,0 26,0 C40.337,0 52,11.663 52,26 C52,40.337 40.337,52 26,52 Z M29,19.333 L20.333,26 L29,32.667 L29,19.333 Z"></path></svg>
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="currentColor"><path d="M26,52 C11.663,52 0,40.337 0,26 C0,11.663 11.663,0 26,0 C40.337,0 52,11.663 52,26 C52,40.337 40.337,52 26,52 Z M29,19.333 L20.333,26 L29,32.667 L29,19.333 Z"></path></svg>
 );
 const Forward10Icon = () => (
-    <svg viewBox="0 0 52 52" fill="currentColor"><path d="M26,0 C40.337,0 52,11.663 52,26 C52,40.337 40.337,52 26,52 C11.663,52 0,40.337 0,26 C0,11.663 11.663,0 26,0 Z M23,32.667 L31.667,26 L23,19.333 L23,32.667 Z"></path></svg>
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="currentColor"><path d="M26,0 C40.337,0 52,11.663 52,26 C52,40.337 40.337,52 26,52 C11.663,52 0,40.337 0,26 C0,11.663 11.663,0 26,0 Z M23,32.667 L31.667,26 L23,19.333 L23,32.667 Z"></path></svg>
 );
 
 
@@ -56,6 +56,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
   const controlsTimeoutRef = useRef<number | null>(null);
+  const infoTimeoutRef = useRef<number | null>(null);
 
   const { history, updateWatchHistory } = useWatchHistory();
   const watchHistoryItem = history.find(item => item.id === media.id);
@@ -66,6 +67,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   const [duration, setDuration] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
   const [isEpisodesPanelOpen, setIsEpisodesPanelOpen] = useState(false);
   
   const isTvShow = media.media_type === 'tv';
@@ -131,8 +133,21 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
 
     const handleTimeUpdate = () => setProgress(video.currentTime);
     const handleDurationChange = () => setDuration(video.duration || 0);
-    const handlePlay = () => { setIsPlaying(true); resetControlsTimeout(); };
-    const handlePause = () => { setIsPlaying(false); if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current); setShowControls(true); };
+    
+    const handlePlay = () => { 
+        setIsPlaying(true); 
+        resetControlsTimeout();
+        if (infoTimeoutRef.current) clearTimeout(infoTimeoutRef.current);
+        setShowInfo(false);
+    };
+
+    const handlePause = () => { 
+        setIsPlaying(false); 
+        if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+        setShowControls(true); 
+        if (infoTimeoutRef.current) clearTimeout(infoTimeoutRef.current);
+        infoTimeoutRef.current = window.setTimeout(() => setShowInfo(true), 2000);
+    };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('durationchange', handleDurationChange);
@@ -148,6 +163,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
       if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+      if (infoTimeoutRef.current) clearTimeout(infoTimeoutRef.current);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mousedown', handleMouseMove);
     };
@@ -210,16 +226,29 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
 
 
   return (
-    <div ref={playerRef} className="w-full h-screen bg-black flex justify-center items-center relative select-none overflow-hidden cursor-none" onDoubleClick={toggleFullscreen}>
+    <div ref={playerRef} className={cn("w-full h-screen bg-black flex justify-center items-center relative select-none overflow-hidden", showControls ? "cursor-auto" : "cursor-none")} onDoubleClick={toggleFullscreen}>
       <video ref={videoRef} src={src} className="w-full h-full object-contain" autoPlay onClick={togglePlay}/>
       
       {/* Dimmer & Info Overlay */}
       <div className={cn('absolute inset-0 bg-black/40 transition-opacity duration-500 z-10', (showControls || !isPlaying) ? 'opacity-100' : 'opacity-0 pointer-events-none')} />
 
+        {/* Info Overlay on Left */}
+        <div className={cn("absolute left-5 md:left-8 bottom-28 md:bottom-32 text-white max-w-md transition-opacity duration-500 z-20", showInfo && !isPlaying ? "opacity-100" : "opacity-0 pointer-events-none")}>
+            {isTvShow && <p className="text-lg">Hometown Cha-Cha-Cha</p> }
+             <div className="flex items-center gap-2 text-sm text-white/80">
+                {isTvShow && <><span>Season 1</span><span className="text-xs">•</span></>}
+                <span>{media.release_date?.substring(0,4) || media.first_air_date?.substring(0,4)}</span>
+                {isTvShow && <span className="text-xs">•</span>}
+                {isTvShow && <span>Drama</span>}
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold my-2">{title}</h1>
+            <p className="text-base text-white/90 line-clamp-3">{description}</p>
+        </div>
+        
       {/* Main Controls Overlay */}
       <div className={cn('absolute inset-0 transition-opacity duration-500 z-20', (showControls || !isPlaying) ? 'opacity-100' : 'opacity-0 pointer-events-none')} >
         {/* Top bar */}
-        <div className="absolute top-0 left-0 right-0 p-5 md:p-8 flex items-center justify-between">
+        <div className="absolute top-0 left-0 right-0 p-5 md:p-8 flex items-center justify-between bg-gradient-to-b from-black/50 to-transparent">
           <button onClick={(e) => { e.stopPropagation(); router.back(); }} className="text-white h-12 w-12 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
             <ArrowLeft className="h-8 w-8" />
           </button>
@@ -236,46 +265,36 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
              )}
           </div>
         </div>
-
-        {/* Info Overlay on Left */}
-        <div className="absolute left-5 md:left-8 bottom-28 md:bottom-32 text-white max-w-md">
-            {isTvShow && <p className="text-lg">Hometown Cha-Cha-Cha</p> }
-             <div className="flex items-center gap-2 text-sm text-white/80">
-                {isTvShow && <><span>Season 1</span><span className="text-xs">•</span></>}
-                <span>{media.release_date?.substring(0,4) || media.first_air_date?.substring(0,4)}</span>
-                {isTvShow && <span className="text-xs">•</span>}
-                {isTvShow && <span>Drama</span>}
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold my-2">{title}</h1>
-            <p className="text-base text-white/90 line-clamp-3">{description}</p>
-        </div>
         
         {/* Center Controls */}
         <div className="absolute inset-0 flex items-center justify-center gap-12" onClick={togglePlay}>
-            <button onClick={(e) => handleSeekRelative(-10, e)} className="text-white/80 hover:text-white transition-transform hover:scale-110">
+            <button onClick={(e) => handleSeekRelative(-10, e)} className="text-white/80 hover:text-white transition-transform hover:scale-110 relative w-16 h-16 flex items-center justify-center">
                 <Rewind10Icon />
-                <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs font-bold">10</span>
+                <span className="absolute text-sm font-bold">10</span>
             </button>
             <button className="h-20 w-20 rounded-full flex items-center justify-center transition-transform hover:scale-110 bg-black/30 backdrop-blur-sm ring-2 ring-white/50">
                 {isPlaying ? <PauseIcon className="h-10 w-10 text-white" /> : <PlayIcon className="h-10 w-10 text-white" />}
             </button>
-            <button onClick={(e) => handleSeekRelative(10, e)} className="text-white/80 hover:text-white transition-transform hover:scale-110">
+            <button onClick={(e) => handleSeekRelative(10, e)} className="text-white/80 hover:text-white transition-transform hover:scale-110 relative w-16 h-16 flex items-center justify-center">
                 <Forward10Icon />
-                 <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-xs font-bold">10</span>
+                 <span className="absolute text-sm font-bold">10</span>
             </button>
         </div>
 
         {/* Bottom Bar */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 text-white">
-            <div className="w-full relative group">
+        <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 text-white bg-gradient-to-t from-black/50 to-transparent">
+            <div className="flex items-center gap-4 w-full">
+                <span className="text-sm font-medium w-16 text-center">{formatTime(progress)}</span>
                 <Slider 
                     value={[progress]} 
                     max={duration} 
                     step={0.1} 
                     onValueChange={handleSeek} 
-                    className="w-full cursor-pointer h-1 [&>span:first-child]:h-1 [&>span:first-child>span]:bg-primary [&>span:nth-child(2)]:h-3 [&>span:nth-child(2)]:w-3 [&>span:nth-child(2)]:opacity-0 group-hover:[&>span:nth-child(2)]:opacity-100"
+                    className="w-full cursor-pointer h-1.5 group/slider"
                 />
+                 <span className="text-sm font-medium w-16 text-center">{formatTime(duration)}</span>
             </div>
+
           <div className="flex justify-between items-center mt-4">
              <div className="flex items-center gap-4">
                  <button onClick={(e) => toggleMute(e)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full">
@@ -286,7 +305,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
                 {isTvShow && <button className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><NextEpisodeIcon className="h-6 w-6" /></button>}
                 {isTvShow && <button onClick={() => setIsEpisodesPanelOpen(p => !p)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><EpisodesIcon className="h-6 w-6" /></button>}
                 <button className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><CaptionsIcon className="h-6 w-6" /></button>
-                <button onClick={(e) => toggleFullscreen(e)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full">{isFullscreen ? <FullscreenExitIcon className="h-6 w-6" /> : <FullscreenEnterIcon className="h-6 w-6" />}</button>
+                <button onClick={(e) => toggleFullscreen(e)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full">{isFullscreen ? <FullscreenExitIcon className="h-6 w-6" /> : <FullscreenEnterIcon className="h-6 w-6" /></button>
             </div>
           </div>
         </div>
@@ -321,3 +340,5 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     </div>
   );
 }
+
+    
