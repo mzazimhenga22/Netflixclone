@@ -5,35 +5,20 @@
  * @fileOverview A flow for generating personalized movie and TV show recommendations.
  *
  * - getRecommendations - A function that handles the recommendation process.
- * - RecommendationsInput - The input type for the getRecommendations function.
- * - RecommendationsOutput - The return type for the getRecommendations function.
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
 import { movieGenres } from '@/lib/movieGenres';
 import { tvGenres } from '@/lib/tvGenres';
+import {
+    RecommendationsInputSchema,
+    type RecommendationsInput,
+    RecommendationsOutputSchema,
+    type RecommendationsOutput
+} from './recommendations-types';
+
 
 const allGenres = [...new Set([...movieGenres.map(g => g.name), ...tvGenres.map(g => g.name)])];
-
-export const RecommendationsInputSchema = z.object({
-  watchHistory: z.array(z.string()).describe('A list of movie or TV show titles the user has watched.'),
-  myList: z.array(z.string()).describe("A list of movie or TV show titles the user has added to their 'My List'."),
-  favoriteGenre: z.string().optional().describe('The user\'s self-declared favorite genre.'),
-});
-export type RecommendationsInput = z.infer<typeof RecommendationsInputSchema>;
-
-const CategorySchema = z.object({
-    type: z.enum(['genre', 'trending', 'popular_movies', 'popular_tv', 'search']).describe("The type of category to fetch."),
-    value: z.string().describe("The value for the category (e.g., genre name, search query). For 'trending', 'popular_movies', and 'popular_tv', this can be an empty string."),
-});
-
-export const RecommendationsOutputSchema = z.array(z.object({
-  title: z.string().describe('The user-visible title for the movie row (e.g., "Because You Watched Inception", "Dark Comedies").'),
-  category: CategorySchema.describe('The category information used to fetch the movies for this row.'),
-}));
-export type RecommendationsOutput = z.infer<typeof RecommendationsOutputSchema>;
-
 
 const recommendationPrompt = ai.definePrompt({
     name: 'recommendationPrompt',
@@ -70,7 +55,7 @@ const recommendationPrompt = ai.definePrompt({
 });
 
 
-export const getRecommendationsFlow = ai.defineFlow(
+const getRecommendationsFlow = ai.defineFlow(
     {
         name: 'getRecommendationsFlow',
         inputSchema: RecommendationsInputSchema,
