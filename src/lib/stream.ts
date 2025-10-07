@@ -26,7 +26,6 @@ export async function getStream(
   season?: number,
   episode?: number
 ): Promise<{ stream: Stream | null; error: string | null }> {
-  let lastError: Error | null = null;
   const title = (media.title || media.name || '') as string;
 
   try {
@@ -92,7 +91,6 @@ export async function getStream(
     return { stream: output.stream as Stream, error: null };
     
   } catch (err: unknown) {
-    // Treat caught value as unknown and extract message defensively
     let message = 'An unknown error occurred during scraping.';
     if (err instanceof Error) {
       message = err.message;
@@ -109,3 +107,4 @@ export async function getStream(
     return { stream: null, error: message };
   }
 }
+
