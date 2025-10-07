@@ -39,14 +39,14 @@ interface ProfileFormProps {
 }
 
 const avatars = [
-    'https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/defaults%2Favatar1.png?alt=media&token=c2e8a5ed-1033-4556-91d4-8d45f403988f',
-    'https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/defaults%2Favatar2.png?alt=media&token=e8583424-77a8-4819-a9a3-a7c858b43896',
-    'https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/defaults%2Favatar3.png?alt=media&token=013783a3-34e8-4b47-b50a-8a8b1d916726',
-    'https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/defaults%2Favatar4.png?alt=media&token=dd50b3e6-e1e3-469b-9c51-50e5883a45c3',
-    'https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/defaults%2Favatar5.png?alt=media&token=4e8d35e1-8f1d-4876-8803-b097e334346e',
-    'https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/defaults%2Favatar6.png?alt=media&token=b70743b5-f674-4c17-8a19-943085521b44',
-    'https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/defaults%2Favatar7.png?alt=media&token=6a5e1732-45e0-4c3e-862d-9d7a9657c865',
-    'https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/defaults%2Favatar8.png?alt=media&token=6b0c2e35-502a-4369-a178-0e1a3df3f4b5',
+    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar1.png?alt=media&token=e827b5f6-3914-4395-8292-39324135502c",
+    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar2.png?alt=media&token=255776c4-7389-4809-810a-2004278a9947",
+    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar3.png?alt=media&token=86641A58-348A-42A6-A2A5-364F3539079A",
+    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar4.png?alt=media&token=C3F4A8B3-3B3B-4F6A-915A-69A6B2A8A3F6",
+    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar5.png?alt=media&token=E9A4B3C5-5A3E-4B3A-9E2A-1A2B3C4D5E6F",
+    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar6.png?alt=media&token=A9B8C7D6-5E4F-3A2B-1C0D-9E8F7A6B5C4D",
+    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar7.png?alt=media&token=B8C9D0E7-6F5A-4B3C-2D1E-0F9E8D7C6B5A",
+    "https://firebasestorage.googleapis.com/v0/b/studio-9973247152-e6670.appspot.com/o/avatars%2Favatar8.png?alt=media&token=D7E8F9A0-1B2C-3D4E-5F6A-7B8C9D0E1F2A"
 ];
 
 export default function ProfileForm({ profile, onSave, onCancel, onDelete }: ProfileFormProps) {
