@@ -28,8 +28,9 @@ const vidsrcScraper: Source = {
                 Referer: vidsrcBase + '/',
             }
         });
-
-        const streamSrcMatch = mainPage.body.match(/src:\s*"([^"]+)"/);
+        
+        // More robust way to find the stream URL, looking for setSrc call
+        const streamSrcMatch = mainPage.body.match(/player\.setSrc\("([^"]+)"\)/);
         const streamUrl = streamSrcMatch ? streamSrcMatch[1] : null;
 
         if (!streamUrl) {
