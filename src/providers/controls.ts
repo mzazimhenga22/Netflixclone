@@ -3,11 +3,11 @@ import { FullScraperEvents, IndividualScraperEvents } from './events';
 import { ScrapeMedia } from './media';
 import { MetaOutput, getAllEmbedMetaSorted, getAllSourceMetaSorted, getSpecificId } from './meta';
 import { FeatureMap } from './targets';
-import { makeFetcher } from './common';
-import { Fetcher, UseableFetcher } from '../fetchers/types';
-import { EmbedOutput, SourcererOutput, Embed, Sourcerer } from './base';
-import { scrapeIndividualEmbed, scrapeInvidualSource } from './individualRunner';
-import { RunOutput, runAllProviders } from './runner';
+import { makeFetcher } from './utils/common';
+import { Fetcher, UseableFetcher } from './fetchers/types';
+import { EmbedOutput, SourcererOutput, Embed, Sourcerer } from './providers/base';
+import { scrapeIndividualEmbed, scrapeInvidualSource } from './runners/individualRunner';
+import { RunOutput, runAllProviders } from './runners/runner';
 import { ProviderList } from './get';
 
 export interface ProviderControlsInput {

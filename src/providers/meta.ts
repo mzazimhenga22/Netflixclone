@@ -1,6 +1,6 @@
 
 import { MediaTypes } from './media';
-import { Embed, Sourcerer } from './base';
+import { Embed, Sourcerer } from './providers/base';
 import { ProviderList } from './get';
 
 export type MetaOutput = {
