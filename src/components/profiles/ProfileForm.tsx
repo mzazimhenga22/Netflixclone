@@ -40,14 +40,14 @@ interface ProfileFormProps {
 }
 
 const avatars = [
-    "https://picsum.photos/seed/1/200/200",
-    "https://picsum.photos/seed/2/200/200",
-    "https://picsum.photos/seed/3/200/200",
-    "https://picsum.photos/seed/4/200/200",
-    "https://picsum.photos/seed/5/200/200",
-    "https://picsum.photos/seed/6/200/200",
-    "https://picsum.photos/seed/7/200/200",
-    "https://picsum.photos/seed/8/200/200"
+    "https://picsum.photos/seed/avatar1/200/200",
+    "https://picsum.photos/seed/avatar2/200/200",
+    "https://picsum.photos/seed/avatar3/200/200",
+    "https://picsum.photos/seed/avatar4/200/200",
+    "https://picsum.photos/seed/avatar5/200/200",
+    "https://picsum.photos/seed/avatar6/200/200",
+    "https://picsum.photos/seed/avatar7/200/200",
+    "https://picsum.photos/seed/avatar8/200/200"
 ];
 
 export default function ProfileForm({ profile, onSave, onCancel, onDelete }: ProfileFormProps) {
@@ -59,15 +59,23 @@ export default function ProfileForm({ profile, onSave, onCancel, onDelete }: Pro
   const [favoriteGenreId, setFavoriteGenreId] = useState(profile?.favoriteGenreId?.toString() || 'none');
 
   const handleSave = () => {
-    onSave({
+    const dataToSave: Omit<Profile, 'id'> & { id?: string } = {
       id: profile?.id,
       name,
       avatar,
       isLocked,
-      pin: isLocked ? pin : undefined,
       country,
-      favoriteGenreId: favoriteGenreId && favoriteGenreId !== 'none' ? parseInt(favoriteGenreId) : undefined,
-    });
+    };
+
+    if (isLocked) {
+      dataToSave.pin = pin;
+    }
+
+    if (favoriteGenreId && favoriteGenreId !== 'none') {
+        dataToSave.favoriteGenreId = parseInt(favoriteGenreId);
+    }
+    
+    onSave(dataToSave);
   };
 
   return (
