@@ -19,7 +19,7 @@ export default async function TrendingNow() {
             <h2 className="text-3xl md:text-5xl font-bold mb-8">Trending Now</h2>
             <div className="relative">
                 <div className="flex space-x-4 overflow-x-auto pb-4 hide-scrollbar">
-                    {trending.map((item, index) => (
+                    {trending.map((item) => (
                          <div key={item.id} className="w-60 flex-shrink-0">
                             <StaticMovieCard movie={item} />
                         </div>

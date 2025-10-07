@@ -23,8 +23,8 @@ export default function StaticMovieCard({ movie }: StaticMovieCardProps) {
   const linkHref = pathname === '/' ? '/only-on-streamclone' : '/signup/registration';
 
   return (
-    <Link href={linkHref}>
-      <div className="group relative aspect-video bg-zinc-900 rounded-md transition-transform duration-300 ease-out will-change-transform cursor-pointer overflow-hidden">
+    <Link href={linkHref} className="block group">
+      <div className="relative aspect-video bg-zinc-900 rounded-md transition-transform duration-300 ease-out will-change-transform cursor-pointer overflow-hidden">
         <Image
           src={posterUrl}
           alt={movie.title || movie.name || "Movie poster"}
