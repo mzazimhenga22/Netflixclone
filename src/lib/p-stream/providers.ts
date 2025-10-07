@@ -8,6 +8,9 @@ import * as cheerio from 'cheerio';
 
 const vidsrcBase = 'https://vidsrc.to';
 const vidsrcproBase = 'https://vidsrc.pro';
+const superembedBase = 'https://superembed.stream';
+const twoembedBase = 'https://www.2embed.cc';
+
 
 const vidsrcScraper: Source = {
     id: 'vidsrc',
@@ -24,7 +27,6 @@ const vidsrcScraper: Source = {
         url = `${vidsrcBase}/embed/tv/${media.tmdbId}/${media.season.number}/${media.episode.number}`;
       }
   
-      // Use a realistic UA + referer (some sites block non-browser UA)
       const mainPage = await ops.fetcher(url, {
         method: 'GET',
         headers: {
@@ -172,7 +174,7 @@ const vidsrcScraper: Source = {
 const vidsrcProScraper: Source = {
   id: 'vidsrcpro',
   name: 'VidSrc.pro',
-  rank: 90, // Slightly lower rank than .to
+  rank: 90, 
   disabled: false,
   async fn(ops) {
     const media: ScrapeMedia = ops.media;
@@ -215,11 +217,102 @@ const vidsrcProScraper: Source = {
     };
   },
 };
-  
 
+const superembedScraper: Source = {
+  id: 'superembed',
+  name: 'SuperEmbed',
+  rank: 80,
+  disabled: false,
+  async fn(ops) {
+    const media: ScrapeMedia = ops.media;
+    let url: string;
+    if (media.type === 'movie') {
+      url = `${superembedBase}/movie?tmdb=${media.tmdbId}`;
+    } else {
+      url = `${superembedBase}/tv?tmdb=${media.tmdbId}&s=${media.season.number}&e=${media.episode.number}`;
+    }
+    
+    return {
+      embeds: [{ embedId: 'superembed-player', url }],
+      stream: undefined,
+    };
+  },
+};
+
+const twoembedScraper: Source = {
+  id: 'twoembed',
+  name: '2Embed',
+  rank: 70,
+  disabled: false,
+  async fn(ops) {
+    const media: ScrapeMedia = ops.media;
+    let url: string;
+    if (media.type === 'movie') {
+      url = `${twoembedBase}/embed/tmdb/movie?id=${media.tmdbId}`;
+    } else {
+      url = `${twoembedBase}/embed/tmdb/tv?id=${media.tmdbId}&s=${media.season.number}&e=${media.episode.number}`;
+    }
+    
+    const mainPage = await ops.fetcher(url, { method: 'GET' });
+    const html = mainPage.body;
+    const $ = cheerio.load(html);
+
+    const playerUrl = $('.play-btn a').attr('href');
+
+    if (!playerUrl) throw new NotFoundError('Could not find player URL on 2embed');
+
+    const playerId = new URL(playerUrl, twoembedBase).searchParams.get('id');
+
+    if (!playerId) throw new NotFoundError('Could not extract player ID from URL');
+
+    const streamDataUrl = `${twoembedBase}/ajax/embed/play?id=${playerId}&_token=2embed`; // Fictional token
+    const streamDataRes = await ops.fetcher(streamDataUrl, { 
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            Referer: url,
+        }
+    });
+
+    const streamData = streamDataRes.body;
+    if (!streamData.status || !streamData.link) throw new NotFoundError('Failed to get stream data from 2embed ajax endpoint');
+    
+    return {
+        embeds: [{ embedId: 'twoembed-player', url: streamData.link }],
+        stream: undefined,
+    };
+  },
+};
+
+const superembedPlayer: Embed = {
+    id: 'superembed-player',
+    name: 'SuperEmbed Player',
+    async fn(ops) {
+        const page = await ops.fetcher(ops.url, { method: 'GET' });
+        const m3u8 = page.body.match(/file:\s*"(https?:\/\/[^"]+\.m3u8[^"]*)/);
+        if (!m3u8) throw new NotFoundError('Could not find m3u8 file in SuperEmbed player');
+
+        return {
+            stream: {
+                qualities: {
+                    auto: {
+                        type: 'hls',
+                        url: m3u8[1],
+                    },
+                },
+                captions: [],
+            },
+        };
+    },
+};
+  
 export const allSources: Source[] = [
     vidsrcScraper,
-    vidsrcProScraper
+    vidsrcProScraper,
+    superembedScraper,
+    twoembedScraper
 ];
 
-export const allEmbeds: Embed[] = [];
+export const allEmbeds: Embed[] = [
+    superembedPlayer
+];
