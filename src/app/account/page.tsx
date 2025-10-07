@@ -9,11 +9,13 @@ import { ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { useUser } from '@/firebase';
 
 export default function AccountPage() {
     const { activeProfile } = useProfile();
+    const { user, isUserLoading } = useUser();
 
-    if (!activeProfile) {
+    if (!activeProfile || isUserLoading) {
         return (
           <div className="flex items-center justify-center h-screen bg-black">
               <LoadingSpinner />
@@ -35,7 +37,7 @@ export default function AccountPage() {
                         <div className="space-y-4">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="font-bold">{`user${activeProfile.id}@streamclone.com`}</p>
+                                    <p className="font-bold">{user?.email}</p>
                                     <p className="text-gray-500">Password: ********</p>
                                 </div>
                                 <div className='text-right'>
@@ -67,7 +69,7 @@ export default function AccountPage() {
                         <h2 className="font-semibold text-gray-400 text-lg">PLAN DETAILS</h2>
                         <div className="flex justify-between items-center">
                             <div>
-                                <p><span className="font-bold">Standard</span> 1080p</p>
+                                <p><span className="font-bold">Premium</span> <span className="border-2 border-gray-400 px-1 text-xs">4K+HDR</span></p>
                             </div>
                             <Button variant="link" className="text-blue-500">Change plan</Button>
                         </div>
