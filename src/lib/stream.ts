@@ -1,7 +1,6 @@
-
 'use server';
 
-import { makeProviders, makeStandardFetcher, makeSimpleProxyFetcher, targets, type ScrapeMedia, type Stream } from '@/providers';
+import { makeProviders, makeStandardFetcher, makeSimpleProxyFetcher, targets, type ScrapeMedia, type Stream } from '@p-stream/providers';
 import type { Movie } from '@/types';
 
 // The proxy is used as a fallback for scrapers that might need it.
