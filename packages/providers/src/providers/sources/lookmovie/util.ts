@@ -1,7 +1,8 @@
-import { MovieMedia, ShowMedia } from '../../../media';
-import { compareMedia } from '../../../utils/compare';
-import { ScrapeContext } from '../../../utils/context';
-import { NotFoundError } from '../../../utils/errors';
+
+import { MovieMedia, ShowMedia } from '@/entrypoint/utils/media';
+import { compareMedia } from '@/utils/compare';
+import { ScrapeContext } from '@/utils/context';
+import { NotFoundError } from '@/utils/errors';
 
 import { Result, ResultItem, ShowDataResult, episodeObj } from './type';
 import { getVideo } from './video';

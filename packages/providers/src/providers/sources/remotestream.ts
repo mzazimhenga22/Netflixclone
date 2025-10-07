@@ -1,8 +1,9 @@
-import { flags } from '../../targets';
-import { makeSourcerer } from '../base';
-import { NotFoundError } from '../../utils/errors';
-import { SourcererOutput } from '../base';
-import { MovieScrapeContext, ShowScrapeContext } from '../../utils/context';
+
+import { flags } from '@/entrypoint/utils/targets';
+import { makeSourcerer } from '@/providers/base';
+import { NotFoundError } from '@/utils/errors';
+import { SourcererOutput } from '@/providers/base';
+import { MovieScrapeContext, ShowScrapeContext } from '@/utils/context';
 
 const remotestreamBase = atob('aHR0cHM6Ly9mc2IuOG1ldDNkdGpmcmNxY2hjb25xcGtsd3hzeGIyb2N1bWMuc3RyZWFt');
 
@@ -12,7 +13,6 @@ const referer = 'https://remotestre.am/';
 export const remotestreamScraper = makeSourcerer({
   id: 'remotestream',
   name: 'Remote Stream',
-  disabled: true,
   rank: 30,
   flags: [flags.CORS_ALLOWED],
   async scrapeShow(ctx: ShowScrapeContext): Promise<SourcererOutput> {

@@ -1,8 +1,9 @@
+
 import { load } from 'cheerio';
 import { unpack } from 'unpacker';
 
-import { flags } from '../../targets';
-import { NotFoundError } from '../../utils/errors';
+import { flags } from '@/entrypoint/utils/targets';
+import { NotFoundError } from '@/utils/errors';
 
 import { makeEmbed } from '../base';
 import { Caption, getCaptionTypeFromUrl, labelToLanguageCode } from '../captions';
@@ -63,7 +64,6 @@ export const closeLoadScraper = makeEmbed({
   id: 'closeload',
   name: 'CloseLoad',
   rank: 106,
-  disabled: true,
   async scrape(ctx) {
     const baseUrl = new URL(ctx.url).origin;
 
@@ -156,7 +156,7 @@ export const closeLoadScraper = makeEmbed({
       // Validate base64 string before decoding
       const isValidBase64 = /^[A-Za-z0-9+/]*={0,2}$/.test(base64EncodedUrl);
       if (!isValidBase64) {
-        throw new NotFoundError('Invalid base64 encoding found in source url');
+        throw new NotFoundError(`Invalid base64 encoding found in source url: ${base64EncodedUrl.substring(0, 50)}...`);
       }
 
       let decodedString: string;
