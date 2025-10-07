@@ -40,14 +40,14 @@ interface ProfileFormProps {
 }
 
 const avatars = [
-    "https://picsum.photos/seed/avatar1/200/200",
-    "https://picsum.photos/seed/avatar2/200/200",
-    "https://picsum.photos/seed/avatar3/200/200",
-    "https://picsum.photos/seed_avatar4/200/200",
-    "https://picsum.photos/seed/avatar5/200/200",
-    "https://picsum.photos/seed/avatar6/200/200",
-    "https://picsum.photos/seed/avatar7/200/200",
-    "https://picsum.photos/seed/avatar8/200/200"
+    "https://picsum.photos/seed/1/200/200",
+    "https://picsum.photos/seed/2/200/200",
+    "https://picsum.photos/seed/3/200/200",
+    "https://picsum.photos/seed/4/200/200",
+    "https://picsum.photos/seed/5/200/200",
+    "https://picsum.photos/seed/6/200/200",
+    "https://picsum.photos/seed/7/200/200",
+    "https://picsum.photos/seed/8/200/200"
 ];
 
 export default function ProfileForm({ profile, onSave, onCancel, onDelete }: ProfileFormProps) {
@@ -56,7 +56,7 @@ export default function ProfileForm({ profile, onSave, onCancel, onDelete }: Pro
   const [isLocked, setIsLocked] = useState(profile?.isLocked || false);
   const [pin, setPin] = useState(profile?.pin || '');
   const [country, setCountry] = useState(profile?.country || 'US');
-  const [favoriteGenreId, setFavoriteGenreId] = useState(profile?.favoriteGenreId?.toString() || '');
+  const [favoriteGenreId, setFavoriteGenreId] = useState(profile?.favoriteGenreId?.toString() || 'none');
 
   const handleSave = () => {
     onSave({
@@ -66,7 +66,7 @@ export default function ProfileForm({ profile, onSave, onCancel, onDelete }: Pro
       isLocked,
       pin: isLocked ? pin : undefined,
       country,
-      favoriteGenreId: favoriteGenreId ? parseInt(favoriteGenreId) : undefined,
+      favoriteGenreId: favoriteGenreId && favoriteGenreId !== 'none' ? parseInt(favoriteGenreId) : undefined,
     });
   };
 
@@ -101,7 +101,7 @@ export default function ProfileForm({ profile, onSave, onCancel, onDelete }: Pro
                         <SelectValue placeholder="Select a favorite genre" />
                     </SelectTrigger>
                     <SelectContent className="max-h-64">
-                         <SelectItem value="">None</SelectItem>
+                         <SelectItem value="none">None</SelectItem>
                         {movieGenres.map(g => (
                             <SelectItem key={g.id} value={g.id.toString()}>{g.name}</SelectItem>
                         ))}

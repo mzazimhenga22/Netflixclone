@@ -10,7 +10,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit/zod';
+import { z } from 'zod';
 import { movieGenres } from '@/lib/movieGenres';
 import { tvGenres } from '@/lib/tvGenres';
 
