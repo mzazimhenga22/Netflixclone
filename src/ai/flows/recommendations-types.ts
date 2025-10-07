@@ -23,13 +23,15 @@ export const RecommendationsInputSchema = z.object({
 });
 export type RecommendationsInput = z.infer<typeof RecommendationsInputSchema>;
 
-const CategorySchema = z.object({
-    type: z.enum(['genre', 'trending', 'popular_movies', 'popular_tv', 'search']).describe("The type of category to fetch."),
-    value: z.string().describe("The value for the category (e.g., genre name, search query). For 'trending', 'popular_movies', and 'popular_tv', this can be an empty string."),
+
+const RecommendationCategorySchema = z.object({
+    title: z.string().describe('The user-visible title for the movie row (e.g., "Because You Watched Inception", "Dark Comedies").'),
+    category: z.object({
+        type: z.enum(['genre', 'trending', 'popular_movies', 'popular_tv', 'search']).describe("The type of category to fetch."),
+        value: z.string().describe("The value for the category (e.g., genre name, search query). For 'trending', 'popular_movies', and 'popular_tv', this can be an empty string."),
+    }).describe('The category information used to fetch the movies for this row.'),
 });
 
-export const RecommendationsOutputSchema = z.array(z.object({
-  title: z.string().describe('The user-visible title for the movie row (e.g., "Because You Watched Inception", "Dark Comedies").'),
-  category: CategorySchema.describe('The category information used to fetch the movies for this row.'),
-}));
+
+export const RecommendationsOutputSchema = z.array(RecommendationCategorySchema);
 export type RecommendationsOutput = z.infer<typeof RecommendationsOutputSchema>;
