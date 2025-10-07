@@ -224,7 +224,6 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     return () => window.removeEventListener('keydown', onKey);
   }, [togglePlay, handleSeekRelative, toggleFullscreen, resetControlsTimeout]);
 
-
   return (
     <div ref={playerRef} className={cn("w-full h-screen bg-black flex justify-center items-center relative select-none overflow-hidden", showControls ? "cursor-auto" : "cursor-none")} onDoubleClick={toggleFullscreen}>
       <video ref={videoRef} src={src} className="w-full h-full object-contain" autoPlay onClick={togglePlay}/>
@@ -305,7 +304,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
                 {isTvShow && <button className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><NextEpisodeIcon className="h-6 w-6" /></button>}
                 {isTvShow && <button onClick={() => setIsEpisodesPanelOpen(p => !p)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><EpisodesIcon className="h-6 w-6" /></button>}
                 <button className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><CaptionsIcon className="h-6 w-6" /></button>
-                <button onClick={(e) => toggleFullscreen(e)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full">{isFullscreen ? <FullscreenExitIcon className="h-6 w-6" /> : <FullscreenEnterIcon className="h-6 w-6" /></button>
+                <button onClick={(e) => toggleFullscreen(e)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full">{isFullscreen ? <FullscreenExitIcon className="h-6 w-6" /> : <FullscreenEnterIcon className="h-6 w-6" />}</button>
             </div>
           </div>
         </div>
