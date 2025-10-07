@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, X, RotateCcw, RotateCw } from 'lucide-react';
+import { ArrowLeft, X, RotateCcw, RotateCw, Captions } from 'lucide-react';
 import Image from 'next/image';
 import type { Movie } from '@/types';
 import { useWatchHistory } from '@/hooks/useWatchHistory';
@@ -32,9 +32,6 @@ const FullscreenEnterIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 const FullscreenExitIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M4.5 12.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5H4a.5.5 0 0 0-.5.5v4.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm26 0h3v3h-3v-3ZM28 8h.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4ZM4.5 28.5h4a.5.5 0 0 0 .5-.5v-3.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v3.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm25-1v3h-3v-3h3Zm-4-1h4.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5Z"></path></svg>
-);
-const CaptionsIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M29.13 22.13H6.87a.88.88 0 0 0-.87.88v5.12a.88.88 0 0 0 .87.88h22.26a.88.88 0 0 0 .87-.88v-5.12a.88.88 0 0 0-.87-.88Zm-1 4.25h-6.19v-2.5h6.19Zm-8.7-2.5h6.2v2.5h-6.2Zm-8.67 0h6.19v2.5H10.76Z"></path></svg>
 );
 const EpisodesIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 13V2l-4 4 4 4M20 22h-8M20 18h-8M20 14h-8M4 22h2M4 18h2M4 14h2"/></svg>
@@ -287,7 +284,7 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
                     )}
                     <Popover>
                         <PopoverTrigger asChild>
-                            <button className="text-white h-7 w-7"><CaptionsIcon /></button>
+                            <button className="text-white h-7 w-7"><Captions className="h-7 w-7" /></button>
                         </PopoverTrigger>
                          <PopoverContent className="w-64 bg-black/80 border-white/20 text-white p-2" align="end">
                             <div className="text-center p-2 border-b border-white/20">Audio & Subtitles</div>
