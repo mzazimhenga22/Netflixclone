@@ -2,7 +2,7 @@
 import { ProviderControls, makeControls } from './controls';
 import { getBuiltinEmbeds, getBuiltinExternalSources, getBuiltinSources } from './providers';
 import { Targets, getTargetFeatures } from './targets';
-import { Fetcher } from '../fetchers/types';
+import { Fetcher } from './fetchers/types';
 import { Embed, Sourcerer } from './base';
 import { getProviders } from './get';
 

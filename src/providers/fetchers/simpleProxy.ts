@@ -36,15 +36,16 @@ export function makeSimpleProxyFetcher(proxyUrl: string, f: FetchLike): Fetcher 
         clearTimeout(timeoutId);
 
         // set extra headers that cant normally be accessed
-        res.extraHeaders = new Headers();
+        const extraHeaders = new Headers();
         Object.entries(responseHeaderMap).forEach((entry) => {
           const value = res.headers.get(entry[0]);
           if (!value) return;
-          res.extraHeaders?.set(entry[1].toLowerCase(), value);
+          extraHeaders.set(entry[1].toLowerCase(), value);
         });
+        (res as any).extraHeaders = extraHeaders;
 
         // set correct final url
-        res.extraUrl = res.headers.get('X-Final-Destination') ?? res.url;
+        (res as any).extraUrl = res.headers.get('X-Final-Destination') ?? res.url;
         return res;
       } catch (error: any) {
         if (error.name === 'AbortError') {

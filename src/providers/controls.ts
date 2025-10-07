@@ -5,7 +5,7 @@ import { MetaOutput, getAllEmbedMetaSorted, getAllSourceMetaSorted, getSpecificI
 import { FeatureMap } from './targets';
 import { makeFetcher } from './utils/common';
 import { Fetcher, UseableFetcher } from './fetchers/types';
-import { EmbedOutput, SourcererOutput, Embed, Sourcerer } from './providers/base';
+import { EmbedOutput, SourcererOutput, Embed, Sourcerer } from './base';
 import { scrapeIndividualEmbed, scrapeInvidualSource } from './runners/individualRunner';
 import { RunOutput, runAllProviders } from './runners/runner';
 import { ProviderList } from './get';

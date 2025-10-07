@@ -1,3 +1,4 @@
+
 import { Fetcher, FetcherOptions, UseableFetcher } from '../fetchers/types';
 
 export type FullUrlOptions = Pick<FetcherOptions, 'query' | 'baseUrl'>;
