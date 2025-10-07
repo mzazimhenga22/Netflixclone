@@ -16,7 +16,7 @@ const providers = makeProviders({
   target: targets.NATIVE
 });
 
-export async function getStream(media: Movie): Promise<Stream | null> {
+export async function getStream(media: Movie, season?: number, episode?: number): Promise<Stream | null> {
   try {
     const tmdbId = media.id.toString();
     const releaseYear = new Date(media.release_date || media.first_air_date || '').getFullYear();
@@ -41,19 +41,18 @@ export async function getStream(media: Movie): Promise<Stream | null> {
             title,
             releaseYear,
             tmdbId,
-            // Default to first season, first episode for now
             season: {
-                number: 1,
+                number: season || 1,
                 tmdbId: '', // Not strictly needed by most providers
             },
             episode: {
-                number: 1,
+                number: episode || 1,
                 tmdbId: '', // Not strictly needed by most providers
             },
         };
     }
     
-    console.log(`Searching for stream for: ${title} (${releaseYear})`);
+    console.log(`Searching for stream for: ${title} (${releaseYear})`, scrapeMedia.type === 'tv' ? `S${scrapeMedia.season.number}E${scrapeMedia.episode.number}`: '');
 
     const output = await providers.runAll({
       media: scrapeMedia,

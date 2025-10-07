@@ -2,23 +2,27 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import VideoPlayer from '@/components/watch/VideoPlayer';
 import { getMovieOrTvDetails } from '@/lib/tmdb';
-import { notFound, useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import type { Movie } from '@/types';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import { getStream } from '@/lib/stream';
 import type { Stream } from '@p-stream/providers';
 
-export default function WatchPage() {
+function WatchPageContent() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const [mediaDetails, setMediaDetails] = useState<Movie | null>(null);
   const [stream, setStream] = useState<Stream | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const mediaId = parseInt(params.id as string, 10);
+  const season = searchParams.get('season') ? parseInt(searchParams.get('season') as string, 10) : undefined;
+  const episode = searchParams.get('episode') ? parseInt(searchParams.get('episode') as string, 10) : undefined;
+
 
   useEffect(() => {
     if (isNaN(mediaId)) {
@@ -33,7 +37,7 @@ export default function WatchPage() {
         const details = await getMovieOrTvDetails(mediaId);
         if (details) {
           setMediaDetails(details);
-          const streamData = await getStream(details);
+          const streamData = await getStream(details, season, episode);
           if (streamData) {
             setStream(streamData);
           } else {
@@ -51,7 +55,7 @@ export default function WatchPage() {
     };
 
     fetchDetailsAndStream();
-  }, [mediaId]);
+  }, [mediaId, season, episode]);
 
   if (loading) {
     return (
@@ -98,3 +102,12 @@ export default function WatchPage() {
     />
   );
 }
+
+export default function WatchPage() {
+    return (
+        <Suspense fallback={<div className="flex flex-col items-center justify-center h-screen bg-black"><LoadingSpinner label="Loading player..."/></div>}>
+            <WatchPageContent />
+        </Suspense>
+    );
+}
+

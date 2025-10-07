@@ -142,19 +142,21 @@ const MovieModal = ({ movie, onClose }: MovieModalProps) => {
           </div>
           <div className="space-y-3">
             {episodesPlaceholder.map((ep, index) => (
-              <div key={ep.id} className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer gap-4">
-                <span className="text-xl text-muted-foreground font-bold w-8 text-center">{index + 1}</span>
-                <div className="relative w-40 h-20 rounded-md overflow-hidden flex-shrink-0">
-                    <Image src={ep.thumbnail} alt={ep.title} fill className="object-cover" />
-                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                        <Play className="h-8 w-8 text-white" />
+              <Link href={`/watch/${movie.id}?season=1&episode=${ep.id}`} key={ep.id}>
+                  <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer gap-4">
+                    <span className="text-xl text-muted-foreground font-bold w-8 text-center">{index + 1}</span>
+                    <div className="relative w-40 h-20 rounded-md overflow-hidden flex-shrink-0">
+                        <Image src={ep.thumbnail} alt={ep.title} fill className="object-cover" />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <Play className="h-8 w-8 text-white" />
+                        </div>
                     </div>
-                </div>
-                <div className="flex-grow">
-                    <h4 className="font-bold">{ep.title}</h4>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{ep.description}</p>
-                </div>
-              </div>
+                    <div className="flex-grow">
+                        <h4 className="font-bold">{ep.title}</h4>
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{ep.description}</p>
+                    </div>
+                  </div>
+              </Link>
             ))}
           </div>
         </div>
