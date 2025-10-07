@@ -1,0 +1,255 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user account in the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address.",
+          "format": "email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User's display name."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL of the user's profile picture.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "displayName"
+      ]
+    },
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user profile within the application, allowing multiple profiles per user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user profile."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User. (Relationship: User 1:N UserProfile)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the profile."
+        },
+        "avatar": {
+          "type": "string",
+          "description": "URL or identifier for the profile's avatar image."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "name",
+        "avatar"
+      ]
+    },
+    "Movie": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Movie",
+      "type": "object",
+      "description": "Represents a movie or TV show.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the movie or TV show (likely from TMDB)."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the movie or TV show."
+        },
+        "overview": {
+          "type": "string",
+          "description": "Short description or summary of the movie or TV show."
+        },
+        "posterPath": {
+          "type": "string",
+          "description": "Path to the movie or TV show's poster image."
+        },
+        "releaseDate": {
+          "type": "string",
+          "description": "The date the movie or tv show was released."
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ]
+    },
+    "MyList": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MyList",
+      "type": "object",
+      "description": "Represents a user's list of saved movies and TV shows.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user's list item."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User. (Relationship: User 1:N MyList)"
+        },
+        "movieId": {
+          "type": "string",
+          "description": "Reference to the Movie. (Relationship: Movie 1:N MyList)"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "movieId"
+      ]
+    },
+    "WatchingProgress": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WatchingProgress",
+      "type": "object",
+      "description": "Stores the user's watching progress for a particular movie or episode.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the watching progress entry."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User. (Relationship: User 1:N WatchingProgress)"
+        },
+        "movieId": {
+          "type": "string",
+          "description": "Reference to the Movie. (Relationship: Movie 1:N WatchingProgress)"
+        },
+        "progress": {
+          "type": "number",
+          "description": "The users saved progress in the move or tv show"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "movieId",
+        "progress"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user account information.  The 'userId' is the Firebase Authentication UID.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The Firebase Authentication UID of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "users/{userId}/userProfiles/{profileId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile information. Each user can have multiple profiles. The `userId` is denormalized and used for authorization.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The Firebase Authentication UID of the user."
+            },
+            {
+              "name": "profileId",
+              "description": "The unique identifier for the user profile."
+            }
+          ]
+        }
+      },
+      {
+        "path": "movies/{movieId}",
+        "definition": {
+          "entityName": "Movie",
+          "schema": {
+            "$ref": "#/backend/entities/Movie"
+          },
+          "description": "Stores movie information.  'movieId' is the unique TMDB identifier.",
+          "params": [
+            {
+              "name": "movieId",
+              "description": "The unique identifier for the movie (likely from TMDB)."
+            }
+          ]
+        }
+      },
+      {
+        "path": "users/{userId}/myList/{listItemId}",
+        "definition": {
+          "entityName": "MyList",
+          "schema": {
+            "$ref": "#/backend/entities/MyList"
+          },
+          "description": "Stores the user's list of saved movies and TV shows. The `userId` is denormalized and used for authorization.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The Firebase Authentication UID of the user."
+            },
+            {
+              "name": "listItemId",
+              "description": "The unique identifier for the list item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "users/{userId}/watchingProgress/{progressId}",
+        "definition": {
+          "entityName": "WatchingProgress",
+          "schema": {
+            "$ref": "#/backend/entities/WatchingProgress"
+          },
+          "description": "Stores the user's watching progress for a particular movie or episode. The `userId` is denormalized and used for authorization.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The Firebase Authentication UID of the user."
+            },
+            {
+              "name": "progressId",
+              "description": "The unique identifier for the watching progress entry."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to mirror the relationships between users, profiles, movies, lists, and watching progress in a Netflix-like application. It prioritizes authorization independence and predictable data access patterns.\n\n*   **Users:** User data is stored in a `users` collection, with documents named after the user's UID. This allows for easy retrieval of user-specific information.\n*   **UserProfiles:** Each user can have multiple profiles, which are stored in a subcollection `userProfiles` under each user's document (`users/{userId}/userProfiles/{profileId}`).\n*   **Movies:** Movie data is stored in a top-level `movies` collection, facilitating easy listing and searching of movies.\n*   **MyList:** Each user has a `myList` subcollection (`users/{userId}/myList/{listItemId}`) to store their list of saved movies. This ensures that each list item is tied to a specific user.\n*   **WatchingProgress:** Each user stores their watching progress in a `watchingProgress` subcollection (`users/{userId}/watchingProgress/{progressId}`). This allows tracking of individual user's progress on various movies.\n\n**Authorization Independence and QAPs:**\n\n*   The structure avoids `get()` calls in security rules by using path-based authorization for user-specific data (profiles, lists, watching progress).  Since all the data is nested under the `users/{userId}` path, security rules can simply verify that `request.auth.uid == userId`.\n*   The structure supports secure `list` operations (QAPs) because each collection either contains only documents belonging to a specific user (e.g., `users/{userId}/myList`) or contains public data (e.g., `movies`). This allows rules to limit `list` access based on the path or the user's authentication status."
+  }
+}
