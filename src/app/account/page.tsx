@@ -11,9 +11,9 @@ import Link from 'next/link';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
 export default function AccountPage() {
-    const { profile } = useProfile();
+    const { activeProfile } = useProfile();
 
-    if (!profile) {
+    if (!activeProfile) {
         return (
           <div className="flex items-center justify-center h-screen bg-black">
               <LoadingSpinner />
@@ -35,7 +35,7 @@ export default function AccountPage() {
                         <div className="space-y-4">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <p className="font-bold">{`user${profile.id}@streamclone.com`}</p>
+                                    <p className="font-bold">{`user${activeProfile.id}@streamclone.com`}</p>
                                     <p className="text-gray-500">Password: ********</p>
                                 </div>
                                 <div className='text-right'>
@@ -80,9 +80,9 @@ export default function AccountPage() {
                         <div>
                              <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-4">
-                                    <Image src={profile.avatar} alt={profile.name} width={64} height={64} className="rounded-md" />
+                                    <Image src={activeProfile.avatar} alt={activeProfile.name} width={64} height={64} className="rounded-md" />
                                     <div>
-                                        <p className="font-bold">{profile.name}</p>
+                                        <p className="font-bold">{activeProfile.name}</p>
                                         <p className="text-gray-500 text-sm">All Maturity Ratings</p>
                                     </div>
                                 </div>
