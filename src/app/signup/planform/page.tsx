@@ -1,4 +1,7 @@
 
+"use client";
+
+import { useState } from 'react';
 import Link from 'next/link';
 import SignupHeader from '@/components/shared/SignupHeader';
 import Footer from '@/components/shared/Footer';
@@ -14,13 +17,15 @@ import {
 } from "@/components/ui/table";
 import { cn } from '@/lib/utils';
 
-const plans = [
-    { name: 'Basic', price: '$9.99', quality: 'Good', resolution: '720p', devices: '1', selected: false },
-    { name: 'Standard', price: '$15.49', quality: 'Better', resolution: '1080p', devices: '2', selected: true },
-    { name: 'Premium', price: '$19.99', quality: 'Best', resolution: '4K+HDR', devices: '4', selected: false },
+const plansData = [
+    { name: 'Basic', price: '$9.99', quality: 'Good', resolution: '720p', devices: '1' },
+    { name: 'Standard', price: '$15.49', quality: 'Better', resolution: '1080p', devices: '2' },
+    { name: 'Premium', price: '$19.99', quality: 'Best', resolution: '4K+HDR', devices: '4' },
 ];
 
 export default function PlanFormPage() {
+  const [selectedPlan, setSelectedPlan] = useState('Standard');
+
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
       <SignupHeader />
@@ -41,9 +46,19 @@ export default function PlanFormPage() {
               <TableHeader>
                 <TableRow className="border-b-0">
                   <TableHead className="w-[30%]"></TableHead>
-                  {plans.map((plan) => (
-                    <TableHead key={plan.name} className={cn("text-center p-4", plan.selected && "bg-primary/20")}>
-                        <div className={cn("w-28 h-28 mx-auto flex items-center justify-center font-bold text-xl rounded-md", plan.selected ? "bg-primary text-primary-foreground" : "bg-primary/80 text-primary-foreground/90")}>
+                  {plansData.map((plan) => (
+                    <TableHead 
+                        key={plan.name} 
+                        className={cn(
+                            "text-center p-4 cursor-pointer", 
+                            selectedPlan === plan.name && "bg-primary/20"
+                        )}
+                        onClick={() => setSelectedPlan(plan.name)}
+                    >
+                        <div className={cn(
+                            "w-28 h-28 mx-auto flex items-center justify-center font-bold text-xl rounded-md transition-colors", 
+                            selectedPlan === plan.name ? "bg-primary text-primary-foreground" : "bg-primary/80 text-primary-foreground/90 hover:bg-primary/90"
+                        )}>
                             {plan.name}
                         </div>
                     </TableHead>
@@ -53,26 +68,60 @@ export default function PlanFormPage() {
               <TableBody>
                 <TableRow>
                   <TableCell className="font-medium">Monthly price</TableCell>
-                  {plans.map((plan) => (
-                    <TableCell key={plan.name} className={cn("text-center font-bold", plan.selected && "text-primary")}>{plan.price}</TableCell>
+                  {plansData.map((plan) => (
+                    <TableCell 
+                        key={plan.name} 
+                        className={cn(
+                            "text-center font-bold cursor-pointer", 
+                            selectedPlan === plan.name && "text-primary"
+                        )}
+                        onClick={() => setSelectedPlan(plan.name)}
+                    >
+                        {plan.price}
+                    </TableCell>
                   ))}
                 </TableRow>
                  <TableRow>
                   <TableCell className="font-medium">Video quality</TableCell>
-                  {plans.map((plan) => (
-                    <TableCell key={plan.name} className={cn("text-center font-bold", plan.selected && "text-primary")}>{plan.quality}</TableCell>
+                  {plansData.map((plan) => (
+                    <TableCell 
+                        key={plan.name} 
+                        className={cn(
+                            "text-center font-bold cursor-pointer", 
+                            selectedPlan === plan.name && "text-primary"
+                        )}
+                        onClick={() => setSelectedPlan(plan.name)}
+                    >
+                        {plan.quality}
+                    </TableCell>
                   ))}
                 </TableRow>
                  <TableRow>
                   <TableCell className="font-medium">Resolution</TableCell>
-                  {plans.map((plan) => (
-                    <TableCell key={plan.name} className={cn("text-center font-bold", plan.selected && "text-primary")}>{plan.resolution}</TableCell>
+                  {plansData.map((plan) => (
+                    <TableCell 
+                        key={plan.name} 
+                        className={cn(
+                            "text-center font-bold cursor-pointer", 
+                            selectedPlan === plan.name && "text-primary"
+                        )}
+                        onClick={() => setSelectedPlan(plan.name)}
+                    >
+                        {plan.resolution}
+                    </TableCell>
                   ))}
                 </TableRow>
                  <TableRow>
                   <TableCell className="font-medium">Watch on your TV, computer, mobile phone and tablet</TableCell>
-                  {plans.map((plan) => (
-                    <TableCell key={plan.name} className={cn("text-center", plan.selected && "text-primary")}>
+                  {plansData.map((plan) => (
+                    <TableCell 
+                        key={plan.name} 
+                        className={cn(
+                            "text-center cursor-pointer", 
+                            selectedPlan === plan.name && "text-primary"
+                        )}
+                        onClick={() => setSelectedPlan(plan.name)}
+                    >
                         <div className="flex justify-center items-center gap-2 flex-wrap">
                             <Tv2 className="h-5 w-5" />
                             <Laptop className="h-5 w-5" />
