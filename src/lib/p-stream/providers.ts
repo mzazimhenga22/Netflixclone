@@ -38,7 +38,9 @@ const vidsrcScraper: Source = {
                 const sourcesMatch = scriptContent.match(/sources: (\[.*?\])/);
                 if (sourcesMatch && sourcesMatch[1]) {
                     try {
-                        const sources = JSON.parse(sourcesMatch[1]);
+                        // The matched string is a JavaScript array, not strict JSON, so we need to be careful.
+                        // A common trick is to wrap it in a new Function constructor to evaluate it safely.
+                        const sources = new Function(`return ${sourcesMatch[1]}`)();
                         const hlsSource = sources.find((s: any) => s.file && s.file.includes('.m3u8'));
                         if (hlsSource) {
                             streamUrl = hlsSource.file;
@@ -46,6 +48,7 @@ const vidsrcScraper: Source = {
                         }
                     } catch (e) {
                         // ignore parsing errors
+                        console.error("Failed to parse sources from script tag", e);
                     }
                 }
             }
