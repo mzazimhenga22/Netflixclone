@@ -176,7 +176,11 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
       <div ref={playerRef} className={cn("w-full h-screen bg-black flex justify-center items-center relative select-none overflow-hidden", showControls ? "cursor-auto" : "cursor-none")} onDoubleClick={toggleFullscreen}>
         <video ref={videoRef} src={src} className="w-full h-full object-contain" autoPlay muted onClick={togglePlay}/>
         
-        <PauseDetailsOverlay videoRef={videoRef} media={media} />
+        <PauseDetailsOverlay
+          videoRef={videoRef}
+          media={media}
+          onShowEpisodes={() => setIsEpisodesPanelOpen(true)}
+        />
 
         {/* Center Controls */}
         <div className={cn("absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-12 transition-opacity duration-300", !showControls && "opacity-0 pointer-events-none")}>

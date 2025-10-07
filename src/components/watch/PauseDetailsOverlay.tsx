@@ -4,6 +4,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import type { Movie } from "@/types";
 import Image from 'next/image';
+import { Button } from "../ui/button";
 
 const API_KEY = '1ba41bda48d0f1c90954f4811637b6d6';
 
@@ -11,6 +12,7 @@ interface PauseDetailsOverlayProps {
   videoRef: React.RefObject<HTMLVideoElement>;
   media: Movie;
   delayMs?: number;
+  onShowEpisodes: () => void;
 }
 
 interface TmdbConfig {
@@ -35,6 +37,7 @@ export default function PauseDetailsOverlay({
   videoRef,
   media,
   delayMs = 900,
+  onShowEpisodes,
 }: PauseDetailsOverlayProps) {
   const [isPaused, setIsPaused] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
@@ -130,6 +133,7 @@ export default function PauseDetailsOverlay({
                       buildImageUrl(config, details.poster_path, "w780");
 
   const topCast = (details?.credits?.cast || []).slice(0, 4);
+  const isTvShow = media.media_type === 'tv';
 
   return (
     <div
@@ -152,7 +156,7 @@ export default function PauseDetailsOverlay({
             </div>
 
             <div className="mt-6 mb-8 flex gap-3">
-              <button
+              <Button
                 onClick={(e) => {
                   e.stopPropagation();
                   const v = videoRef?.current;
@@ -162,17 +166,20 @@ export default function PauseDetailsOverlay({
                 className="bg-white text-black px-6 py-2 rounded-md font-bold text-lg hover:bg-white/80 transition-colors"
               >
                 Resume
-              </button>
+              </Button>
 
-              <button
+              <Button
                 onClick={(e) => {
                   e.stopPropagation();
-                  window.open(`https://www.themoviedb.org/${media.media_type}/${media.id}`, "_blank");
+                  if (isTvShow) {
+                    onShowEpisodes();
+                  }
                 }}
-                className="border border-white/50 text-white px-6 py-2 rounded-md font-bold text-lg bg-black/40 hover:bg-white/10 transition-colors"
+                disabled={!isTvShow}
+                className="border border-white/50 text-white px-6 py-2 rounded-md font-bold text-lg bg-black/40 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                More Info
-              </button>
+                {isTvShow ? 'Episodes' : 'More Info'}
+              </Button>
             </div>
 
             <p className="mt-4 text-base lg:text-lg line-clamp-4">{details.overview}</p>
