@@ -1,7 +1,7 @@
 
 
 import { serializeBody } from './body';
-import { makeFullUrl } from './common';
+import { makeFullUrl } from '../utils/common';
 import { FetchLike, FetchReply } from './fetch';
 import { Fetcher } from './types';
 

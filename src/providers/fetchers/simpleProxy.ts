@@ -1,5 +1,5 @@
 
-import { makeFullUrl } from './common';
+import { makeFullUrl } from '../utils/common';
 import { FetchLike } from './fetch';
 import { makeStandardFetcher } from './standardFetch';
 import { Fetcher } from './types';

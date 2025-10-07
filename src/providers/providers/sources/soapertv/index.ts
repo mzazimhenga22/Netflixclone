@@ -1,13 +1,13 @@
 
 import { load } from 'cheerio';
 
-import { flags } from '../../entrypoint/utils/targets';
-import { Caption, labelToLanguageCode } from '../../providers/captions';
-import { Stream } from '../../providers/streams';
-import { compareMedia } from '../../utils/compare';
-import { MovieScrapeContext, ShowScrapeContext } from '../../utils/context';
-import { NotFoundError } from '../../utils/errors';
-import { convertPlaylistsToDataUrls } from '../../utils/playlist';
+import { flags } from '../../../entrypoint/utils/targets';
+import { Caption, labelToLanguageCode } from '../../../providers/captions';
+import { Stream } from '../../../providers/streams';
+import { compareMedia } from '../../../utils/compare';
+import { MovieScrapeContext, ShowScrapeContext } from '../../../utils/context';
+import { NotFoundError } from '../../../utils/errors';
+import { convertPlaylistsToDataUrls } from '../../../utils/playlist';
 
 import { InfoResponse } from './types';
 import { SourcererOutput, makeSourcerer } from '../../base';
