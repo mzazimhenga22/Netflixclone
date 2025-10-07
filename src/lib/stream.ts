@@ -71,15 +71,16 @@ export async function getStream(media: Movie, season?: number, episode?: number)
     }
     
     console.log(`[STREAM] Stream found via source '${output.sourceId}' and embed '${output.embedId}' for: ${title}`);
-    console.log('[STREAM] Stream Details:', output.stream);
 
     return output.stream;
 
   } catch (err) {
     if (err instanceof NotFoundError) {
       console.warn(`[STREAM] Stream not found for ${media.title || media.name}:`, err.message);
-    } else {
+    } else if (err instanceof Error) {
       console.error(`[STREAM] An unexpected error occurred while fetching the stream for ${media.title || media.name}:`, err);
+    } else {
+      console.error(`[STREAM] An unknown error occurred for ${media.title || media.name}:`, err);
     }
     return null;
   }

@@ -1,3 +1,4 @@
+
 import { Fetcher, FetcherOptions, FetcherResponse } from './types';
 
 function a(val: string | number | boolean): string {

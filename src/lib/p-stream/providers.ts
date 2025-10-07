@@ -89,4 +89,3 @@ export const allSources: Source[] = [
 export const allEmbeds: Embed[] = [
     vidsrcEmbed,
 ];
-

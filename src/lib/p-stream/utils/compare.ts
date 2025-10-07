@@ -1,3 +1,4 @@
+
 function getWordCount(text: string): Map<string, number> {
   const words = text
     .toLowerCase()

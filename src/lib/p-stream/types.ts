@@ -23,7 +23,6 @@ export type ScrapeMedia =
 
 export type FetcherOptions = {
   method: 'GET' | 'POST';
-  url: string;
   body?: Record<string, any> | string;
   bodyType?: 'form' | 'json';
   responseType?: 'json' | 'text';
@@ -46,7 +45,7 @@ export type RunnerOptions = {
   proxiedFetcher?: Fetcher;
   media: ScrapeMedia;
   target: string;
-  url?: string;
+  url: string;
   consistentIpForRequests: boolean;
   extra?: Record<string, any>;
   events?: {
@@ -86,7 +85,7 @@ export type Source = {
   name: string;
   rank: number;
   disabled?: boolean;
-  fn: (ops: RunnerOptions) => Promise<SourceOutput>;
+  fn: (ops: Omit<RunnerOptions, 'url'>) => Promise<SourceOutput>;
 };
 
 export type Embed = {
