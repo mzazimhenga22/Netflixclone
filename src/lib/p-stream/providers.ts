@@ -255,7 +255,7 @@ const twoembedScraper: Source = {
             url = `${twoembedBase}/ajax/embed/sources?id=${media.tmdbId}&s=${media.season.number}&e=${media.episode.number}`;
         }
 
-        const sources = await ops.fetcher<{ link: string }>(url, {
+        const sources = await ops.fetcher(url, {
             method: 'GET',
             responseType: 'json',
         });
