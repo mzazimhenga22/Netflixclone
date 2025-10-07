@@ -151,28 +151,7 @@ export default function PauseDetailsOverlay({
                  <span className="text-green-400 font-semibold">{(details.vote_average * 10).toFixed(0)}% Match</span>
             </div>
 
-            <p className="mt-4 text-base lg:text-lg line-clamp-4">{details.overview}</p>
-
-            <div className="mt-8">
-              <h4 className="text-sm uppercase font-semibold text-muted-foreground mb-3">Cast</h4>
-              <div className="flex flex-wrap gap-x-6 gap-y-3">
-                {topCast.map(c => (
-                    <div key={c.cast_id || c.credit_id} className="flex items-center gap-3">
-                         <div className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden flex-shrink-0">
-                            {c.profile_path && config && (
-                                <Image src={`${config.images.secure_base_url}w185${c.profile_path}`} alt={c.name} width={40} height={40} className="object-cover" />
-                            )}
-                        </div>
-                        <div>
-                            <p className="font-semibold text-sm">{c.name}</p>
-                            <p className="text-xs text-muted-foreground">{c.character}</p>
-                        </div>
-                    </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-10 flex gap-3">
+            <div className="mt-6 mb-8 flex gap-3">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -195,6 +174,28 @@ export default function PauseDetailsOverlay({
                 More Info
               </button>
             </div>
+
+            <p className="mt-4 text-base lg:text-lg line-clamp-4">{details.overview}</p>
+
+            <div className="mt-8">
+              <h4 className="text-sm uppercase font-semibold text-muted-foreground mb-3">Cast</h4>
+              <div className="flex flex-wrap gap-x-6 gap-y-3">
+                {topCast.map(c => (
+                    <div key={c.cast_id || c.credit_id} className="flex items-center gap-3">
+                         <div className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden flex-shrink-0">
+                            {c.profile_path && config && (
+                                <Image src={`${config.images.secure_base_url}w185${c.profile_path}`} alt={c.name} width={40} height={40} className="object-cover" />
+                            )}
+                        </div>
+                        <div>
+                            <p className="font-semibold text-sm">{c.name}</p>
+                            <p className="text-xs text-muted-foreground">{c.character}</p>
+                        </div>
+                    </div>
+                ))}
+              </div>
+            </div>
+
         </div>
       </div>
     </div>
