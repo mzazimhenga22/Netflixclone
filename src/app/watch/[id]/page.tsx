@@ -1,8 +1,10 @@
 
+
 import VideoPlayer from '@/components/watch/VideoPlayer';
 import { getMovieOrTvDetails } from '@/lib/tmdb';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import { getStream } from '@/lib/stream';
+import type { Stream } from 'providers';
 
 interface WatchPageParams {
   params: {
@@ -49,13 +51,27 @@ export default async function WatchPage({ params, searchParams }: WatchPageParam
     );
   }
 
-  const videoUrl = stream.qualities[Object.keys(stream.qualities)[0]]?.url;
+  let videoUrl: string | undefined;
+
+  if (stream.type === 'hls') {
+    videoUrl = stream.playlist;
+  } else if (stream.type === 'file') {
+    // Take the best quality available, or the first one
+    const qualityOrder: Array<keyof Stream['qualities']> = ['4k', '1080', '720', '480', '360', 'unknown'];
+    for (const quality of qualityOrder) {
+      if (stream.qualities[quality]) {
+        videoUrl = stream.qualities[quality]?.url;
+        break;
+      }
+    }
+  }
+
 
   if (!videoUrl) {
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-black text-white text-center p-4">
             <h1 className="text-2xl font-bold mb-4">Video Source Not Available</h1>
-            <p className="text-lg text-muted-foreground">A stream was found, but the data is incomplete.</p>
+            <p className="text-lg text-muted-foreground">A stream was found, but the data is incomplete or invalid.</p>
         </div>
     )
   }

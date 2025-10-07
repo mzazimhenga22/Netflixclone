@@ -13,4 +13,5 @@ export interface Movie {
   genre_ids?: number[];
   media_type?: 'movie' | 'tv';
   certification?: string;
+  imdb_id?: string;
 }
