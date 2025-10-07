@@ -12,6 +12,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import NetflixProgress from './NetflixProgress';
+import { Slider } from '@/components/ui/slider';
+
 
 // Custom Netflix-style SVG Icons
 const PlayIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -296,5 +298,3 @@ export default function VideoPlayer({ src, media }: VideoPlayerProps) {
     </Sheet>
   );
 }
-
-    
