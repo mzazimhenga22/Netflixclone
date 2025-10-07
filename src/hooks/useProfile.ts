@@ -57,10 +57,13 @@ export const useProfile = () => {
     const isProfileSetupPage = pathname === '/profiles/setup';
 
     if (isUserLoading || areProfilesLoading) return;
+    
+    // Check localStorage directly to prevent race conditions after setting a profile and redirecting
+    const storedProfileId = typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_PROFILE_KEY) : null;
 
     if (!user && !isPublicPage) {
       router.push('/login');
-    } else if (user && !activeProfile && !isProfileSetupPage) {
+    } else if (user && !activeProfile && !storedProfileId && !isProfileSetupPage) {
       router.push('/profiles/setup');
     }
   }, [user, activeProfile, isUserLoading, areProfilesLoading, pathname, router]);
