@@ -1,22 +1,5 @@
 
-import { Embed, EmbedOutput, Fetcher, RunnerOptions, Source, SourceOutput } from './types';
-
-const providers = new Map<string, Source | Embed>();
-
-export function registerProvider(provider: Source | Embed) {
-  if (providers.has(provider.id)) {
-    throw new Error(`Provider with id ${provider.id} is already registered`);
-  }
-  providers.set(provider.id, provider);
-}
-
-function runSource(runnerOps: RunnerOptions, source: Source): Promise<SourceOutput> {
-  return source.fn(runnerOps);
-}
-
-async function runEmbed(runnerOps: RunnerOptions, embed: Embed): Promise<EmbedOutput> {
-  return embed.fn(runnerOps);
-}
+import { Embed, EmbedRunnerOptions, Fetcher, RunnerOptions, Source, SourceRunnerOptions } from './types';
 
 export function makeProviders(ops: {
   fetcher: Fetcher;
@@ -30,56 +13,62 @@ export function makeProviders(ops: {
   const allEmbeds = ops.embeds ?? [];
 
   return {
-    runAll: async (runnerOps: Pick<RunnerOptions, 'media' | 'extra' | 'events'>) => {
-      const sourcesToRun = allSources.filter((v) => v.rank >= 0).sort((a, b) => b.rank - a.rank);
+    runAll: async (runnerOps: Pick<RunnerOptions, 'media' | 'events'>) => {
+      const sourcesToRun = allSources.filter((v) => !v.disabled).sort((a, b) => b.rank - a.rank);
 
       for (const source of sourcesToRun) {
-        let output: SourceOutput;
+        let output;
         try {
-          output = await runSource(
-            {
-              ...runnerOps,
-              fetcher: ops.fetcher,
-              proxiedFetcher: ops.proxiedFetcher,
-              target: ops.target,
-              consistentIpForRequests: ops.consistentIpForRequests ?? false,
-            },
-            source,
-          );
+          output = await source.fn({
+            ...runnerOps,
+            fetcher: ops.fetcher,
+            proxiedFetcher: ops.proxiedFetcher ?? ops.fetcher,
+            target: ops.target,
+            consistentIpForRequests: ops.consistentIpForRequests ?? false,
+          } as SourceRunnerOptions);
         } catch (err) {
           if (err instanceof Error) runnerOps.events?.onError?.(err);
           continue;
         }
 
-        const embedToRun = allEmbeds.find((embed) => embed.id === output.embedId);
-        if (!embedToRun) {
-          runnerOps.events?.onError?.(new Error(`Source ${source.id} returned embedId that is not registered`));
-          continue;
+        if (output.stream) {
+           return {
+                sourceId: source.id,
+                embedId: null, 
+                stream: output.stream
+            }
         }
 
-        let embedOutput: EmbedOutput;
-        try {
-          embedOutput = await runEmbed(
-            {
-              ...runnerOps,
-              fetcher: ops.fetcher,
-              proxiedFetcher: ops.proxiedFetcher,
-              target: ops.target,
-              url: output.url,
-              consistentIpForRequests: ops.consistentIpForRequests ?? false,
-            },
-            embedToRun,
-          );
-        } catch (err) {
-          if (err instanceof Error) runnerOps.events?.onError?.(err);
-          continue;
-        }
+        for (const embed of output.embeds) {
+            const embedToRun = allEmbeds.find((e) => e.id === embed.embedId);
+            if (!embedToRun) {
+                 runnerOps.events?.onError?.(new Error(`Source ${source.id} returned embedId that is not registered`));
+                 continue;
+            }
 
-        return {
-          sourceId: source.id,
-          embedId: embedToRun.id,
-          stream: embedOutput.stream,
-        };
+            let embedOutput;
+            try {
+                embedOutput = await embedToRun.fn({
+                    ...runnerOps,
+                    fetcher: ops.fetcher,
+                    proxiedFetcher: ops.proxiedFetcher ?? ops.fetcher,
+                    target: ops.target,
+                    url: embed.url,
+                    consistentIpForRequests: ops.consistentIpForRequests ?? false,
+                } as EmbedRunnerOptions);
+            } catch (err) {
+                 if (err instanceof Error) runnerOps.events?.onError?.(err);
+                 continue;
+            }
+
+            if (embedOutput.stream) {
+                 return {
+                    sourceId: source.id,
+                    embedId: embedToRun.id,
+                    stream: embedOutput.stream,
+                };
+            }
+        }
       }
 
       return null;

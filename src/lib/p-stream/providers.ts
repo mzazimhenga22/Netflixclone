@@ -1,30 +1,12 @@
 
 "use client";
 
-// All the providers are stored here
-// A fetcher is a way to get a source, and a source is a place that can provide a stream
-// This is a simplified version of how providers work, but it's good enough for our purposes
+import { makeStandardFetcher } from "./fetchers";
+import { NotFoundError } from "./errors";
+import type { Embed, Source, ScrapeMedia } from "./types";
 
-import {
-    makeStandardFetcher,
-    type Fetcher,
-} from "./fetchers";
+const vidsrcBase = 'https://vidsrc.to';
 
-import {
-    NotFoundError,
-} from "./errors";
-
-import type {
-    Embed,
-    Source,
-} from "./types";
-
-import {
-    compareTitle,
-} from "./utils/compare";
-
-
-// VidSrc is a source that can provide streams
 const vidsrcScraper: Source = {
     id: 'vidsrc',
     name: 'VidSrc',
@@ -32,31 +14,39 @@ const vidsrcScraper: Source = {
     disabled: false,
     async fn(ops) {
         const fetcher = makeStandardFetcher(fetch);
+        
+        const media: ScrapeMedia = ops.media;
 
-        const finalUrl = `https://vidsrc.to/embed/${ops.media.type === 'movie' ? 'movie' : 'tv'}/${ops.media.tmdbId}${ops.media.type === 'tv' ? `/${ops.media.season.number}/${ops.media.episode.number}` : ''}`;
+        let url: string;
+        if (media.type === 'movie') {
+            url = `${vidsrcBase}/embed/movie/${media.tmdbId}`;
+        } else {
+            url = `${vidsrcBase}/embed/tv/${media.tmdbId}/${media.season.number}/${media.episode.number}`;
+        }
 
-        const mainPage = await fetcher(finalUrl, {
+        const mainPage = await fetcher(url, {
             method: 'GET',
             headers: {
-                Referer: 'https://vidsrc.to/',
+                Referer: vidsrcBase + '/',
             }
         });
 
-        // This is a simplified way to get the stream URL, but it works for VidSrc
-        const streamUrl = mainPage.body.match(/src: "([^"]+)"/)?.[1];
+        const streamSrcMatch = mainPage.body.match(/src:\s*"([^"]+)"/);
+        const streamUrl = streamSrcMatch ? streamSrcMatch[1] : null;
 
         if (!streamUrl) {
-            throw new NotFoundError('Could not find stream URL');
+            throw new NotFoundError('Could not find stream URL in VidSrc page');
         }
 
         return {
-            embedId: 'vidsrc-embed',
-            url: streamUrl,
+            embeds: [{
+                embedId: 'vidsrc-embed',
+                url: streamUrl,
+            }],
         }
     }
 };
 
-// This is the embed that VidSrc uses
 const vidsrcEmbed: Embed = {
     id: 'vidsrc-embed',
     name: 'VidSrc Embed',
@@ -64,7 +54,7 @@ const vidsrcEmbed: Embed = {
     async fn(ops) {
         const streamUrl = ops.url;
         if (!streamUrl) {
-            throw new NotFoundError('No stream URL found');
+            throw new NotFoundError('No stream URL found in VidSrc embed operations');
         }
 
         return {
@@ -80,7 +70,6 @@ const vidsrcEmbed: Embed = {
         }
     }
 };
-
 
 export const allSources: Source[] = [
     vidsrcScraper,

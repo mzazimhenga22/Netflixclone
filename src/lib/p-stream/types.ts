@@ -1,4 +1,5 @@
 
+
 export type ScrapeMedia =
   | {
       type: 'movie';
@@ -22,7 +23,7 @@ export type ScrapeMedia =
     };
 
 export type FetcherOptions = {
-  method: 'GET' | 'POST';
+  method?: 'GET' | 'POST';
   body?: Record<string, any> | string;
   bodyType?: 'form' | 'json';
   responseType?: 'json' | 'text';
@@ -40,20 +41,26 @@ export type FetcherResponse = {
 
 export type Fetcher = (url: string, ops: FetcherOptions) => Promise<FetcherResponse>;
 
-export type RunnerOptions = {
+export interface RunnerOptions {
   fetcher: Fetcher;
-  proxiedFetcher?: Fetcher;
+  proxiedFetcher: Fetcher;
   media: ScrapeMedia;
   target: string;
-  url: string;
   consistentIpForRequests: boolean;
-  extra?: Record<string, any>;
   events?: {
     onError?: (error: Error) => void;
   };
-};
+}
 
-type StreamCaption = {
+export interface SourceRunnerOptions extends RunnerOptions {
+  // progress(percent: number): void;
+}
+export interface EmbedRunnerOptions extends RunnerOptions {
+  url: string;
+  headers?: Record<string, string>;
+}
+
+export type StreamCaption = {
   id: string;
   url: string;
   langIso: string;
@@ -65,6 +72,7 @@ export type Stream = {
     [key: string]: {
       type: 'mp4' | 'hls';
       url: string;
+      headers?: Record<string, string>;
     };
   };
   captions: StreamCaption[];
@@ -72,8 +80,11 @@ export type Stream = {
 };
 
 export type SourceOutput = {
-  embedId: string;
-  url: string;
+  embeds: {
+    embedId: string;
+    url: string;
+  }[];
+  stream?: Stream; 
 };
 
 export type EmbedOutput = {
@@ -85,12 +96,12 @@ export type Source = {
   name: string;
   rank: number;
   disabled?: boolean;
-  fn: (ops: Omit<RunnerOptions, 'url'>) => Promise<SourceOutput>;
+  fn: (ops: SourceRunnerOptions) => Promise<SourceOutput>;
 };
 
 export type Embed = {
   id: string;
   name: string;
   disabled?: boolean;
-  fn: (ops: RunnerOptions) => Promise<EmbedOutput>;
+  fn: (ops: EmbedRunnerOptions) => Promise<EmbedOutput>;
 };

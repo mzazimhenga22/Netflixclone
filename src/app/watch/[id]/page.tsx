@@ -1,10 +1,8 @@
 
 import VideoPlayer from '@/components/watch/VideoPlayer';
 import { getMovieOrTvDetails } from '@/lib/tmdb';
-import type { Movie } from '@/types';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import { getStream } from '@/lib/stream';
-import type { Stream } from '@p-stream/providers';
 
 interface WatchPageParams {
   params: {
@@ -51,7 +49,6 @@ export default async function WatchPage({ params, searchParams }: WatchPageParam
     );
   }
 
-  // We should pick the highest quality, but for now we'll just pick the first one
   const videoUrl = stream.qualities[Object.keys(stream.qualities)[0]]?.url;
 
   if (!videoUrl) {
@@ -62,7 +59,6 @@ export default async function WatchPage({ params, searchParams }: WatchPageParam
         </div>
     )
   }
-
 
   return (
     <VideoPlayer

@@ -6,10 +6,8 @@ import type { Movie } from '@/types';
 import type { Stream } from '@/lib/p-stream';
 import { allSources, allEmbeds } from './p-stream/providers';
 
-// this is how the library will make http requests
 const myFetcher = makeStandardFetcher(fetch);
 
-// make an instance of the providers library
 const providers = makeProviders({
   fetcher: myFetcher,
   target: targets.NATIVE,
@@ -39,7 +37,7 @@ export async function getStream(media: Movie, season?: number, episode?: number)
             releaseYear,
             tmdbId,
         };
-    } else { // media_type is 'tv'
+    } else { 
         scrapeMedia = {
             type: 'tv',
             title,
@@ -47,11 +45,11 @@ export async function getStream(media: Movie, season?: number, episode?: number)
             tmdbId,
             season: {
                 number: season || 1,
-                tmdbId: '', // Not strictly needed by most providers
+                tmdbId: '', 
             },
             episode: {
                 number: episode || 1,
-                tmdbId: '', // Not strictly needed by most providers
+                tmdbId: '', 
             },
         };
     }
@@ -68,13 +66,13 @@ export async function getStream(media: Movie, season?: number, episode?: number)
       }
     });
 
-    if (!output) {
+    if (!output || !output.stream) {
       const errorMsg = `No stream found from any provider for: ${title}. ${lastError ? `Last error: ${lastError.message}`: ''}`;
       console.log(`[STREAM] ${errorMsg}`);
       return { stream: null, error: errorMsg };
     }
     
-    console.log(`[STREAM] Stream found via source '${output.sourceId}' and embed '${output.embedId}' for: ${title}`);
+    console.log(`[STREAM] Stream found via source '${output.sourceId}' and embed '${output.embedId || 'none'}' for: ${title}`);
 
     return { stream: output.stream, error: null };
 
