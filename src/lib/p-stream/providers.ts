@@ -14,7 +14,7 @@ const vidsrcScraper: Source = {
   id: 'vidsrc',
   name: 'VidSrc',
   rank: 100,
-  disabled: false,
+  disabled: true,
   async fn(ops) {
     const media: ScrapeMedia = ops.media;
 
@@ -176,7 +176,7 @@ const vidsrcProScraper: Source = {
   id: 'vidsrcpro',
   name: 'VidSrc.pro',
   rank: 90, 
-  disabled: false,
+  disabled: true,
   async fn(ops) {
     const media: ScrapeMedia = ops.media;
     let url: string;
@@ -223,7 +223,7 @@ const superembedScraper: Source = {
   id: 'superembed',
   name: 'SuperEmbed',
   rank: 80,
-  disabled: false,
+  disabled: true,
   async fn(ops) {
     const media: ScrapeMedia = ops.media;
     let url: string;
@@ -243,7 +243,7 @@ const superembedScraper: Source = {
 const twoembedScraper: Source = {
     id: 'twoembed',
     name: '2Embed',
-    rank: 70,
+    rank: 110,
     disabled: false,
     async fn(ops) {
         const media: ScrapeMedia = ops.media;
@@ -258,9 +258,14 @@ const twoembedScraper: Source = {
         const sources = await ops.fetcher(url, {
             method: 'GET',
             responseType: 'json',
+            headers: {
+                'Referer': ops.media.type === 'movie'
+                    ? `${twoembedBase}/embed/movie?tmdb=${ops.media.tmdbId}`
+                    : `${twoembedBase}/embed/tv?tmdb=${ops.media.tmdbId}&s=${ops.media.season.number}&e=${ops.media.episode.number}`,
+            }
         });
         
-        if (!sources.body.link) {
+        if (!sources.body || !sources.body.link) {
             throw new NotFoundError('Could not find player URL on 2embed');
         }
 
@@ -283,7 +288,7 @@ const twoembedPlayer: Embed = {
         });
         
         const m3u8 = iframePage.body.match(/file:\s*"(https?:\/\/[^"]+\.m3u8[^"]*)/);
-        if (!m3u8) throw new NotFoundError('Could not find m3u8 file in 2Embed player');
+        if (!m3u8 || !m3u8[1]) throw new NotFoundError('Could not find m3u8 file in 2Embed player');
 
         return {
             stream: {
@@ -333,3 +338,5 @@ export const allEmbeds: Embed[] = [
     superembedPlayer,
     twoembedPlayer
 ];
+
+    
