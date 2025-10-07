@@ -26,7 +26,7 @@ interface TmdbDetails extends Movie {
 }
 
 
-function buildImageUrl(config: TmdbConfig | null, filePath: string | null | undefined, size = "w780") {
+function buildImageUrl(config: TmdbConfig | null, filePath: string | null | undefined, size = "w1280") {
   if (!filePath || !config) return null;
   return `${config.images.secure_base_url}${size}${filePath}`;
 }
@@ -133,19 +133,17 @@ export default function PauseDetailsOverlay({
 
   return (
     <div
-      className="absolute inset-0 grid grid-cols-1 md:grid-cols-2 pointer-events-auto animate-in fade-in-0 duration-700"
+      className="absolute inset-0 pointer-events-auto animate-in fade-in-0 duration-700"
       style={{ zIndex: 60 }}
       onClick={onClose}
     >
-      <div className="relative h-full w-full">
-        {backdropUrl && (
-            <Image src={backdropUrl} alt={details.title || details.name || 'Backdrop'} fill className="object-cover" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/80 to-black"></div>
-      </div>
+      {backdropUrl && (
+          <Image src={backdropUrl} alt={details.title || details.name || 'Backdrop'} fill className="object-cover" />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-l from-black via-black/70 to-transparent"></div>
       
-      <div className="relative h-full w-full bg-black/80 backdrop-blur-sm p-8 md:p-12 lg:p-16 flex flex-col justify-center">
-        <div className="max-w-xl text-white">
+      <div className="absolute inset-0 flex justify-end items-center">
+         <div className="w-1/2 max-w-2xl text-white p-8 md:p-12 lg:p-16">
             <h2 className="text-3xl lg:text-5xl font-black">{details.title || details.name}</h2>
             <div className="flex items-center gap-4 text-muted-foreground mt-2 text-lg">
                 <span>{details.release_date?.slice(0,4) || details.first_air_date?.slice(0,4)}</span>
