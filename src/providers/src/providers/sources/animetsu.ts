@@ -1,4 +1,3 @@
-
 import { SourcererOutput, makeSourcerer } from '../base';
 import { getAnilistIdFromMedia } from '../../utils/anilist';
 import { MovieScrapeContext, ShowScrapeContext } from '../../utils/context';
