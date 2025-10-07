@@ -4,6 +4,7 @@
 import { makeProviders, makeStandardFetcher, targets, NotFoundError, type ScrapeMedia } from '@/lib/p-stream';
 import type { Movie } from '@/types';
 import type { Stream } from '@/lib/p-stream';
+import { allSources, allEmbeds } from './p-stream/providers';
 
 // this is how the library will make http requests
 const myFetcher = makeStandardFetcher(fetch);
@@ -12,13 +13,9 @@ const myFetcher = makeStandardFetcher(fetch);
 const providers = makeProviders({
   fetcher: myFetcher,
   target: targets.NATIVE,
-  // Add error event listeners for more detailed logging
-  events: {
-    onError(err: Error) {
-      console.error('[STREAM] Provider internal error:', err.message);
-    },
-  },
-} as any);
+  sources: allSources,
+  embeds: allEmbeds,
+});
 
 export async function getStream(media: Movie, season?: number, episode?: number): Promise<Stream | null> {
   try {
