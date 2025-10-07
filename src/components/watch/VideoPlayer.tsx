@@ -9,6 +9,10 @@ import { ArrowLeft, X } from 'lucide-react';
 import Image from 'next/image';
 import type { Movie } from '@/types';
 import { useWatchHistory } from '@/hooks/useWatchHistory';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+
 
 // Custom Netflix-style SVG Icons
 const PlayIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -27,27 +31,19 @@ const FullscreenEnterIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M31.5 8H28V4.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v4H19a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5Zm-2 7h-3V9h3v6Zm-15.5-3H11V8.5a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0-.5.5V12h3.5a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5H5V9h5v5H8.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5ZM13 23.5a.5.5 0 0 0-.5.5V28H8.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5H12v-3.5a.5.5 0 0 0-.5-.5h-3v-5h3.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5H4.5a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5H8v-3.5a.5.5 0 0 0-.5-.5h-3V21h10v3.5a.5.5 0 0 0 .5.5ZM27.5 20h-4a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5H27v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5V24h-3.5a.5.5 0 0 0-.5.5v3h-5v-5h1.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5H20v-3.5a.5.5 0 0 0-.5-.5h-3V21h10v6h-3v-3.5a.5.5 0 0 0-.5-.5Z"></path></svg>
 );
 const FullscreenExitIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M4.5 12.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5H4a.5.5 0 0 0-.5.5v4.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm26 0h3v3h-3v-3ZM28 8h.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4ZM4.5 28.5h4a.5.5 0 0 0 .5-.5v-3.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v3.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm25-1v3h-3v-3h3Zm-4-1h4.5a.5.5 0 0 0 .5-.5v-3.5a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v3.5a.5.5 0 0 0 .5.5Z"></path></svg>
-);
-const EpisodesIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M21 16H3v-2h18v2zm0-4H3v-2h18v2zm0-4H3V6h18v2z"></path></svg>
-);
-const NextEpisodeIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M15.5 15.38V8.62L21 12l-5.5 3.38zM14 12l-5.5-3.38v6.76L14 12zM3 6h2v12H3V6z"></path></svg>
-);
-const CaptionsIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M18 4H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM6 12h2v2H6v-2zm8 6H6v-2h8v2zm0-4H6v-2h8v2z"></path></svg>
+  <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M4.5 12.5h4a.5.5 0 0 0 .5-.5V8.5a.5.5 0 0 0-.5-.5H4a.5.5 0 0 0-.5.5v4.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm26 0h3v3h-3v-3ZM28 8h.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h4ZM4.5 28.5h4a.5.5 0 0 0 .5-.5v-3.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5v3.5a.5.5 0 0 0 .5.5Zm1-4h3v3h-3v-3Zm25-1v3h-3v-3h3Zm-4-1h4.5a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5Z"></path></svg>
 );
 const Rewind10Icon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-        <path d="M12.5,3C7.26,3,3,7.26,3,12.5S7.26,22,12.5,22S22,17.74,22,12.5C22,12.2,22,11.9,21.96,11.61L19.92,13.65C19.97,14.1,20,14.55,20,15c0,4.14-3.36,7.5-7.5,7.5S5,19.14,5,15c0-3.35,2.2-6.18,5.18-7.11L9,9.24V7.11C8.3,7.26,7.66,7.5,7.07,7.81L6.04,6.78C7.38,5.7,8.94,5,10.68,4.56L11,2.5C11.5,2.53,12,2.54,12.5,2.54M10,14H8V12h2.5L10,12.5V10.5h-2V9h4v6h-2V14M16.5,14H13V9h4.5v1.5H14.5v2h1.5V14z" />
-    </svg>
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M12.5 3C7.8 3 3.5 6.3 3.5 11c0 2.8 1.7 5.3 4.2 6.5l-1.5 1.5c-3-1.5-5.2-4.5-5.2-8C1 5.2 5.9 1 12.5 1c5.2 0 9.6 3.3 11.2 7.8l-1.5 1.5C20.8 6.3 17 3 12.5 3z M10.5 10V7h-2v3.5L12 12V10h-1.5z M16.5 10h-3V7h-2v5h5V10z"></path></svg>
 );
-
 const Forward10Icon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-        <path d="M12.5,3C17.74,3,22,7.26,22,12.5S17.74,22,12.5,22S3,17.74,3,12.5c0-0.34,0.03-0.67,0.07-1l2.1,2.1C5.07,13.75,5,14.12,5,14.5c0,4.14,3.36,7.5,7.5,7.5s7.5-3.36,7.5-7.5c0-3.35-2.2-6.18-5.18-7.11L14,9.24V7.11c0.7,0.15,1.34,0.39,1.93,0.71l1.03-1.03C15.62,5.7,14.06,5,12.32,4.56L12,2.5C12.17,2.5,12.33,2.5,12.5,2.5M11,14h2V9h-4.5v1.5H11v2H9V14h2m5.5,0h2V9h-4.5v1.5H16.5v2H15V14h1.5Z" />
-    </svg>
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M12.5 3C7.8 3 3.5 6.3 3.5 11c0 2.8 1.7 5.3 4.2 6.5l-1.5 1.5c-3-1.5-5.2-4.5-5.2-8C1 5.2 5.9 1 12.5 1c5.2 0 9.6 3.3 11.2 7.8l-1.5 1.5C20.8 6.3 17 3 12.5 3z M10.5 10V7h-2v3.5L12 12V10h-1.5z M16.5 10h-3V7h-2v5h5V10z" transform="scale(-1, 1) translate(-24, 0)"></path></svg>
+);
+const CaptionsIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 36 36" fill="currentColor" {...props}><path d="M29.13 22.13H6.87a.88.88 0 0 0-.87.88v5.12a.88.88 0 0 0 .87.88h22.26a.88.88 0 0 0 .87-.88v-5.12a.88.88 0 0 0-.87-.88Zm-1 4.25h-6.19v-2.5h6.19Zm-8.7-2.5h6.2v2.5h-6.2Zm-8.67 0h6.19v2.5H10.76Z"></path></svg>
+);
+const EpisodesIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 13V2l-4 4 4 4M20 22h-8M20 18h-8M20 14h-8M4 22h2M4 18h2M4 14h2"/></svg>
 );
 
 
@@ -58,295 +54,275 @@ interface VideoPlayerProps {
 
 export default function VideoPlayer({ src, media }: VideoPlayerProps) {
   const router = useRouter();
-  const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
-  const controlsTimeoutRef = useRef<number | null>(null);
-  const infoTimeoutRef = useRef<number | null>(null);
-
-  const { history, updateWatchHistory } = useWatchHistory();
-  const watchHistoryItem = history.find(item => item.id === media.id);
-
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [volume, setVolume] = useState(0.5);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [showInfo, setShowInfo] = useState(false);
   const [isEpisodesPanelOpen, setIsEpisodesPanelOpen] = useState(false);
-  
+  const controlsTimeoutRef = useRef<number | null>(null);
+  const infoTimeoutRef = useRef<number | null>(null);
+  const { updateWatchHistory } = useWatchHistory();
+
   const isTvShow = media.media_type === 'tv';
-  const title = media.title || media.name;
-  const description = media.overview;
 
-  // Jump to saved time on initial load
-  useEffect(() => {
-    if (videoRef.current && watchHistoryItem) {
-      videoRef.current.currentTime = watchHistoryItem.progress;
-    }
-  }, [watchHistoryItem]);
-  
-  // Save progress to watch history
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (videoRef.current && !videoRef.current.paused && videoRef.current.duration > 0) {
-        const currentTime = videoRef.current.currentTime;
-        const duration = videoRef.current.duration;
-        // Only save if watched for at least 60s and not finished
-        if (currentTime > 60 && currentTime / duration < 0.98) {
-          updateWatchHistory(media.id, currentTime, duration, media.media_type);
-        }
+  const formatTime = (timeInSeconds: number) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const handleProgress = useCallback(() => {
+    if (videoRef.current) {
+      const currentTime = videoRef.current.currentTime;
+      const duration = videoRef.current.duration;
+      setProgress(currentTime);
+      if (!isNaN(duration)) {
+        setDuration(duration);
       }
-    }, 5000); // Save every 5 seconds
-
-    return () => clearInterval(interval);
+      updateWatchHistory(media.id, currentTime, duration, media.media_type);
+    }
   }, [media.id, media.media_type, updateWatchHistory]);
 
 
-  const formatTime = (seconds: number) => {
-    if (isNaN(seconds)) return '0:00';
-    const date = new Date(seconds * 1000);
-    const hh = date.getUTCHours();
-    const mm = date.getUTCMinutes();
-    const ss = date.getUTCSeconds().toString().padStart(2, '0');
-    if (hh) {
-      return `${hh}:${mm.toString().padStart(2, '0')}:${ss}`;
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+        video.volume = volume;
+        video.muted = isMuted;
+        video.addEventListener('timeupdate', handleProgress);
+        video.addEventListener('loadedmetadata', () => {
+            if (videoRef.current) setDuration(videoRef.current.duration);
+        });
+
+        // Set initial state
+        setIsPlaying(!video.paused);
+        setIsMuted(video.muted);
+        setVolume(video.volume);
     }
-    return `${mm}:${ss}`;
-  };
+    return () => {
+      video?.removeEventListener('timeupdate', handleProgress);
+    };
+  }, [handleProgress, isMuted, volume]);
 
   const resetControlsTimeout = useCallback(() => {
     if (controlsTimeoutRef.current) {
       clearTimeout(controlsTimeoutRef.current);
     }
     setShowControls(true);
-    if (videoRef.current && !videoRef.current.paused) {
-      controlsTimeoutRef.current = window.setTimeout(() => {
-        setShowControls(false);
-        setIsEpisodesPanelOpen(false);
-      }, 4000);
-    }
+    controlsTimeoutRef.current = window.setTimeout(() => {
+      setShowControls(false);
+    }, 4000);
   }, []);
 
-  const handleMouseMove = useCallback(() => {
-    resetControlsTimeout();
-  }, [resetControlsTimeout]);
-
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleTimeUpdate = () => setProgress(video.currentTime);
-    const handleDurationChange = () => setDuration(video.duration || 0);
-    
-    const handlePlay = () => { 
-        setIsPlaying(true); 
-        resetControlsTimeout();
-        if (infoTimeoutRef.current) clearTimeout(infoTimeoutRef.current);
-        setShowInfo(false);
-    };
-
-    const handlePause = () => { 
-        setIsPlaying(false); 
-        if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-        setShowControls(true); 
-        if (infoTimeoutRef.current) clearTimeout(infoTimeoutRef.current);
-        infoTimeoutRef.current = window.setTimeout(() => setShowInfo(true), 2000);
-    };
-
-    video.addEventListener('timeupdate', handleTimeUpdate);
-    video.addEventListener('durationchange', handleDurationChange);
-    video.addEventListener('play', handlePlay);
-    video.addEventListener('pause', handlePause);
-    
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mousedown', handleMouseMove);
-
+    const player = playerRef.current;
+    const handleMouseMove = () => resetControlsTimeout();
+    player?.addEventListener('mousemove', handleMouseMove);
+    resetControlsTimeout(); // Initial timeout
     return () => {
-      video.removeEventListener('timeupdate', handleTimeUpdate);
-      video.removeEventListener('durationchange', handleDurationChange);
-      video.removeEventListener('play', handlePlay);
-      video.removeEventListener('pause', handlePause);
+      player?.removeEventListener('mousemove', handleMouseMove);
       if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
       if (infoTimeoutRef.current) clearTimeout(infoTimeoutRef.current);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mousedown', handleMouseMove);
     };
-  }, [resetControlsTimeout, handleMouseMove]);
-  
-  const togglePlay = useCallback((e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) video.play(); else video.pause();
-  }, []);
+  }, [resetControlsTimeout]);
 
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+        setIsPlaying(true);
+        if (infoTimeoutRef.current) clearTimeout(infoTimeoutRef.current);
+        setShowInfo(false);
+      } else {
+        videoRef.current.pause();
+        setIsPlaying(false);
+        infoTimeoutRef.current = window.setTimeout(() => setShowInfo(true), 2000);
+      }
+    }
+  };
+  
   const handleSeek = (value: number[]) => {
     if (videoRef.current) {
-      videoRef.current.currentTime = value[0];
-      setProgress(value[0]);
+        const newTime = value[0];
+        videoRef.current.currentTime = newTime;
+        setProgress(newTime);
     }
   };
 
-  const handleSeekRelative = useCallback((offset: number, e?: React.MouseEvent) => {
-    e?.stopPropagation();
+  const skip = (amount: number) => {
     if (videoRef.current) {
-      videoRef.current.currentTime = Math.max(0, Math.min(duration, videoRef.current.currentTime + offset));
+      videoRef.current.currentTime += amount;
     }
-  }, [duration]);
-
-  const toggleMute = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    const newMuted = !isMuted;
-    video.muted = newMuted;
-    setIsMuted(newMuted);
   };
 
-  const toggleFullscreen = useCallback((e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    const player = playerRef.current;
-    if (!player) return;
-    if (!document.fullscreenElement) {
-        player.requestFullscreen().catch(err => console.error(err));
-    } else {
-        document.exitFullscreen();
+  const toggleMute = () => {
+    if (videoRef.current) {
+      const newMuted = !videoRef.current.muted;
+      videoRef.current.muted = newMuted;
+      setIsMuted(newMuted);
+      if (!newMuted && videoRef.current.volume === 0) {
+        videoRef.current.volume = 0.5;
+        setVolume(0.5);
+      }
     }
-  }, []);
+  };
+  
+  const handleVolumeChange = (value: number[]) => {
+      if (videoRef.current) {
+          const newVolume = value[0];
+          videoRef.current.volume = newVolume;
+          setVolume(newVolume);
+          if (newVolume > 0 && isMuted) {
+              videoRef.current.muted = false;
+              setIsMuted(false);
+          }
+      }
+  }
 
-  useEffect(() => {
-    const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-        if ((e.target as HTMLElement).tagName === 'INPUT') return;
-        resetControlsTimeout();
-        if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
-        else if (e.key === 'ArrowLeft') handleSeekRelative(-10);
-        else if (e.key === 'ArrowRight') handleSeekRelative(10);
-        else if (e.key.toLowerCase() === 'f') { e.preventDefault(); toggleFullscreen(); }
-        else if (e.key.toLowerCase() === 'm') toggleMute();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [togglePlay, handleSeekRelative, toggleFullscreen, resetControlsTimeout]);
+  const toggleFullscreen = () => {
+    const elem = playerRef.current;
+    if (elem) {
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  };
 
   return (
-    <div ref={playerRef} className={cn("w-full h-screen bg-black flex justify-center items-center relative select-none overflow-hidden", showControls ? "cursor-auto" : "cursor-none")} onDoubleClick={toggleFullscreen}>
-      <video ref={videoRef} src={src} className="w-full h-full object-contain" autoPlay onClick={togglePlay}/>
-      
-      {/* Dimmer & Info Overlay */}
-      <div className={cn('absolute inset-0 bg-black/40 transition-opacity duration-500 z-10', (showControls || !isPlaying) ? 'opacity-100' : 'opacity-0 pointer-events-none')} />
-
-        {/* Info Overlay on Left */}
-        <div className={cn("absolute left-5 md:left-8 bottom-28 md:bottom-32 text-white max-w-md transition-opacity duration-500 z-20", showInfo && !isPlaying ? "opacity-100" : "opacity-0 pointer-events-none")}>
-            {isTvShow && <p className="text-lg">Hometown Cha-Cha-Cha</p> }
-             <div className="flex items-center gap-2 text-sm text-white/80">
-                {isTvShow && <><span>Season 1</span><span className="text-xs">•</span></>}
-                <span>{media.release_date?.substring(0,4) || media.first_air_date?.substring(0,4)}</span>
-                {isTvShow && <span className="text-xs">•</span>}
-                {isTvShow && <span>Drama</span>}
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold my-2">{title}</h1>
-            <p className="text-base text-white/90 line-clamp-3">{description}</p>
-        </div>
+    <Sheet open={isEpisodesPanelOpen} onOpenChange={setIsEpisodesPanelOpen}>
+      <div ref={playerRef} className={cn("w-full h-screen bg-black flex justify-center items-center relative select-none overflow-hidden", showControls ? "cursor-auto" : "cursor-none")} onDoubleClick={toggleFullscreen}>
+        <video ref={videoRef} src={src} className="w-full h-full object-contain" autoPlay muted onClick={togglePlay}/>
         
-      {/* Main Controls Overlay */}
-      <div className={cn('absolute inset-0 transition-opacity duration-500 z-20', (showControls || !isPlaying) ? 'opacity-100' : 'opacity-0 pointer-events-none')} >
-        {/* Top bar */}
-        <div className="absolute top-0 left-0 right-0 p-5 md:p-8 flex items-center justify-between bg-gradient-to-b from-black/50 to-transparent">
-          <button onClick={(e) => { e.stopPropagation(); router.back(); }} className="text-white h-12 w-12 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors">
-            <ArrowLeft className="h-8 w-8" />
-          </button>
-          <div className="flex items-center gap-4">
-             {isTvShow && (
-                 <>
-                    <button className="bg-black/50 border border-white/50 text-white px-4 py-2 rounded-md text-sm flex items-center gap-2 hover:bg-black/80">
-                        Season 1 <svg width="1em" height="1em" viewBox="0 0 24 24" className="ml-2 h-4 w-4"><path fill="currentColor" d="m7 10l5 5l5-5z"></path></svg>
-                    </button>
-                    <button onClick={() => setIsEpisodesPanelOpen(false)} className={cn("text-white h-12 w-12 flex items-center justify-center hover:bg-white/20", isEpisodesPanelOpen ? "visible" : "invisible")}>
-                        <X className="h-8 w-8" />
-                    </button>
-                 </>
-             )}
+        {/* Dimmer & Info Overlay */}
+        <div className={cn("absolute inset-0 bg-black/40 transition-opacity duration-500", isPlaying || !showInfo ? 'opacity-0' : 'opacity-100', showControls && 'opacity-0', 'pointer-events-none')}>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                <h1 className="text-4xl font-bold">{media.title || media.name}</h1>
+                <p className="text-lg text-muted-foreground mt-2 max-w-2xl line-clamp-3">{media.overview}</p>
+            </div>
+        </div>
+
+        {/* Top Controls */}
+        <div className={cn("absolute top-0 left-0 right-0 p-4 bg-gradient-to-b from-black/70 to-transparent transition-transform duration-300", !showControls && "-translate-y-full")}>
+          <div className="flex items-center justify-between">
+            <button onClick={() => router.back()} className="text-white hover:opacity-80 transition-opacity">
+              <ArrowLeft className="h-8 w-8" />
+            </button>
+            <h2 className="text-xl font-bold">{media.title || media.name}</h2>
+            <div>{/* Spacer */}</div>
           </div>
         </div>
         
-        {/* Center Controls */}
-        <div className="absolute inset-0 flex items-center justify-center gap-12" onClick={togglePlay}>
-            <button onClick={(e) => handleSeekRelative(-10, e)} className="text-white/80 hover:text-white transition-transform hover:scale-110 flex items-center justify-center w-16 h-16 rounded-full bg-black/30 backdrop-blur-sm">
-                <Rewind10Icon className="w-8 h-8" />
-            </button>
-            <button className="h-20 w-20 rounded-full flex items-center justify-center transition-transform hover:scale-110 bg-black/30 backdrop-blur-sm ring-2 ring-white/50">
-                {isPlaying ? <PauseIcon className="h-10 w-10 text-white" /> : <PlayIcon className="h-10 w-10 text-white" />}
-            </button>
-            <button onClick={(e) => handleSeekRelative(10, e)} className="text-white/80 hover:text-white transition-transform hover:scale-110 flex items-center justify-center w-16 h-16 rounded-full bg-black/30 backdrop-blur-sm">
-                <Forward10Icon className="w-8 h-8" />
-            </button>
-        </div>
-
-        {/* Bottom Bar */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8 text-white bg-gradient-to-t from-black/50 to-transparent">
-            <div className="flex items-center gap-4 w-full">
-                <span className="text-sm font-medium w-16 text-center">{formatTime(progress)}</span>
-                <Slider 
-                    value={[progress]} 
-                    max={duration} 
-                    step={1} 
-                    onValueChange={handleSeek} 
-                    className="w-full cursor-pointer h-1.5 group/slider"
+        {/* Bottom Controls */}
+        <div className={cn("absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent transition-transform duration-300", !showControls && "translate-y-full")}>
+            {/* Progress Bar */}
+            <div className="flex items-center gap-4 text-sm font-semibold">
+                <span className="w-14 text-right">{formatTime(progress)}</span>
+                 <Slider
+                    defaultValue={[0]}
+                    value={[progress]}
+                    max={duration || 1}
+                    step={1}
+                    onValueChange={handleSeek}
+                    className="w-full"
                 />
-                 <span className="text-sm font-medium w-16 text-center">{formatTime(duration)}</span>
+                <span className="w-14">{formatTime(duration)}</span>
             </div>
 
-          <div className="flex justify-between items-center mt-4">
-             <div className="flex items-center gap-4">
-                 <button onClick={(e) => toggleMute(e)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full">
-                    {isMuted ? <VolumeMutedIcon className="h-6 w-6" /> : <VolumeHighIcon className="h-6 w-6" />}
-                 </button>
-             </div>
-            <div className="flex items-center gap-2">
-                {isTvShow && <button className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><NextEpisodeIcon className="h-6 w-6" /></button>}
-                {isTvShow && <button onClick={() => setIsEpisodesPanelOpen(p => !p)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><EpisodesIcon className="h-6 w-6" /></button>}
-                <button className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full"><CaptionsIcon className="h-6 w-6" /></button>
-                <button onClick={(e) => toggleFullscreen(e)} className="h-10 w-10 flex items-center justify-center hover:bg-white/20 rounded-full">{isFullscreen ? <FullscreenExitIcon className="h-6 w-6" /> : <FullscreenEnterIcon className="h-6 w-6" />}</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Episodes Panel */}
-      {isTvShow && (
-       <div className={cn(
-        'absolute top-0 right-0 h-full w-[420px] bg-black/80 backdrop-blur-md transition-transform duration-500 ease-in-out z-30 p-8 pt-24 overflow-y-auto',
-        isEpisodesPanelOpen ? 'translate-x-0' : 'translate-x-full'
-      )}>
-        <h2 className="text-2xl font-bold text-white mb-6">Episodes</h2>
-        <div className="space-y-4">
-            {[...Array(16)].map((_, i) => (
-                <div key={i} className={cn("flex gap-4 p-2 rounded-md cursor-pointer", i === 10 ? "bg-white/20" : "hover:bg-white/10")}>
-                    <span className="text-xl text-white/80 w-8 text-center pt-1">{i+1}</span>
-                    <div className="relative w-40 h-24 rounded-md overflow-hidden">
-                        <Image src={`https://picsum.photos/seed/ep${i+1}/160/90`} alt={`Episode ${i+1}`} fill objectFit="cover" />
-                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                            <PlayIcon className="h-8 w-8 text-white/80" />
+            {/* Main Controls */}
+            <div className="flex items-center justify-between mt-3">
+                <div className="flex items-center gap-6">
+                    <button onClick={togglePlay} className="text-white h-7 w-7">
+                        {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                    </button>
+                     <div className="flex items-center gap-4">
+                        <button onClick={() => skip(-10)} className="text-white h-7 w-7">
+                            <Rewind10Icon />
+                        </button>
+                        <button onClick={() => skip(10)} className="text-white h-7 w-7">
+                            <Forward10Icon />
+                        </button>
+                    </div>
+                     <div className="flex items-center gap-2 group">
+                        <button onClick={toggleMute} className="text-white h-7 w-7">
+                            {isMuted || volume === 0 ? <VolumeMutedIcon /> : <VolumeHighIcon />}
+                        </button>
+                        <div className="w-24 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <Slider 
+                                defaultValue={[volume]} 
+                                value={[volume]}
+                                max={1}
+                                step={0.1}
+                                onValueChange={handleVolumeChange} 
+                           />
                         </div>
                     </div>
-                    <div className="flex-1 text-white">
-                        <h3 className="font-bold">Episode {i+1}</h3>
-                        <p className="text-sm text-white/70">{i % 2 === 0 ? "45m" : "52m"}</p>
-                    </div>
                 </div>
-            ))}
+                
+                <div className="flex items-center gap-4">
+                    {isTvShow && (
+                         <SheetTrigger asChild>
+                            <button className="text-white h-7 w-7"><EpisodesIcon /></button>
+                        </SheetTrigger>
+                    )}
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <button className="text-white h-7 w-7"><CaptionsIcon /></button>
+                        </PopoverTrigger>
+                         <PopoverContent className="w-64 bg-black/80 border-white/20 text-white p-2" align="end">
+                            <div className="text-center p-2 border-b border-white/20">Audio & Subtitles</div>
+                             <div className="p-2 space-y-2">
+                                <label className="block text-sm text-muted-foreground">Audio</label>
+                                <Button variant="ghost" className="w-full justify-start">English</Button>
+                                <Button variant="ghost" className="w-full justify-start">Español</Button>
+                            </div>
+                            <div className="p-2 space-y-2">
+                                <label className="block text-sm text-muted-foreground">Subtitles</label>
+                                <Button variant="ghost" className="w-full justify-start">Off</Button>
+                                <Button variant="ghost" className="w-full justify-start">English</Button>
+                                <Button variant="ghost" className="w-full justify-start">Español</Button>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                    <button onClick={toggleFullscreen} className="text-white h-7 w-7">
+                        {document.fullscreenElement ? <FullscreenExitIcon /> : <FullscreenEnterIcon />}
+                    </button>
+                </div>
+            </div>
         </div>
       </div>
-       )}
-    </div>
+      <SheetContent className="bg-black/90 border-l border-white/20 text-white w-full sm:max-w-md p-0">
+        <SheetHeader className="p-4 border-b border-white/20">
+          <SheetTitle>Episodes: {media.name}</SheetTitle>
+        </SheetHeader>
+        <div className="p-4 space-y-3">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <div key={index} className="flex items-center p-2 rounded-md hover:bg-white/10 cursor-pointer gap-4">
+              <span className="text-xl text-muted-foreground font-bold w-8 text-center">{index + 1}</span>
+              <div className="relative w-40 h-20 rounded-md overflow-hidden flex-shrink-0">
+                <Image src={`https://picsum.photos/seed/ep${index + (media.id || 0)}/320/180`} alt={`Episode ${index+1}`} fill className="object-cover" />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                  <PlayIcon className="h-8 w-8 text-white" />
+                </div>
+              </div>
+              <div className="flex-grow">
+                <h4 className="font-bold">Episode {index + 1}</h4>
+                <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                  As a crisis looms, the group must make a difficult choice. A surprising ally emerges.
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
-
-    
