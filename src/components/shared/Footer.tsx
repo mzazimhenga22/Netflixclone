@@ -8,7 +8,7 @@ const Footer = () => {
                 <p className="mb-8">Questions? Call <Link href="tel:000-800-919-1694" className="hover:underline">000-800-919-1694</Link></p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-sm">
                     {footerLinks.map((link) => (
-                        <Link href="#" key={link} className="hover:underline">{link}</Link>
+                        <Link href={link === 'Only on StreamClone' ? '/only-on-streamclone' : '#'} key={link} className="hover:underline">{link}</Link>
                     ))}
                 </div>
                 <p className="mt-8 text-sm">StreamClone</p>
