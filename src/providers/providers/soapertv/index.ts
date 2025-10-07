@@ -1,12 +1,12 @@
 import { load } from 'cheerio';
 
-import { flags } from '../../../targets';
+import { flags } from '../../targets';
 import { Caption, labelToLanguageCode } from '../../captions';
 import { Stream } from '../../streams';
-import { compareMedia } from '../../../utils/compare';
-import { MovieScrapeContext, ShowScrapeContext } from '../../../utils/context';
-import { NotFoundError } from '../../../utils/errors';
-import { convertPlaylistsToDataUrls } from '../../../utils/playlist';
+import { compareMedia } from '../../utils/compare';
+import { MovieScrapeContext, ShowScrapeContext } from '../../utils/context';
+import { NotFoundError } from '../../utils/errors';
+import { convertPlaylistsToDataUrls } from '../../utils/playlist';
 
 import { InfoResponse } from './types';
 import { SourcererOutput, makeSourcerer } from '../../base';

@@ -1,52 +1,52 @@
 
-import { Embed, Sourcerer } from '@/providers/base';
-import { doodScraper } from '@/providers/embeds/dood';
-import { mixdropScraper } from '@/providers/embeds/mixdrop';
-import { turbovidScraper } from '@/providers/embeds/turbovid';
-import { upcloudScraper } from '@/providers/embeds/upcloud';
-import { autoembedScraper } from '@/providers/sources/autoembed';
-import { ee3Scraper } from '@/providers/sources/ee3';
-import { fsharetvScraper } from '@/providers/sources/fsharetv';
-import { insertunitScraper } from '@/providers/sources/insertunit';
-import { mp4hydraScraper } from '@/providers/sources/mp4hydra';
-import { nepuScraper } from '@/providers/sources/nepu';
-import { pirxcyScraper } from '@/providers/sources/pirxcy';
-import { tugaflixScraper } from '@/providers/sources/tugaflix';
-import { vidsrcScraper } from '@/providers/sources/vidsrc';
-import { vidsrcvipScraper } from '@/providers/sources/vidsrcvip';
-import { zoechipScraper } from '@/providers/sources/zoechip';
+import { Embed, Sourcerer } from './base';
+import { doodScraper } from './embeds/dood';
+import { mixdropScraper } from './embeds/mixdrop';
+import { turbovidScraper } from './embeds/turbovid';
+import { upcloudScraper } from './embeds/upcloud';
+import { autoembedScraper } from './sources/autoembed';
+import { ee3Scraper } from './sources/ee3';
+import { fsharetvScraper } from './sources/fsharetv';
+import { insertunitScraper } from './sources/insertunit';
+import { mp4hydraScraper } from './sources/mp4hydra';
+import { nepuScraper } from './sources/nepu';
+import { pirxcyScraper } from './sources/pirxcy';
+import { tugaflixScraper } from './sources/tugaflix';
+import { vidsrcScraper } from './sources/vidsrc';
+import { vidsrcvipScraper } from './sources/vidsrcvip';
+import { zoechipScraper } from './sources/zoechip';
 
-import { AnimetsuEmbeds } from '@/providers/embeds/animetsu';
+import { AnimetsuEmbeds } from './embeds/animetsu';
 import {
   autoembedBengaliScraper,
   autoembedEnglishScraper,
   autoembedHindiScraper,
   autoembedTamilScraper,
   autoembedTeluguScraper,
-} from '@/providers/embeds/autoembed';
-import { cinemaosEmbeds, cinemaosHexaEmbeds } from '@/providers/embeds/cinemaos';
-import { closeLoadScraper } from '@/providers/embeds/closeload';
-import { madplayBaseEmbed, madplayNsapiEmbed, madplayNsapiVidFastEmbed, madplayRoperEmbed } from '@/providers/embeds/madplay';
-import { mp4hydraServer1Scraper, mp4hydraServer2Scraper } from '@/providers/embeds/mp4hydra';
-import { myanimedubScraper } from '@/providers/embeds/myanimedub';
-import { myanimesubScraper } from '@/providers/embeds/myanimesub';
-import { ridooScraper } from '@/providers/embeds/ridoo';
-import { streamtapeLatinoScraper, streamtapeScraper } from '@/providers/embeds/streamtape';
-import { streamvidScraper } from '@/providers/embeds/streamvid';
+} from './embeds/autoembed';
+import { cinemaosEmbeds, cinemaosHexaEmbeds } from './embeds/cinemaos';
+import { closeLoadScraper } from './embeds/closeload';
+import { madplayBaseEmbed, madplayNsapiEmbed, madplayNsapiVidFastEmbed, madplayRoperEmbed } from './embeds/madplay';
+import { mp4hydraServer1Scraper, mp4hydraServer2Scraper } from './embeds/mp4hydra';
+import { myanimedubScraper } from './embeds/myanimedub';
+import { myanimesubScraper } from './embeds/myanimesub';
+import { ridooScraper } from './embeds/ridoo';
+import { streamtapeLatinoScraper, streamtapeScraper } from './embeds/streamtape';
+import { streamvidScraper } from './embeds/streamvid';
 import {
   streamwishEnglishScraper,
   streamwishJapaneseScraper,
   streamwishLatinoScraper,
   streamwishSpanishScraper,
-} from '@/providers/embeds/streamwish';
-import { vidCloudScraper } from '@/providers/embeds/vidcloud';
-import { vidifyEmbeds } from '@/providers/embeds/vidify';
+} from './embeds/streamwish';
+import { vidCloudScraper } from './embeds/vidcloud';
+import { vidifyEmbeds } from './embeds/vidify';
 import {
   vidnestAllmoviesEmbed,
   vidnestFlixhqEmbed,
   vidnestHollymoviehdEmbed,
   vidnestOfficialEmbed,
-} from '@/providers/embeds/vidnest';
+} from './embeds/vidnest';
 import {
   VidsrcsuServer10Scraper,
   VidsrcsuServer11Scraper,
@@ -61,37 +61,37 @@ import {
   VidsrcsuServer7Scraper,
   VidsrcsuServer8Scraper,
   VidsrcsuServer9Scraper,
-} from '@/providers/embeds/vidsrcsu';
-import { viperScraper } from '@/providers/embeds/viper';
-import { warezcdnembedHlsScraper } from '@/providers/embeds/warezcdn/hls';
-import { warezcdnembedMp4Scraper } from '@/providers/embeds/warezcdn/mp4';
-import { warezPlayerScraper } from '@/providers/embeds/warezcdn/warezplayer';
-import { zunimeEmbeds } from '@/providers/embeds/zunime';
-import { EightStreamScraper } from '@/providers/sources/8stream';
-import { animeflvScraper } from '@/providers/sources/animeflv';
-import { animetsuScraper } from '@/providers/sources/animetsu';
-import { cinemaosScraper } from '@/providers/sources/cinemaos';
-import { coitusScraper } from '@/providers/sources/coitus';
-import { cuevana3Scraper } from '@/providers/sources/cuevana3';
-import { embedsuScraper } from '@/providers/sources/embedsu';
-import { hdRezkaScraper } from '@/providers/sources/hdrezka';
-import { iosmirrorScraper } from '@/providers/sources/iosmirror';
-import { iosmirrorPVScraper } from '@/providers/sources/iosmirrorpv';
-import { lookmovieScraper } from '@/providers/sources/lookmovie';
-import { madplayScraper } from '@/providers/sources/madplay';
-import { myanimeScraper } from '@/providers/sources/myanime';
-import { nunflixScraper } from '@/providers/sources/nunflix';
-import { rgshowsScraper } from '@/providers/sources/rgshows';
-import { ridooMoviesScraper } from '@/providers/sources/ridomovies';
-import { slidemoviesScraper } from '@/providers/sources/slidemovies';
-import { soaperTvScraper } from '@/providers/sources/soapertv';
-import { streamboxScraper } from '@/providers/sources/streambox';
-import { vidapiClickScraper } from '@/providers/sources/vidapiclick';
-import { vidifyScraper } from '@/providers/sources/vidify';
-import vidnestScraper from '@/providers/sources/vidnest';
-import { warezcdnScraper } from '@/providers/sources/warezcdn';
-import { wecimaScraper } from '@/providers/sources/wecima';
-import { zunimeScraper } from '@/providers/sources/zunime';
+} from './embeds/vidsrcsu';
+import { viperScraper } from './embeds/viper';
+import { warezcdnembedHlsScraper } from './embeds/warezcdn/hls';
+import { warezcdnembedMp4Scraper } from './embeds/warezcdn/mp4';
+import { warezPlayerScraper } from './embeds/warezcdn/warezplayer';
+import { zunimeEmbeds } from './embeds/zunime';
+import { EightStreamScraper } from './sources/8stream';
+import { animeflvScraper } from './sources/animeflv';
+import { animetsuScraper } from './sources/animetsu';
+import { cinemaosScraper } from './sources/cinemaos';
+import { coitusScraper } from './sources/coitus';
+import { cuevana3Scraper } from './sources/cuevana3';
+import { embedsuScraper } from './sources/embedsu';
+import { hdRezkaScraper } from './sources/hdrezka';
+import { iosmirrorScraper } from './sources/iosmirror';
+import { iosmirrorPVScraper } from './sources/iosmirrorpv';
+import { lookmovieScraper } from './sources/lookmovie';
+import { madplayScraper } from './sources/madplay';
+import { myanimeScraper } from './sources/myanime';
+import { nunflixScraper } from './sources/nunflix';
+import { rgshowsScraper } from './sources/rgshows';
+import { ridooMoviesScraper } from './sources/ridomovies';
+import { slidemoviesScraper } from './sources/slidemovies';
+import { soaperTvScraper } from './sources/soapertv';
+import { streamboxScraper } from './sources/streambox';
+import { vidapiClickScraper } from './sources/vidapiclick';
+import { vidifyScraper } from './sources/vidify';
+import vidnestScraper from './sources/vidnest';
+import { warezcdnScraper } from './sources/warezcdn';
+import { wecimaScraper } from './sources/wecima';
+import { zunimeScraper } from './sources/zunime';
 
 export function gatherAllSources(): Array<Sourcerer> {
   // all sources are gathered here
@@ -178,6 +178,9 @@ export function gatherAllEmbeds(): Array<Embed> {
     streamtapeLatinoScraper,
     ...cinemaosEmbeds,
     ...cinemaosHexaEmbeds,
+    // vidsrcNovaEmbed,
+    // vidsrcCometEmbed,
+    // vidsrcPulsarEmbed,
     madplayBaseEmbed,
     madplayNsapiEmbed,
     madplayRoperEmbed,
