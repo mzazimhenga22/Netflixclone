@@ -8,7 +8,7 @@ export type ScrapeMedia =
       tmdbId: string;
     }
   | {
-      type: 'tv';
+      type: 'show';
       title: string;
       releaseYear: number;
       tmdbId: string;

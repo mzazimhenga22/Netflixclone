@@ -36,25 +36,38 @@ export async function getStream(
 
     const scrapeMedia: ScrapeMedia =
       media.media_type === 'movie'
-        ? { type: 'movie', title, releaseYear, tmdbId }
-        : {
-            type: 'tv',
+        ? {
+            type: 'movie',
             title,
             releaseYear,
             tmdbId,
-            season: { number: season || 1, tmdbId: '' },
-            episode: { number: episode || 1, tmdbId: '' },
+          }
+        : {
+            type: 'show',
+            title,
+            releaseYear,
+            tmdbId,
+            season: {
+              number: season || 1,
+              tmdbId: '', // Not all providers need season TMDB ID
+            },
+            episode: {
+              number: episode || 1,
+              tmdbId: '', // Not all providers need episode TMDB ID
+            },
           };
 
     console.log(
       `[STREAM] Searching for stream for: ${title} (${releaseYear})`,
-      scrapeMedia.type === 'tv' ? `S${scrapeMedia.season.number}E${scrapeMedia.episode.number}` : ''
+      scrapeMedia.type === 'show' ? `S${scrapeMedia.season.number}E${scrapeMedia.episode.number}` : ''
     );
 
+    let lastError: Error | null = null;
     const output = await providers.runAll({ 
         media: scrapeMedia,
         events: {
-             onError(err) {
+             onError(err: Error) {
+                 lastError = err;
                  console.error(`[STREAM] Provider error for ${title}:`, err.message);
              },
         }
@@ -65,7 +78,7 @@ export async function getStream(
       return { stream: output.stream, error: null };
     }
 
-    const errorMsg = `No stream found from any provider for: ${title}.`;
+    const errorMsg = lastError?.message || `No stream found from any provider for: ${title}.`;
     console.log(`[STREAM] ${errorMsg}`);
     return { stream: null, error: errorMsg };
 
