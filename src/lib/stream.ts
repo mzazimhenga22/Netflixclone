@@ -2,7 +2,7 @@
 
 'use server';
 
-import { makeProviders, makeStandardFetcher, targets, NotFoundError } from '@/lib/p-stream';
+import { makeProviders, makeStandardFetcher, targets, NotFoundError, type ScrapeMedia } from '@/lib/p-stream';
 import type { Movie } from '@/types';
 import type { Stream } from '@/lib/p-stream';
 
@@ -16,26 +16,47 @@ const providers = makeProviders({
   target: targets.NATIVE
 });
 
-export async function getStream(media: Movie) {
+export async function getStream(media: Movie): Promise<Stream | null> {
   try {
     const tmdbId = media.id.toString();
-    const mediaType = media.media_type;
     const releaseYear = new Date(media.release_date || media.first_air_date || '').getFullYear();
     const title = media.title || media.name || '';
 
-    if (!mediaType || !title || !releaseYear || !tmdbId) {
+    if (!media.media_type || !title || !releaseYear || !tmdbId) {
         throw new Error('Invalid media for stream lookup');
+    }
+
+    let scrapeMedia: ScrapeMedia;
+
+    if (media.media_type === 'movie') {
+        scrapeMedia = {
+            type: 'movie',
+            title,
+            releaseYear,
+            tmdbId,
+        };
+    } else { // media_type is 'tv'
+        scrapeMedia = {
+            type: 'tv',
+            title,
+            releaseYear,
+            tmdbId,
+            // Default to first season, first episode for now
+            season: {
+                number: 1,
+                tmdbId: '', // Not strictly needed by most providers
+            },
+            episode: {
+                number: 1,
+                tmdbId: '', // Not strictly needed by most providers
+            },
+        };
     }
     
     console.log(`Searching for stream for: ${title} (${releaseYear})`);
 
     const output = await providers.runAll({
-      media: {
-        type: mediaType,
-        title,
-        releaseYear,
-        tmdbId
-      },
+      media: scrapeMedia,
     });
 
     if (!output) {
@@ -45,7 +66,6 @@ export async function getStream(media: Movie) {
     
     console.log(`Stream found via ${output.sourceId}:`, output.stream);
 
-    // For now, let's just return the first stream found
     return output.stream;
 
   } catch (err) {
