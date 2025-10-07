@@ -4,15 +4,15 @@
 import { makeProviders, makeStandardFetcher, targets, NotFoundError, type ScrapeMedia } from '@/lib/p-stream';
 import type { Movie } from '@/types';
 import type { Stream } from '@/lib/p-stream';
-import { allSources, allEmbeds } from './p-stream/providers';
+import * as pStreamProviders from './p-stream/providers';
 
 const myFetcher = makeStandardFetcher(fetch);
 
 const providers = makeProviders({
   fetcher: myFetcher,
   target: targets.NATIVE,
-  sources: allSources,
-  embeds: allEmbeds,
+  sources: pStreamProviders.allSources,
+  embeds: pStreamProviders.allEmbeds,
 });
 
 export async function getStream(media: Movie, season?: number, episode?: number): Promise<{ stream: Stream | null; error: string | null; }> {
