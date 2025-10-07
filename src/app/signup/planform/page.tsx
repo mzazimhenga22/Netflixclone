@@ -1,8 +1,9 @@
+
 import Link from 'next/link';
 import SignupHeader from '@/components/shared/SignupHeader';
 import Footer from '@/components/shared/Footer';
 import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
+import { Check, Tv2, Laptop, Smartphone, Tablet } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -72,7 +73,12 @@ export default function PlanFormPage() {
                   <TableCell className="font-medium">Watch on your TV, computer, mobile phone and tablet</TableCell>
                   {plans.map((plan) => (
                     <TableCell key={plan.name} className={cn("text-center", plan.selected && "text-primary")}>
-                        <Check className="h-6 w-6 mx-auto"/>
+                        <div className="flex justify-center items-center gap-2 flex-wrap">
+                            <Tv2 className="h-5 w-5" />
+                            <Laptop className="h-5 w-5" />
+                            <Smartphone className="h-5 w-5" />
+                            <Tablet className="h-5 w-5" />
+                        </div>
                     </TableCell>
                   ))}
                 </TableRow>
