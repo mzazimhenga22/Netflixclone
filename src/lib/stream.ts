@@ -19,6 +19,8 @@ const providers = makeProviders({
   consistentIpForRequests: false,
 });
 
+let lastError: Error | null = null;
+
 export async function getStream(
   media: Movie,
   season?: number,
@@ -61,9 +63,16 @@ export async function getStream(
       media: scrapeMedia,
       events: {
         update(evt) {
+          // evt.error may be many shapes; normalize it to an Error for lastError
           if (evt.status === 'failure' && evt.error) {
-            lastError = evt.error as Error;
-            console.error(`[STREAM] Provider error for ${title}:`, (evt.error as Error).message);
+            const err = evt.error;
+            if (err instanceof Error) {
+              lastError = err;
+            } else {
+              // coerce non-Error to an Error so we consistently have `.message`
+              lastError = new Error(String(err));
+            }
+            console.error(`[STREAM] Provider error for ${title}:`, lastError.message);
           }
         },
       }
@@ -82,16 +91,19 @@ export async function getStream(
 
     return { stream: output.stream as Stream, error: null };
     
-  } catch (err: any) {
+  } catch (err: unknown) {
+    // Treat caught value as unknown and extract message defensively
     let message = 'An unknown error occurred during scraping.';
     if (err instanceof Error) {
       message = err.message;
-      console.error(
-        `[STREAM] An unexpected error occurred while fetching the stream for ${title}:`,
-        err
-      );
+      console.error(`[STREAM] An unexpected error occurred while fetching the stream for ${title}:`, err);
     } else {
-      console.error(`[STREAM] An unknown error occurred for ${title}:`, err);
+      try {
+        message = String(err);
+      } catch {
+        // keep default message
+      }
+      console.error(`[STREAM] An unknown (non-Error) was thrown for ${title}:`, err);
     }
 
     return { stream: null, error: message };
