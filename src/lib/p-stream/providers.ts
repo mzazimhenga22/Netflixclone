@@ -14,7 +14,7 @@ const vidsrcScraper: Source = {
     id: 'vidsrc',
     name: 'VidSrc',
     rank: 100,
-    disabled: false,
+    disabled: true, // Disabling this scraper as it consistently fails
     async fn(ops) {
       const media: ScrapeMedia = ops.media;
   
@@ -238,49 +238,80 @@ const superembedScraper: Source = {
 };
 
 const twoembedScraper: Source = {
-  id: 'twoembed',
-  name: '2Embed',
-  rank: 70,
-  disabled: false,
-  async fn(ops) {
-    const media: ScrapeMedia = ops.media;
-    let url: string;
-    if (media.type === 'movie') {
-      url = `${twoembedBase}/embed/tmdb/movie?id=${media.tmdbId}`;
-    } else {
-      url = `${twoembedBase}/embed/tmdb/tv?id=${media.tmdbId}&s=${media.season.number}&e=${media.episode.number}`;
-    }
-    
-    const mainPage = await ops.fetcher(url, { method: 'GET' });
-    const html = mainPage.body;
-    const $ = cheerio.load(html);
-
-    const playerUrl = $('.play-btn a').attr('href');
-
-    if (!playerUrl) throw new NotFoundError('Could not find player URL on 2embed');
-
-    const playerId = new URL(playerUrl, twoembedBase).searchParams.get('id');
-
-    if (!playerId) throw new NotFoundError('Could not extract player ID from URL');
-
-    const streamDataUrl = `${twoembedBase}/ajax/embed/play?id=${playerId}&_token=2embed`; // Fictional token
-    const streamDataRes = await ops.fetcher(streamDataUrl, { 
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            Referer: url,
+    id: 'twoembed',
+    name: '2Embed',
+    rank: 70,
+    disabled: false,
+    async fn(ops) {
+        const media: ScrapeMedia = ops.media;
+        let url: string;
+        if (media.type === 'movie') {
+            url = `${twoembedBase}/embed/tmdb/movie?id=${media.tmdbId}`;
+        } else {
+            url = `${twoembedBase}/embed/tmdb/tv?id=${media.tmdbId}&s=${media.season.number}&e=${media.episode.number}`;
         }
-    });
+        
+        const mainPage = await ops.fetcher(url, { method: 'GET' });
+        const html = mainPage.body;
+        const $ = cheerio.load(html);
 
-    const streamData = streamDataRes.body;
-    if (!streamData.status || !streamData.link) throw new NotFoundError('Failed to get stream data from 2embed ajax endpoint');
-    
-    return {
-        embeds: [{ embedId: 'twoembed-player', url: streamData.link }],
-        stream: undefined,
-    };
-  },
+        const serverItems = $('.server-item');
+        const embeds = [];
+
+        for (const el of serverItems) {
+            const embedUrl = $(el).attr('data-embed');
+            if (embedUrl) {
+                // This will likely require another step to resolve.
+                // For now, we assume it's an embed that needs another scraper.
+                // We'd need to know what kind of embeds 2embed uses.
+                // Let's assume for now it's a generic player we can handle.
+                embeds.push({
+                    embedId: 'twoembed-player', // A new embed scraper for this
+                    url: `${twoembedBase}${embedUrl}`,
+                });
+            }
+        }
+
+        if (embeds.length === 0) throw new NotFoundError('Could not find any server items on 2embed');
+
+        return {
+            embeds,
+            stream: undefined,
+        };
+    },
 };
+
+const twoembedPlayer: Embed = {
+    id: 'twoembed-player',
+    name: '2Embed Player',
+    async fn(ops) {
+        // The URL from the source scraper is ops.url
+        const iframePage = await ops.fetcher(ops.url, {
+             method: 'GET',
+             headers: {
+                 Referer: twoembedBase,
+             }
+        });
+        
+        // This is a guess, 2embed might have a more complex flow.
+        // It likely has its own player that then loads the final M3U8.
+        const m3u8 = iframePage.body.match(/file:\s*"(https?:\/\/[^"]+\.m3u8[^"]*)/);
+        if (!m3u8) throw new NotFoundError('Could not find m3u8 file in 2Embed player');
+
+        return {
+            stream: {
+                qualities: {
+                    auto: {
+                        type: 'hls',
+                        url: m3u8[1],
+                    },
+                },
+                captions: [],
+            },
+        };
+    }
+};
+
 
 const superembedPlayer: Embed = {
     id: 'superembed-player',
@@ -312,5 +343,6 @@ export const allSources: Source[] = [
 ];
 
 export const allEmbeds: Embed[] = [
-    superembedPlayer
+    superembedPlayer,
+    twoembedPlayer
 ];
