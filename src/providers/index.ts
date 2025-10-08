@@ -4,7 +4,7 @@ export type { Stream, StreamFile, FileBasedStream, HlsBasedStream, Qualities } f
 export type { Fetcher, DefaultedFetcherOptions, FetcherOptions, FetcherResponse } from './fetchers/types';
 export type { RunOutput } from './runners/runner';
 export type { MetaOutput } from './meta';
-export type { FullScraperEvents } from './events';
+export type { FullScraperEvents, UpdateEvent } from './events';
 export type { Targets, Flags } from './targets';
 export type { MediaTypes, ShowMedia, ScrapeMedia, MovieMedia } from './media';
 export type { ProviderControls, RunnerOptions, EmbedRunnerOptions, SourceRunnerOptions } from './controls';
