@@ -1,9 +1,8 @@
-
-import { makeControls } from '@/providers/controls';
-import { getBuiltinEmbeds, getBuiltinExternalSources, getBuiltinSources } from '@/providers/providers';
-import { Targets, getTargetFeatures } from '@/providers/targets';
-import { Fetcher } from '@/providers/fetchers/types';
-import { getProviders } from '@/providers/get';
+import { makeControls } from './controls';
+import { getBuiltinEmbeds, getBuiltinExternalSources, getBuiltinSources } from './providers';
+import { Targets, getTargetFeatures } from './targets';
+import { Fetcher } from './fetchers/types';
+import { getProviders } from './get';
 
 export interface ProviderMakerOptions {
   // fetcher, every web request gets called through here

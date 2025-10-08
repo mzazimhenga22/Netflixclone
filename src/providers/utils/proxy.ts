@@ -1,6 +1,5 @@
-
-import { flags } from '@/providers/targets';
-import { Stream } from '@/providers/streams';
+import { flags } from '../targets';
+import type { Stream } from '../streams';
 
 // Default proxy URL for general purpose proxying
 const DEFAULT_PROXY_URL = 'https://proxy.nsbx.ru/proxy';

@@ -1,10 +1,9 @@
-
-import { ProviderControls, makeControls } from '@/providers/controls';
-import { getBuiltinEmbeds, getBuiltinExternalSources, getBuiltinSources } from '@/providers/providers';
-import { Targets, getTargetFeatures } from '@/providers/targets';
-import { Fetcher } from '@/providers/fetchers/types';
-import { Embed, Sourcerer } from '@/providers/base';
-import { getProviders } from '@/providers/get';
+import { ProviderControls, makeControls } from './controls';
+import { getBuiltinEmbeds, getBuiltinExternalSources, getBuiltinSources } from './providers';
+import { Targets, getTargetFeatures } from './targets';
+import { Fetcher } from './fetchers/types';
+import { Embed, Sourcerer } from './base';
+import { getProviders } from './get';
 
 export type ProviderBuilder = {
   setTarget(target: Targets): ProviderBuilder;

@@ -1,4 +1,3 @@
-
 import { FullScraperEvents, IndividualScraperEvents } from './events';
 import { ScrapeMedia } from './media';
 import { MetaOutput, getAllEmbedMetaSorted, getAllSourceMetaSorted, getSpecificId } from './meta';
@@ -6,7 +5,6 @@ import { FeatureMap } from './targets';
 import { makeFetcher } from './fetchers/common';
 import { Fetcher } from './fetchers/types';
 import { Embed, EmbedOutput, Sourcerer, SourcererOutput } from './base';
-import { ProviderList } from './get';
 import { scrapeIndividualEmbed, scrapeInvidualSource } from './runners/individualRunner';
 import { RunOutput, runAllProviders } from './runners/runner';
 
