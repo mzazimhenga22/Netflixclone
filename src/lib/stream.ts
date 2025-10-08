@@ -1,7 +1,8 @@
 
+
 'use server';
 
-import { makeProviders, makeStandardFetcher, makeSimpleProxyFetcher, targets, type ScrapeMedia, type Stream } from '@/providers';
+import { makeProviders, makeStandardFetcher, makeSimpleProxyFetcher, targets, type ScrapeMedia, type Stream, type UpdateEvent } from '@/providers';
 import type { Movie } from '@/types';
 
 // The proxy is used as a fallback for scrapers that might need it.
@@ -61,7 +62,7 @@ export async function getStream(
     const output = await providers.runAll({
       media: scrapeMedia,
       events: {
-        update(evt) {
+        update(evt: UpdateEvent) {
           // evt.error may be many shapes; normalize it to an Error for lastError
           if (evt.status === 'failure' && evt.error) {
             const err = evt.error;
