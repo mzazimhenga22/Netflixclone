@@ -1,9 +1,8 @@
-
 /* eslint-disable no-console */
-import { flags } from '../../entrypoint/utils/targets';
-import { SourcererOutput, makeSourcerer } from '../base';
-import { MovieScrapeContext, ShowScrapeContext } from '../../utils/context';
-import { NotFoundError } from '../../utils/errors';
+import { flags } from '@/entrypoint/utils/targets';
+import { SourcererOutput, makeSourcerer } from '@/providers/base';
+import { MovieScrapeContext, ShowScrapeContext } from '@/utils/context';
+import { NotFoundError } from '@/utils/errors';
 
 const streamboxBase = 'https://vidjoy.pro/embed/api/fastfetch';
 

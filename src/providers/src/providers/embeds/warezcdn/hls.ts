@@ -1,7 +1,7 @@
-import { flags } from '../../../entrypoint/utils/targets';
-import { makeEmbed } from '../../base';
-import { EmbedScrapeContext } from '../../../utils/context';
-import { NotFoundError } from '../../../utils/errors';
+import { flags } from '@/entrypoint/utils/targets';
+import { makeEmbed } from '@/providers/base';
+import { EmbedScrapeContext } from '@/utils/context';
+import { NotFoundError } from '@/utils/errors';
 
 import { getDecryptedId } from './common';
 

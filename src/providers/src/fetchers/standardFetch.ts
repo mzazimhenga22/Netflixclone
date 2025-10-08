@@ -1,9 +1,7 @@
-
-
-import { serializeBody } from './body';
-import { makeFullUrl } from './common';
-import { FetchLike, FetchReply } from './fetch';
-import { Fetcher } from './types';
+import { serializeBody } from '@/fetchers/body';
+import { makeFullUrl } from '@/fetchers/common';
+import { FetchLike, FetchReply } from '@/fetchers/fetch';
+import { Fetcher } from '@/fetchers/types';
 
 function getHeaders(list: string[], res: FetchReply): Headers {
   const output = new Headers();

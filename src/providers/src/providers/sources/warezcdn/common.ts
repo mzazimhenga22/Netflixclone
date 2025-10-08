@@ -1,5 +1,4 @@
-
-import { ScrapeContext } from '../../../utils/context';
+import { ScrapeContext } from '@/utils/context';
 
 export const warezcdnBase = 'https://embed.warezcdn.link';
 export const warezcdnApiBase = 'https://warezcdn.link/embed';

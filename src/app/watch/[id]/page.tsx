@@ -4,7 +4,7 @@ import VideoPlayer from '@/components/watch/VideoPlayer';
 import { getMovieOrTvDetails } from '@/lib/tmdb';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 import { getStream } from '@/lib/stream';
-import type { Stream } from 'providers';
+import type { Stream } from '@/providers';
 
 interface WatchPageParams {
   params: {

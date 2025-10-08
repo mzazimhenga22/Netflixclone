@@ -1,9 +1,9 @@
 // not a joke, this is a real source
 import { load } from 'cheerio';
 
-import { SourcererEmbed, SourcererOutput, makeSourcerer } from '../../base';
-import { MovieScrapeContext, ShowScrapeContext } from '../../../utils/context';
-import { flags } from '../../../entrypoint/utils/targets';
+import { flags } from '@/entrypoint/utils/targets';
+import { SourcererEmbed, SourcererOutput, makeSourcerer } from '@/providers/base';
+import { MovieScrapeContext, ShowScrapeContext } from '@/utils/context';
 
 async function comboScraper(ctx: ShowScrapeContext | MovieScrapeContext): Promise<SourcererOutput> {
   const embedPage = await ctx.proxiedFetcher(

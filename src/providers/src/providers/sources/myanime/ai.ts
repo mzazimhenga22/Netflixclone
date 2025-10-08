@@ -1,5 +1,5 @@
-import { ShowMedia } from '../../../entrypoint/utils/media';
-import { ScrapeContext } from '../../../utils/context';
+import { ShowMedia } from '@/entrypoint/utils/media';
+import { ScrapeContext } from '@/utils/context';
 
 const GEMINI_BASE_URL = 'https://gemini.aether.mom/v1beta/models/gemini-2.5-flash-lite:generateContent';
 

@@ -1,7 +1,7 @@
-import { flags } from '../../entrypoint/utils/targets';
-import { SourcererOutput, makeSourcerer } from '../base';
-import { MovieScrapeContext, ShowScrapeContext } from '../../utils/context';
-import { NotFoundError } from '../../utils/errors';
+import { flags } from '@/entrypoint/utils/targets';
+import { SourcererOutput, makeSourcerer } from '@/providers/base';
+import { MovieScrapeContext, ShowScrapeContext } from '@/utils/context';
+import { NotFoundError } from '@/utils/errors';
 
 const mamaApiBase = 'https://mama.up.railway.app/api/showbox';
 

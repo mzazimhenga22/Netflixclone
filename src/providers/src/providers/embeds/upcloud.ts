@@ -1,8 +1,8 @@
 import crypto from 'crypto-js';
 
-import { flags } from '../../entrypoint/utils/targets';
-import { makeEmbed } from '../base';
-import { Caption, getCaptionTypeFromUrl, labelToLanguageCode } from '../captions';
+import { flags } from '@/entrypoint/utils/targets';
+import { makeEmbed } from '@/providers/base';
+import { Caption, getCaptionTypeFromUrl, labelToLanguageCode } from '@/providers/captions';
 
 const origin = 'https://rabbitstream.net';
 const referer = 'https://rabbitstream.net/';

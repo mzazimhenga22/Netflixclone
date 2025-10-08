@@ -1,5 +1,5 @@
-import { flags } from '../entrypoint/utils/targets';
-import { Stream } from '../providers/streams';
+import { flags } from '@/entrypoint/utils/targets';
+import { Stream } from '@/providers/streams';
 
 // Default proxy URL for general purpose proxying
 const DEFAULT_PROXY_URL = 'https://proxy.nsbx.ru/proxy';

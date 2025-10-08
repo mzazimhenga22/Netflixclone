@@ -1,8 +1,7 @@
-
-import { makeFullUrl } from './common';
-import { FetchLike } from './fetch';
-import { makeStandardFetcher } from './standardFetch';
-import { Fetcher } from './types';
+import { makeFullUrl } from '@/fetchers/common';
+import { FetchLike } from '@/fetchers/fetch';
+import { makeStandardFetcher } from '@/fetchers/standardFetch';
+import { Fetcher } from '@/fetchers/types';
 
 const headerMap: Record<string, string> = {
   cookie: 'X-Cookie',

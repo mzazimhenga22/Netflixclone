@@ -1,6 +1,5 @@
-
 /* eslint-disable no-console */
-import { NotFoundError } from '../../utils/errors';
+import { NotFoundError } from '@/utils/errors';
 
 import { EmbedOutput, makeEmbed } from '../base';
 

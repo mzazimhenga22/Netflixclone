@@ -1,6 +1,5 @@
-
-import { MovieMedia, ShowMedia } from '../entrypoint/utils/media';
-import { ScrapeContext } from './context';
+import { MovieMedia, ShowMedia } from '@/entrypoint/utils/media';
+import { ScrapeContext } from '@/utils/context';
 
 type JikanAnime = {
   mal_id: number;

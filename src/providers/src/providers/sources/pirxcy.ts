@@ -1,7 +1,7 @@
-import { flags } from '../../entrypoint/utils/targets';
-import { SourcererOutput, makeSourcerer } from '../base';
-import { MovieScrapeContext, ShowScrapeContext } from '../../utils/context';
-import { NotFoundError } from '../../utils/errors';
+import { flags } from '@/entrypoint/utils/targets';
+import { SourcererOutput, makeSourcerer } from '@/providers/base';
+import { MovieScrapeContext, ShowScrapeContext } from '@/utils/context';
+import { NotFoundError } from '@/utils/errors';
 
 const baseUrl = 'https://mbp.pirxcy.dev'; // the dev of this api asked it to be removed. however you can host this endpoint yourself. https://github.com/HyperKiko/mbp-api
 

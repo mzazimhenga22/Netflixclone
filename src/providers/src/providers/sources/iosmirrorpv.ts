@@ -1,12 +1,10 @@
-
-
-import { flags } from '../../entrypoint/utils/targets';
-import { SourcererOutput, makeSourcerer } from '../base';
-import { compareTitle } from '../../utils/compare';
-import { MovieScrapeContext, ShowScrapeContext } from '../../utils/context';
-import { makeCookieHeader } from '../../utils/cookie';
-import { NotFoundError } from '../../utils/errors';
-import { createM3U8ProxyUrl } from '../../utils/proxy';
+import { flags } from '@/entrypoint/utils/targets';
+import { SourcererOutput, makeSourcerer } from '@/providers/base';
+import { compareTitle } from '@/utils/compare';
+import { MovieScrapeContext, ShowScrapeContext } from '@/utils/context';
+import { makeCookieHeader } from '@/utils/cookie';
+import { NotFoundError } from '@/utils/errors';
+import { createM3U8ProxyUrl } from '@/utils/proxy';
 
 // thanks @TPN for this
 // See how to set this up yourself: https://gist.github.com/Pasithea0/9ba31d16580800e899c245a4379e902b

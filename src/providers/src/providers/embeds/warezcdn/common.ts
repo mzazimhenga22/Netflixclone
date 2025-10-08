@@ -1,6 +1,6 @@
-import { warezcdnPlayerBase } from '../../sources/warezcdn/common';
-import { EmbedScrapeContext } from '../../../utils/context';
-import { NotFoundError } from '../../../utils/errors';
+import { warezcdnPlayerBase } from '@/providers/sources/warezcdn/common';
+import { EmbedScrapeContext } from '@/utils/context';
+import { NotFoundError } from '@/utils/errors';
 
 function decrypt(input: string) {
   let output = atob(input);

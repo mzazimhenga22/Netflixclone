@@ -1,6 +1,6 @@
-import { SourcererOutput, makeSourcerer } from '../base';
-import { getAnilistIdFromMedia } from '../../utils/anilist';
-import { MovieScrapeContext, ShowScrapeContext } from '../../utils/context';
+import { SourcererOutput, makeSourcerer } from '@/providers/base';
+import { getAnilistIdFromMedia } from '@/utils/anilist';
+import { MovieScrapeContext, ShowScrapeContext } from '@/utils/context';
 
 async function comboScraper(ctx: ShowScrapeContext | MovieScrapeContext): Promise<SourcererOutput> {
   const anilistId = await getAnilistIdFromMedia(ctx, ctx.media);

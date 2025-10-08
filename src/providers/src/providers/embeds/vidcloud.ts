@@ -1,4 +1,4 @@
-import { makeEmbed } from '../base';
+import { makeEmbed } from '@/providers/base';
 
 import { upcloudScraper } from './upcloud';
 

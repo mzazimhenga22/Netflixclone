@@ -1,9 +1,9 @@
-import { flags } from '../../../entrypoint/utils/targets';
-import { SourcererOutput, makeSourcerer } from '../../base';
-import { getAnilistEnglishTitle } from '../../../utils/anilist';
-import { compareTitle } from '../../../utils/compare';
-import { MovieScrapeContext, ShowScrapeContext } from '../../../utils/context';
-import { NotFoundError } from '../../../utils/errors';
+import { flags } from '@/entrypoint/utils/targets';
+import { SourcererOutput, makeSourcerer } from '@/providers/base';
+import { getAnilistEnglishTitle } from '@/utils/anilist';
+import { compareTitle } from '@/utils/compare';
+import { MovieScrapeContext, ShowScrapeContext } from '@/utils/context';
+import { NotFoundError } from '@/utils/errors';
 
 import { getAiMatching } from './ai';
 

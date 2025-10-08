@@ -1,8 +1,7 @@
-
-import type { ShowMedia } from '../../../entrypoint/utils/media';
-import { SourcererOutput, makeSourcerer } from '../../base';
-import { MovieScrapeContext, ShowScrapeContext } from '../../../utils/context';
-import { NotFoundError } from '../../../utils/errors';
+import type { ShowMedia } from '@/entrypoint/utils/media';
+import { SourcererOutput, makeSourcerer } from '@/providers/base';
+import { MovieScrapeContext, ShowScrapeContext } from '@/utils/context';
+import { NotFoundError } from '@/utils/errors';
 
 import { decode, mirza } from './decrypt';
 

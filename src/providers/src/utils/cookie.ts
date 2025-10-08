@@ -1,6 +1,5 @@
-
-import * as cookie from 'cookie';
-import * as setCookieParser from 'set-cookie-parser';
+import cookie from 'cookie';
+import setCookieParser from 'set-cookie-parser';
 
 export interface Cookie {
   name: string;

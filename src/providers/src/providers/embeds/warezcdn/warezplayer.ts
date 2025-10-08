@@ -1,5 +1,4 @@
-
-import { makeEmbed } from '../../base';
+import { makeEmbed } from '@/providers/base';
 
 export const warezPlayerScraper = makeEmbed({
   id: 'warezplayer',
