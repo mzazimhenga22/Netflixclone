@@ -15,7 +15,7 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner';
 type HistoryMovie = Movie & { watchedAt: number };
 
 export default function ViewingActivityPage() {
-  const { profile } = useProfile();
+  const { activeProfile: profile } = useProfile();
   const { history, removeWatchHistory } = useWatchHistory();
   const [activity, setActivity] = useState<HistoryMovie[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +30,7 @@ export default function ViewingActivityPage() {
       setLoading(true);
       try {
         const moviePromises = history.map(async (item: WatchHistoryItem) => {
-          const details = await getMovieOrTvDetails(item.id, item.media_type);
+          const details = await getMovieOrTvDetails(parseInt(item.id), item.media_type);
           if (details) {
             return { ...details, watchedAt: item.watchedAt };
           }

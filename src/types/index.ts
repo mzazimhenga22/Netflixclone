@@ -1,4 +1,3 @@
-
 export interface Movie {
   id: number;
   title: string;
@@ -14,4 +13,7 @@ export interface Movie {
   media_type?: 'movie' | 'tv';
   certification?: string;
   imdb_id?: string;
+  original_language?: string;
 }
+
+export type TVShow = Movie;

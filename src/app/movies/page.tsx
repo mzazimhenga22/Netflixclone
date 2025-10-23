@@ -61,7 +61,7 @@ export default function MoviesPage() {
           history
             .filter(item => item.media_type === 'movie')
             .map(async (item) => {
-              const movieDetails = await getMovieOrTvDetails(item.id, item.media_type);
+              const movieDetails = await getMovieOrTvDetails(Number(item.id), item.media_type);
               if (movieDetails) {
                 return { ...movieDetails, history: item };
               }

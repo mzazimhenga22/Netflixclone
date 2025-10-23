@@ -1,85 +1,135 @@
+"use client";
 
+import React, { useEffect, useState } from "react";
+import VideoPlayer from "./VideoPlayer";
 
-import VideoPlayer from '@/components/watch/VideoPlayer';
-import { getMovieOrTvDetails } from '@/lib/tmdb';
-import LoadingSpinner from '@/components/shared/LoadingSpinner';
-import { getStream } from '@/lib/stream';
-import type { Stream } from '@/providers';
-
-interface WatchPageParams {
-  params: {
-    id: string;
-  };
-  searchParams: {
-    [key: string]: string | string[] | undefined;
-  };
+interface WatchPageProps {
+  // Next.js may pass `params` as a Promise — unwrap it with React.use() in client components
+  params: Promise<{ id: string }> | { id: string };
 }
 
-export default async function WatchPage({ params, searchParams }: WatchPageParams) {
-  const mediaId = parseInt(params.id, 10);
-  const season = searchParams.season ? parseInt(searchParams.season as string, 10) : undefined;
-  const episode = searchParams.episode ? parseInt(searchParams.episode as string, 10) : undefined;
+/** safe base64 for unicode in browser */
+function base64EncodeBrowser(input: string) {
+  return typeof window !== "undefined"
+    ? btoa(unescape(encodeURIComponent(input)))
+    : Buffer.from(input, "utf8").toString("base64");
+}
 
-  if (isNaN(mediaId)) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen bg-black text-white text-center p-4">
-        <h1 className="text-2xl font-bold mb-4">Playback Error</h1>
-        <p className="text-lg text-muted-foreground">Invalid media ID provided.</p>
-      </div>
-    );
-  }
+/** return proxied URL (keeps data: URLs as-is) */
+function proxiedUrlFor(targetUrl: string) {
+  if (!targetUrl) return targetUrl;
+  if (targetUrl.startsWith("data:")) return targetUrl;
+  // change this to match your proxy path
+  const b64 = base64EncodeBrowser(targetUrl);
+  return `/api/proxy?url=${encodeURIComponent(b64)}`;
+}
 
-  const mediaDetails = await getMovieOrTvDetails(mediaId);
+function extractPlayableUrlFromOutput(output: any): string | undefined {
+  if (!output) return undefined;
 
-  if (!mediaDetails) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen bg-black text-white text-center p-4">
-        <h1 className="text-2xl font-bold mb-4">Playback Error</h1>
-        <p className="text-lg text-muted-foreground">Could not load media details.</p>
-      </div>
-    );
-  }
+  // typical provider shape: output.stream or array
+  const streams = Array.isArray(output.stream) ? output.stream : output.stream ? [output.stream] : [];
 
-  const { stream, error: streamError } = await getStream(mediaDetails, season, episode);
+  for (const s of streams) {
+    if (!s) continue;
 
-  if (streamError || !stream) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen bg-black text-white text-center p-4">
-        <h1 className="text-2xl font-bold mb-4">Playback Error</h1>
-        <p className="text-lg text-muted-foreground">{streamError || "Could not find a video source."}</p>
-      </div>
-    );
-  }
+    // HLS playlist
+    if (s.type === "hls" && s.playlist && typeof s.playlist === "string") {
+      return proxiedUrlFor(s.playlist);
+    }
 
-  let videoUrl: string | undefined;
-
-  if (stream.type === 'hls') {
-    videoUrl = stream.playlist;
-  } else if (stream.type === 'file') {
-    // Take the best quality available, or the first one
-    const qualityOrder: Array<keyof Stream['qualities']> = ['4k', '1080', '720', '480', '360', 'unknown'];
-    for (const quality of qualityOrder) {
-      if (stream.qualities[quality]) {
-        videoUrl = stream.qualities[quality]?.url;
-        break;
+    // file stream (qualities)
+    if (s.type === "file" && s.qualities && typeof s.qualities === "object") {
+      const qkeys = Object.keys(s.qualities);
+      if (qkeys.length) {
+        // try common keys first
+        const pick = s.qualities["1080p"]?.url ?? s.qualities["1080"]?.url ?? s.qualities[qkeys[0]]?.url;
+        if (pick) return proxiedUrlFor(pick);
       }
+    }
+
+    // sometimes providers return { playlist: "...", type: "hls" } directly
+    if (s.playlist && typeof s.playlist === "string") {
+      return proxiedUrlFor(s.playlist);
     }
   }
 
-
-  if (!videoUrl) {
-    return (
-        <div className="flex flex-col items-center justify-center h-screen bg-black text-white text-center p-4">
-            <h1 className="text-2xl font-bold mb-4">Video Source Not Available</h1>
-            <p className="text-lg text-muted-foreground">A stream was found, but the data is incomplete or invalid.</p>
-        </div>
-    )
+  // fallback: top-level output.playlist
+  if (output.playlist && typeof output.playlist === "string") {
+    return proxiedUrlFor(output.playlist);
   }
 
-  return (
-    <VideoPlayer
-      src={videoUrl}
-      media={mediaDetails}
-    />
-  );
+  return undefined;
 }
+
+const WatchPage: React.FC<WatchPageProps> = ({ params }) => {
+  // `params` can be a Promise in newer Next.js versions. Use React.use() to unwrap if needed.
+  // Use a safe typed unwrap so TypeScript doesn't complain about the experimental `use` hook.
+  const realParams = (React as any).use ? (React as any).use(params) : params;
+  const { id } = realParams as { id: string };
+
+  const [videoSrc, setVideoSrc] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchVideoSource = async () => {
+      setLoading(true);
+      setError(null);
+      setVideoSrc(null);
+
+      try {
+        const res = await fetch("/api/scrape", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          // server expects a `media` object
+          body: JSON.stringify({ media: { type: "movie", tmdbId: id } }),
+        });
+
+        if (!res.ok) {
+          const txt = await res.text().catch(() => "");
+          throw new Error(`Scrape failed: ${res.status} ${txt || res.statusText}`);
+        }
+
+        const json = await res.json();
+
+        // debug: print full provider output
+        console.log("scrape response (watchpage):", json);
+
+        if (!json?.ok || !json?.output) throw new Error("No streams found");
+
+        const playable = extractPlayableUrlFromOutput(json.output);
+
+        // debug: show what URL we will try to load
+        console.log("playable URL extracted:", playable);
+
+        if (!playable) throw new Error("No playable stream found in output");
+
+        if (mounted) setVideoSrc(playable);
+      } catch (err) {
+        if (mounted) setError(err instanceof Error ? err.message : String(err));
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    if (id) fetchVideoSource();
+
+    return () => {
+      mounted = false;
+    };
+  }, [id]);
+
+  if (loading) return <div className="p-4 text-white">Loading...</div>;
+  if (error) return <div className="p-4 text-red-400">Error: {error}</div>;
+
+  return (
+    <div className="w-full h-[80vh] flex justify-center items-center bg-black">
+      {videoSrc ? <VideoPlayer src={videoSrc} /> : <div className="text-white">No source</div>}
+    </div>
+  );
+};
+
+export default WatchPage;

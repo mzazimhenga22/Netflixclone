@@ -21,7 +21,7 @@ const fetchAndHydrate = async (movieList: Movie[]): Promise<Movie[]> => {
 };
 
 function SearchResults() {
-  const { profile } = useProfile();
+  const { activeProfile: profile } = useProfile();
   const searchParams = useSearchParams();
   const query = searchParams.get('q');
   const [results, setResults] = useState<Movie[]>([]);
