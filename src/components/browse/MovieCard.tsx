@@ -43,37 +43,30 @@ export default function MovieCard({ movie }: MovieCardProps) {
     return null;
   };
 
-  const calculatePosition = () => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-  
-    const scale = 1.5;
-    const scaledWidth = rect.width * scale;
-    const scaledHeight = rect.height * scale;
+const calculatePosition = () => {
+  const rect = cardRef.current?.getBoundingClientRect();
+  if (!rect) return;
 
-    const cardCenterX = rect.left + rect.width / 2;
-    const cardCenterY = rect.top + rect.height / 2;
+  const { top, left, width, height } = rect;
+  const scale = 1.5; // how much it zooms out
+  const scaledWidth = width * scale;
+  const scaledHeight = height * scale;
 
-    let left = cardCenterX - scaledWidth / 2;
-    let top = cardCenterY - scaledHeight / 2;
+  // Center the zoomed card over the original card
+  const centerX = left + width / 2;
+  const centerY = top + height / 2;
 
-    const scrollable = findScrollableAncestor(cardRef.current);
-    const viewportRect = scrollable ? scrollable.getBoundingClientRect() : { left: 0, width: window.innerWidth, top: 0, height: window.innerHeight };
+  const newLeft = centerX - scaledWidth / 2 + window.scrollX;
+  const newTop = centerY - scaledHeight / 2 + window.scrollY - 40; // lift upward slightly
 
-    const margin = 20;
-    const viewportLeft = (viewportRect.left ?? 0) + margin;
-    const viewportRight = (viewportRect.left ?? 0) + (viewportRect.width ?? window.innerWidth) - margin;
+  setPosition({
+    top: newTop,
+    left: newLeft,
+    width: scaledWidth,
+    height: scaledHeight,
+  });
+};
 
-    if (left < viewportLeft) left = viewportLeft;
-    if (left + scaledWidth > viewportRight) left = Math.max(viewportRight - scaledWidth, viewportLeft);
-    
-    setPosition({ 
-      top: top + window.scrollY, 
-      left: left + window.scrollX, 
-      width: scaledWidth, 
-      height: scaledHeight 
-    });
-  };
 
   const scheduleShow = () => {
     if (isModalOpen) return; // Do not show preview if modal is open
@@ -200,75 +193,106 @@ export default function MovieCard({ movie }: MovieCardProps) {
         createPortal(
           <AnimatePresence>
             {showPreview && position && (
-              <motion.div
-                {...motionSettings}
-                onMouseEnter={handleOverlayEnter}
-                onMouseLeave={handleOverlayLeave}
-                style={{
-                  position: "absolute",
-                  top: position.top,
-                  left: position.left,
-                  width: position.width,
-                  height: 'auto',
-                  zIndex: 9999,
-                  willChange: "transform, opacity",
-                  transformOrigin: "center center",
-                }}
-                className="bg-zinc-900/95 backdrop-blur-sm rounded-xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.6)] overflow-hidden ring-1 ring-white/10 flex flex-col"
-                role="dialog"
-                aria-label={`${movie.title || movie.name} preview`}
-              >
-                <div className="relative w-full aspect-video cursor-pointer" onClick={handleOpenModal}>
-                    <StatusBadge movie={movie} />
-                    <Image
-                      src={posterUrl}
-                      alt={`${movie.title || movie.name} preview`}
-                      fill
-                      className="object-cover w-full h-full transition-all duration-300 ease-in-out"
-                    />
-                </div>
+          <motion.div
+  {...motionSettings}
+  onMouseEnter={handleOverlayEnter}
+  onMouseLeave={handleOverlayLeave}
+  transition={{
+    duration: 0.55,
+    ease: [0.25, 0.1, 0.25, 1], // smoother, more cinematic
+  }}
+  style={{
+    position: "absolute",
+    top: position.top,
+    left: position.left,
+    width: position.width,
+    height: "auto",
+    zIndex: 9999,
+    willChange: "transform, opacity",
+    transformOrigin: "center center",
+  }}
+  className="bg-zinc-900/95 backdrop-blur-sm rounded-xl shadow-[0_12px_40px_-10px_rgba(0,0,0,0.6)] overflow-hidden ring-1 ring-white/10 flex flex-col"
+  role="dialog"
+  aria-label={`${movie.title || movie.name} preview`}
+>
+  <div
+    className="relative w-full aspect-video cursor-pointer"
+    onClick={handleOpenModal}
+  >
+    <StatusBadge movie={movie} />
+    <Image
+      src={posterUrl}
+      alt={`${movie.title || movie.name} preview`}
+      fill
+      className="object-cover w-full h-full transition-all duration-300 ease-in-out"
+    />
+  </div>
 
-                <div className="p-3 bg-zinc-900 text-white flex-grow flex flex-col justify-between">
-                   <div className="flex-grow">
-                    <div className="flex items-center gap-2">
-                      <Button size="icon" className="h-9 w-9 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform">
-                        <Play className="h-5 w-5 fill-black" />
-                      </Button>
+  <div className="p-3 bg-zinc-900 text-white flex-grow flex flex-col justify-between">
+    <div className="flex-grow">
+      <div className="flex items-center gap-2">
+        <Button
+          size="icon"
+          className="h-9 w-9 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform"
+        >
+          <Play className="h-5 w-5 fill-black" />
+        </Button>
 
-                      <Button onClick={handleToggleList} size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
-                        {isInList ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
-                      </Button>
+        <Button
+          onClick={handleToggleList}
+          size="icon"
+          variant="outline"
+          className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform"
+        >
+          {isInList ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+        </Button>
 
-                      <Button size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
-                        <ThumbsUp className="h-5 w-5" />
-                      </Button>
+        <Button
+          size="icon"
+          variant="outline"
+          className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform"
+        >
+          <ThumbsUp className="h-5 w-5" />
+        </Button>
 
-                      <div className="ml-auto">
-                        <Button onClick={handleOpenModal} size="icon" variant="outline" className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform">
-                          <ChevronDown className="h-5 w-5" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+        <div className="ml-auto">
+          <Button
+            onClick={handleOpenModal}
+            size="icon"
+            variant="outline"
+            className="h-9 w-9 rounded-full border-white/40 text-white bg-black/40 hover:border-white hover:scale-105 transition-transform"
+          >
+            <ChevronDown className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+    </div>
 
-                  <div className="space-y-1 mt-2">
-                    <div className="flex items-center gap-3 text-sm text-white/80">
-                      <span className="text-green-400 font-semibold">{movie.vote_average.toFixed(1)}/10 Rating</span>
-                      <span className="border px-1 text-[11px] rounded-sm">16+</span>
-                      <span>{movie.release_date?.substring(0,4)}</span>
-                    </div>
+    <div className="space-y-1 mt-2">
+      <div className="flex items-center gap-3 text-sm text-white/80">
+        <span className="text-green-400 font-semibold">
+          {movie.vote_average.toFixed(1)}/10 Rating
+        </span>
+        <span className="border px-1 text-[11px] rounded-sm">16+</span>
+        <span>{movie.release_date?.substring(0, 4)}</span>
+      </div>
 
-                    <div className="flex flex-wrap items-center gap-1.5 text-xs text-white/70">
-                       {getGenreNames(movie.genre_ids).slice(0,3).map((genreName, index, arr) => (
-                          <React.Fragment key={genreName}>
-                            <span>{genreName}</span>
-                            {index < arr.length - 1 && <span className="text-white/40 text-[8px]">&#9679;</span>}
-                          </React.Fragment>
-                       ))}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+      <div className="flex flex-wrap items-center gap-1.5 text-xs text-white/70">
+        {getGenreNames(movie.genre_ids)
+          .slice(0, 3)
+          .map((genreName, index, arr) => (
+            <React.Fragment key={genreName}>
+              <span>{genreName}</span>
+              {index < arr.length - 1 && (
+                <span className="text-white/40 text-[8px]">&#9679;</span>
+              )}
+            </React.Fragment>
+          ))}
+      </div>
+    </div>
+  </div>
+</motion.div>
+
             )}
           </AnimatePresence>,
           document.body

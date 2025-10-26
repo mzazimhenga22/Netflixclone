@@ -13,6 +13,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "placehold.co", pathname: "/**" },
@@ -20,14 +21,18 @@ const nextConfig = {
       { protocol: "https", hostname: "picsum.photos", pathname: "/**" },
       { protocol: "https", hostname: "image.tmdb.org", pathname: "/**" },
       { protocol: "https", hostname: "firebasestorage.googleapis.com", pathname: "/**" },
+
+      // ✅ Added Netflix background image domain
+      { protocol: "https", hostname: "assets.nflxext.com", pathname: "/**" },
     ],
   },
 
-  // ✅ New stable location for Turbopack settings
+  // ✅ Turbopack-compatible placeholder (safe default)
   turbopack: {
-    rules: {}, // empty object = safe neutral config
+    rules: {},
   },
 
+  // ✅ Preserve your React Native alias
   webpack: (config) => {
     config.resolve.alias["react-native"] = path.resolve(
       __dirname,
