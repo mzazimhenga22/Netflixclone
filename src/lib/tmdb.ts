@@ -48,6 +48,7 @@ async function fetchFromTmdb<T>(
   return enqueueRequest(async () => {
     try {
       const res = await fetch(url);
+
       if (res.status === 429) {
         const wait = Math.min(2000 * attempt, 10000);
         console.warn(`⚠️ TMDB rate limit hit. Retrying in ${wait}ms...`);
@@ -56,10 +57,23 @@ async function fetchFromTmdb<T>(
       }
 
       if (!res.ok) {
+        // Treat 404 as a normal "missing resource" — cache an empty/fallback result and warn (not error).
+        if (res.status === 404) {
+          console.warn(`TMDB 404 for ${endpoint}`);
+          const empty = isSingleItem ? (null as T) : ([] as T[]);
+          cache.set(cacheKey, empty);
+          return empty;
+        }
+
+        // For other errors, log and return a safe fallback (so server won't throw).
         console.error(`Failed to fetch from ${endpoint}:`, res.status, res.statusText);
-        const errorBody = await res.text();
-        console.error('Error body:', errorBody);
-        return isSingleItem ? (null as T) : ([] as T[]);
+        try {
+          const errorBody = await res.text();
+          console.error('Error body:', errorBody);
+        } catch {}
+        const fallback = isSingleItem ? (null as T) : ([] as T[]);
+        cache.set(cacheKey, fallback);
+        return fallback;
       }
 
       const data = await res.json();
@@ -68,7 +82,9 @@ async function fetchFromTmdb<T>(
       return result;
     } catch (error) {
       console.error(`Error fetching from ${endpoint}:`, error);
-      return isSingleItem ? (null as T) : ([] as T[]);
+      const fallback = isSingleItem ? (null as T) : ([] as T[]);
+      cache.set(cacheKey, fallback);
+      return fallback;
     }
   });
 }
@@ -174,7 +190,7 @@ async function getCertification(id: number, mediaType: 'movie' | 'tv'): Promise<
       return usRating?.rating || undefined;
     }
   } catch (error) {
-    console.error(`Failed to fetch certification for ${mediaType} ${id}:`, error);
+    console.warn(`Failed to fetch certification for ${mediaType} ${id}:`, error);
     return undefined;
   }
 }
