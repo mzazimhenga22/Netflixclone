@@ -37,6 +37,10 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
+    // Disable Next.js image optimization in development to avoid timeouts
+    // when fetching very large remote images (useful for local dev with Turbopack).
+    // Remove or set to false in production to enable optimization.
+    unoptimized: true,
   },
 
   reactStrictMode: true,

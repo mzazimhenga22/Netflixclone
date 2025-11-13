@@ -25,6 +25,10 @@ const nextConfig = {
       // ✅ Added Netflix background image domain
       { protocol: "https", hostname: "assets.nflxext.com", pathname: "/**" },
     ],
+    // Disable Next.js image optimization in development to avoid timeouts
+    // when fetching large remote images (helps when running with Turbopack/dev).
+    // Set to `false` or remove in production if you want server-side optimization.
+    unoptimized: true,
   },
 
   // ✅ Turbopack-compatible placeholder (safe default)
